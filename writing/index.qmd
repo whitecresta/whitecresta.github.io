@@ -1,29 +1,113 @@
 ---
 title: "Writing"
 subtitle: "Publications and translations."
-toc: false
+toc: true
 ---
 
-## Edited volumes
+::: {.pure-note}
+The complete and current list of my publications is on the University of Edinburgh's [Research Explorer](https://www.research.ed.ac.uk/en/persons/chris-perkins/publications/).
+:::
 
-Perkins, Chris, and Ferran de Vargas, eds. 2025. *Political Thought and Japan's New Left Movements*. Bloomsbury.
+## Books
+
+```{=html}
+<div class="book-grid">
+<a class="book" href="https://www.bloomsbury.com/uk/political-thought-and-japans-new-left-movements-9781350534681/">
+  <span class="book-cover"><img src="https://res.cloudinary.com/bloomsbury-atlas/image/upload/w_360,c_scale,dpr_1.5/jackets/9781350534681.jpg" alt="Cover of Political Thought and Japan's New Left Movements" loading="lazy" onerror="this.parentNode.classList.add('no-cover'); this.remove();"><span class="cover-fallback">Political Thought and Japan's New Left Movements</span></span>
+  <span class="book-title">Political Thought and Japan's New Left Movements: Transformations in Radical Theory</span>
+  <span class="book-meta">Edited with Ferran de Vargas · Bloomsbury Academic, 2026</span>
+</a>
+<a class="book" href="https://link.springer.com/book/10.1007/978-981-99-7043-8">
+  <span class="book-cover"><img src="https://media.springernature.com/full/springer-static/cover-hires/book/978-981-99-7043-8" alt="Cover of The Tokyo University Trial and the Struggle Against Order in Postwar Japan" loading="lazy" onerror="this.parentNode.classList.add('no-cover'); this.remove();"><span class="cover-fallback">The Tokyo University Trial and the Struggle Against Order in Postwar Japan</span></span>
+  <span class="book-title">The Tokyo University Trial and the Struggle Against Order in Postwar Japan</span>
+  <span class="book-meta">Palgrave Macmillan, 2024</span>
+</a>
+<a class="book" href="https://link.springer.com/book/10.1057/9781137480354">
+  <span class="book-cover"><img src="https://media.springernature.com/full/springer-static/cover-hires/book/978-1-137-48035-4" alt="Cover of The United Red Army on Screen" loading="lazy" onerror="this.parentNode.classList.add('no-cover'); this.remove();"><span class="cover-fallback">The United Red Army on Screen</span></span>
+  <span class="book-title">The United Red Army on Screen: Cinema, Aesthetics and the Politics of Memory</span>
+  <span class="book-meta">Palgrave Macmillan, 2015</span>
+</a>
+</div>
+```
+
+Perkins, Chris, and Ferran de Vargas, eds. 2026. *Political Thought and Japan's New Left Movements: Transformations in Radical Theory*. SOAS Studies in Modern and Contemporary Japan. London: Bloomsbury Academic.
+
+Perkins, Chris. 2024. *The Tokyo University Trial and the Struggle Against Order in Postwar Japan*. New Directions in East Asian History. Singapore: Palgrave Macmillan.
+
+Perkins, Chris. 2015. *The United Red Army on Screen: Cinema, Aesthetics and the Politics of Memory*. Palgrave Macmillan Memory Studies. Basingstoke: Palgrave Macmillan.
 
 ## Journal articles
+
+Perkins, Chris, and J. Reig. 2020. 'An Investigation into Cultures, Concepts and Understandings of Japanese Studies in the UK.' *Japan Forum*. Published online 4 November 2020.
+
+Perkins, Chris. 2019. 'Kon Satoshi and Japan's Monsters in the City.' *Nordlit* 42: 141–52.
+
+Perkins, Chris. 2019. 'From the Ashes of the Great Kantō Earthquake: The Tokyo Imperial University Settlement.' *Japan Forum* 31 (3): 408–33.
+
+Perkins, Chris. 2017. 'The Starting Point of the Student Movement.' *Asiatische Studien* 71 (2): 683–95.
+
+Terasaki, S., and Chris Perkins. 2017. 'Characteristics of Cosmopolitan Consumers with a Global Identification: An Exploratory Analysis of Japanese Consumers.' *International Journal of Marketing and Distribution* 1 (1): 1–13.
+
+Perkins, Chris. 2013. 'Flatness Depth and Kon Satoshi's Ethics.' *Journal of Japanese and Korean Cinema* 4 (2): 119–33.
+
+Perkins, Chris, and C. Rumford. 2013. 'The Politics of (Un)fixity and the Vernacularization of Borders.' *Global Society* 27 (3): 267–82.
+
+Perkins, Chris, and A. Cooper. 2012. 'Borders and Status-Functions: An Institutional Approach to the Study of Borders.' *European Journal of Social Theory* 15 (1): 55–71.
+
+Perkins, Chris. 2011. 'Inheriting the Legacy of the Souls of the War Dead: Linking Past, Present and Future at the Yūshūkan.' *Electronic Journal of Contemporary Japanese Studies* 11 (3), article 6.
 
 Perkins, Chris, and C. Frazier-Crawford Boerl. 2011. 'The Political Pluralisation of American Evangelicals: How Old Media Built a Movement and Why the Internet Is Poised to Change It.' *International Journal for the Study of the Christian Church* 11 (1): 66–78.
 
 Perkins, Chris. 2010. 'The Banality of Boundaries: Performance of the Nation in a Japanese Television Comedy.' *Television and New Media* 11 (5): 386–403.
 
-## Working papers
+## Book chapters and encyclopedia entries
 
-Perkins, Chris. 2009. 'Fixing Subjectivities: The Politics of Belonging and Achieving the Nation.' Politics and International Relations Working Paper 12. Royal Holloway.
+Perkins, Chris. Forthcoming. 'Japanese Student Activism, the New Left and the Rise of Radical Protest in the "Long 1960s".' In *Student Activism, Social Change and Democracy Since 1900*, edited by D. Laqua. Liverpool: Liverpool University Press.
 
-## Reviews
+de Vargas, Ferran, and Chris Perkins. 2026. 'Introduction: The Japanese New Left and the Politics of Rupture.' In *Political Thought and Japan's New Left Movements: Transformations in Radical Theory*, edited by Chris Perkins and Ferran de Vargas. London: Bloomsbury Academic.
 
-Perkins, Chris. 2009. Review of *A New Politics of Identity: Political Principles for an Interdependent World*, by Bhikhu Parekh. *Studies in Ethnicity and Nationalism* 9 (2): 348–49.
+Perkins, Chris. 2026. 'Nagasaki Hiroshi: Liberating Rebellion.' In *Political Thought and Japan's New Left Movements: Transformations in Radical Theory*, edited by Chris Perkins and Ferran de Vargas. London: Bloomsbury Academic.
 
-## Translations in progress
+Perkins, Chris. 2025. 'The Emergence and Impact of the New Left in Postwar Japan.' In *Oxford Research Encyclopedia of Asian History*. Oxford: Oxford University Press.
+
+Perkins, Chris. 2022. 'Murakami's Strange Library.' In *Libraries in Literature*, edited by A. Crawford and R. Crawford, 220–32. Oxford: Oxford University Press.
+
+Perkins, Chris. 2020. 'The *Diary of Yunbogi* and Japan-Korea Relations.' In *Popular Culture and the Transformation of Japan-Korea Relations*, edited by R. Sakamoto and S. Epstein, 111–23. Asia's Transformations. London: Routledge.
+
+Cooper, A., Chris Perkins, and C. Rumford. 2016. 'The Vernacularization of Borders.' In *Placing the Border in Everyday Life*, edited by R. Jones and C. Johnson, 15–32. Border Regions Series. Farnham: Ashgate.
+
+Perkins, Chris. 2014. '*Part-Timer, Buy a House*: Middle-Class Precarity, Sentimentality and Learning the Meaning of Work.' In *Visions of Precarity in Japanese Popular Culture and Literature*, edited by K. Iwata-Weickgenannt and R. Rosenbaum, 64–85. Routledge Contemporary Japan Series. Abingdon: Routledge.
+
+Cooper, A., and Chris Perkins. 2014. 'Mobile Borders/Bordering Mobilities: Status Functions, Contemporary State Bordering Practices and Implications for Resistance and Intervention.' In *Governing Borders and Security: The Politics of Connectivity and Dispersal*, edited by C. Kinnvall and T. Svensson, 14–31. Taylor & Francis.
+
+## Translations
+
+Hirabayashi Hatsunosuke. 2025. 'The Problem of the Cultural Sciences (*Bunka kagaku mondai*).' Translated by Chris Perkins. In *The Hirabayashi Hatsunosuke Reader: Mass Culture and Intermediality in Imperial Japan*, edited by A. W. Moore and S. Jacobowitz, 85–94. SOAS Studies in Modern and Contemporary Japan. London: Bloomsbury Academic.
+
+Hirabayashi Hatsunosuke. 2025. 'The Scope of What I Can Know (*Watashi no shirieru han'i*).' Translated by Chris Perkins. In *The Hirabayashi Hatsunosuke Reader: Mass Culture and Intermediality in Imperial Japan*, edited by A. W. Moore and S. Jacobowitz, 135–38. SOAS Studies in Modern and Contemporary Japan. London: Bloomsbury Academic.
+
+Hirabayashi Hatsunosuke. 2025. 'Self-Reflection (*Serufu refurekushon*).' Translated by Chris Perkins. In *The Hirabayashi Hatsunosuke Reader: Mass Culture and Intermediality in Imperial Japan*, edited by A. W. Moore and S. Jacobowitz, 139–40. SOAS Studies in Modern and Contemporary Japan. London: Bloomsbury Academic.
+
+### In progress
 
 - *The Departure of Futurology* (未来学の出発)
 - Maruyama Masao's essay on the consciousness of freedom
 - The *Shutaisei Reader*
+
+## Reviews
+
+Perkins, Chris. 2013. Review of *Making Tea, Making Japan: Cultural Nationalism in Practice*, by Kristin Surak. *H-Net Reviews*.
+
+Perkins, Chris. 2012. Review of *Between Frontiers: Nation and Identity in a Southeast Asian Borderland*, by Noboru Ishikawa. *Ethnopolitics* 11 (2): 230–32.
+
+Perkins, Chris. 2009. Review of *A New Politics of Identity: Political Principles for an Interdependent World*, by Bhikhu Parekh. *Studies in Ethnicity and Nationalism* 9 (2): 348–49.
+
+## Other publications
+
+Perkins, Chris. 2017. 'Dissertations in 2nd Year? Promoting Assessment Literacy for Independent Research.' Higher Education Academy, 39–42.
+
+Perkins, Chris, and S. Terasaki. 2017. 外国への全般的な肯定的態度の結果要素：帰納的推論に基づく基礎理論的研究. Faculty of Economics Kyushu University Discussion Paper Series.
+
+Terasaki, S., and Chris Perkins. 2016. 'Antecedents for Cosmopolitan Consumers: An Exploratory Analysis of Japanese Cosmopolitans.' In *Global Marketing Conference Proceedings: Bridging Asia and the World*, 851–55. Global Alliance of Marketing & Management Associations.
+
+Perkins, Chris. 2009. 'Fixing Subjectivities: The Politics of Belonging and Achieving the Nation.' Politics and International Relations Working Paper 12. Royal Holloway.

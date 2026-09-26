@@ -10,6 +10,12 @@ toc: false
 <style>.quarto-title-block .description { display: none; }</style>
 ```
 
+```{=html}
+<div class="tool-meta">
+<span><strong>Funder:</strong> Arts and Humanities Research Council (AHRC), Curiosity Award</span>
+</div>
+```
+
 In the context of contemporary challenges to democratic governance and an apparent collapse in our collective capacity to imagine democratic futures, this project seeks historical lessons from a previously understudied crisis of governance, that of 1970s Japan. Our goal is to write a new history of Japan's 1970s through the lens of crisis, whilst providing new tools to support the academic community in tracing the actors and networks formed during this decade across the political spectrum.
 
 Japan's 1970s tends to be viewed in the literature as merely transitional, a lull between the New Left uprisings of the 1960s and the postmodern hedonism of the 1980s. Yet a close reading of the historical record paints a very different picture. Geopolitical shocks, including the oil crises, Nixon's visit to China, and the collapse of the Bretton Woods system, combined with more diffuse anxieties: the impact of automation and datafication, the ever-expanding reach of mass media, global population growth, and the challenge of managing an increasingly privatised, consumerist society.
