@@ -7,7 +7,7 @@ project:
 website:
   title: "Chris Perkins"
   description: "Research, tools and archives on modern Japanese intellectual and political history."
-  site-url: "https://example.org"   # change once the domain is chosen
+  site-url: "https://whitecresta.github.io"
   search: true
   page-navigation: true
   back-to-top-navigation: true
