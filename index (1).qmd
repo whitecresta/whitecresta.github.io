@@ -1,0 +1,13 @@
+---
+title: "Tools"
+subtitle: "Apps and utilities developed alongside my research. Each page explains what the tool does, how to use it and how to cite it."
+toc: false
+listing:
+  contents: "*/index.qmd"
+  type: grid
+  grid-columns: 3
+  fields: [title, description, categories]
+  sort: "date desc"
+  categories: true
+  filter-ui: true
+---

@@ -1,0 +1,12 @@
+---
+title: "Notes"
+subtitle: "Finds, sources and work in progress."
+toc: false
+listing:
+  contents: "*/index.qmd"
+  type: default
+  sort: "date desc"
+  categories: true
+  feed: true
+  fields: [date, title, description, categories]
+---

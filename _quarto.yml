@@ -1,0 +1,39 @@
+project:
+  type: website
+  output-dir: _site
+  resources:
+    - "tools/*/app/**"
+
+website:
+  title: "Chris Perkins"
+  description: "Research, tools and archives on modern Japanese intellectual and political history."
+  site-url: "https://example.org"   # change once the domain is chosen
+  search: true
+  page-navigation: true
+  back-to-top-navigation: true
+  navbar:
+    left:
+      - href: tools/index.qmd
+        text: Tools
+      - href: archives/index.qmd
+        text: Archives & Databases
+      - href: notes/index.qmd
+        text: Notes
+      - href: writing/index.qmd
+        text: Writing
+      - href: about.qmd
+        text: About
+  page-footer:
+    left: "© 2026 Chris Perkins · University of Edinburgh"
+    right: "Built with [Quarto](https://quarto.org)"
+
+format:
+  html:
+    theme:
+      light: [cosmo, assets/theme.scss]
+    css: assets/custom.css
+    toc: true
+    toc-location: right
+    lang: en-GB
+    link-external-newwindow: true
+    smooth-scroll: true

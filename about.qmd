@@ -1,0 +1,13 @@
+---
+title: "About"
+toc: false
+---
+
+I am Senior Lecturer and Head of Japanese in the School of Literatures, Languages and Cultures at the University of Edinburgh, and Chief Editor of *Japan Forum*, the journal of the British Association for Japanese Studies.
+
+My research centres on modern Japanese intellectual and political history: the Japanese New Left, state repression and the Special Higher Police (Tokkō), conservative postwar networks, and Japanese futurology (*miraigaku*).
+
+This site is where I put things that don't fit in a journal article: tools, catalogues of archival material, translations in progress and notes on sources.
+
+**Contact:** [chris.perkins@ed.ac.uk](mailto:chris.perkins@ed.ac.uk)<br>
+**University profile:** <!-- add link -->

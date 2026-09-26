@@ -1,0 +1,10 @@
+---
+title: "Starting a research notebook"
+description: "What this section is for."
+date: 2026-09-26
+categories: [site]
+---
+
+This section will collect short notes: interesting documents turned up in archives, bibliographic finds, and work in progress on futurology, the New Left and postwar conservatism.
+
+To add a note, create a new folder under `notes/` named with the date and a short slug, and put an `index.qmd` inside it.

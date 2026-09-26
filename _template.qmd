@@ -1,0 +1,38 @@
+---
+# HOW TO ADD A TOOL
+# 1. Make a new folder under tools/, e.g. tools/furigana-helper/
+# 2. Copy this file into it and rename it index.qmd
+# 3. Put the app's HTML/JS files in tools/furigana-helper/app/
+#    (or delete the iframe and use an external link if the app is hosted elsewhere)
+# 4. Fill in the fields below. The Tools page updates itself.
+title: "Tool name"
+description: "One sentence shown on the Tools page card."
+date: 2026-01-01
+categories: [database, translation]   # free tags, used for filtering
+toc: true
+---
+
+```{=html}
+<div class="tool-meta">
+<span><strong>Status:</strong> Beta</span>
+<span><strong>Version:</strong> 0.1</span>
+<span><strong>Language:</strong> English</span>
+<span><strong>Updated:</strong> Month YYYY</span>
+</div>
+```
+
+[Open the tool in a new tab](app/index.html){.tool-launch}
+
+## What it does
+
+## Try it here
+
+<iframe class="app-frame" src="app/index.html" title="Tool name"></iframe>
+
+## How to use it
+
+## Sources and data
+
+## How to cite
+
+> Perkins, Chris. YYYY. *Tool name*, version 0.1. URL

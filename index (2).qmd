@@ -1,0 +1,9 @@
+---
+title: "Writing"
+subtitle: "Publications and translations."
+toc: false
+---
+
+::: {.placeholder-note}
+To be filled in: selected publications, and translation projects including *The Departure of Futurology* (未来学の出発), Maruyama Masao's essay on the consciousness of freedom, and the *Shutaisei Reader*.
+:::

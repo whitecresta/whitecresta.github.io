@@ -1,0 +1,23 @@
+<!doctype html>
+<html lang="en-GB">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Example tool</title>
+<style>
+  body { font-family: Inter, system-ui, sans-serif; margin: 0; padding: 2rem; background: #fff; color: #1f2328; }
+  input { font: inherit; padding: .5rem .7rem; border: 1px solid #d5d1c8; border-radius: 5px; width: 100%; max-width: 24rem; box-sizing: border-box; }
+  #out { margin-top: 1rem; font-family: "Noto Serif JP", serif; font-size: 1.4rem; color: #a23b2a; }
+  p { color: #5f6368; }
+</style>
+</head>
+<body>
+  <p>A tiny demo app. Real apps are just HTML files dropped into a tool's <code>app/</code> folder.</p>
+  <input id="in" placeholder="Type something…" autofocus>
+  <div id="out"></div>
+  <script>
+    const i = document.getElementById('in'), o = document.getElementById('out');
+    i.addEventListener('input', () => { o.textContent = i.value.split('').reverse().join(''); });
+  </script>
+</body>
+</html>
