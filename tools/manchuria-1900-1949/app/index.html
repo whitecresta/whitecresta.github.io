@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Manchuria, 1900-1949</title>
+<style>
+  body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Helvetica,Arial,sans-serif;max-width:780px;margin:2rem auto;padding:0 1.5rem;background:#ffffff;color:#2C2C2A}
+  .sec{color:#5F5E5A}
+  .t{font-size:14px;fill:#2C2C2A}
+  .ts{font-size:12px;fill:#5F5E5A}
+  input[type=range]{flex:1}
+  h3{font-size:12px;text-transform:uppercase;letter-spacing:.03em;margin:0 0 6px;color:#5F5E5A;font-weight:600}
+  .legend-col{min-width:150px}
+  .legend-row{display:flex;align-items:center;gap:6px;font-size:12.5px;margin:3px 0}
+  .china{fill:#F1EFE8;stroke:#5F5E5A}
+  .japan{fill:#EAF3DE;stroke:#3B6D11}
+  .soviet{fill:#E6F1FB;stroke:#185FA5}
+  .cdot{fill:#0F6E56}
+  .capring{fill:none;stroke:#0F6E56}
+  .rail-russian{stroke:#534AB7}
+  .rail-mantetsu{stroke:#D85A30}
+  .rail-chinese{stroke:#993556}
+  .rail-soviet{stroke:#185FA5}
+</style>
+</head>
+<body>
+
+<h1 style="font-size:20px;font-weight:500;margin:0 0 1rem;">Manchuria, 1900-1949</h1>
+
+<div style="display:flex;align-items:center;gap:12px;margin:0 0 8px;">
+<label class="sec" style="font-size:14px;">Year</label>
+<input type="range" min="0" max="8" step="1" value="5" id="yr" oninput="update(this.value)">
+<span style="font-size:16px;font-weight:500;min-width:48px;text-align:right;" id="year-label">1932</span>
+</div>
+<p style="font-size:14px;margin:0 0 6px;" id="caption">Manchukuo is proclaimed; Puyi becomes Chief Executive. Former Chinese state railways are absorbed into the new Manchukuo National Railway.</p>
+<p class="sec" style="font-size:13px;margin:0 0 4px;"><strong>Key figures: </strong><span id="key-figures">Puyi (last Qing Emperor, installed as Chief Executive), Zheng Xiaoxu (first Prime Minister), Doihara Kenji (smuggled Puyi out of Tianjin)</span></p>
+<p class="sec" style="font-size:13px;margin:0 0 16px;"><span id="also-text">Puyi had been living in Japanese-protected exile in Tianjin since his 1912 abdication; his installation gave the new state a veneer of Qing restoration rather than naked Japanese annexation.</span></p>
+
+<div style="display:flex;flex-wrap:wrap;gap:20px 32px;margin:0 0 20px;padding:12px 16px;border:1px solid #5F5E5A33;border-radius:8px;">
+  <div class="legend-col">
+    <h3>Markers</h3>
+    <div class="legend-row"><svg width="14" height="14"><circle class="cdot" cx="7" cy="7" r="5"/></svg>City</div>
+    <div class="legend-row"><svg width="18" height="18"><circle class="capring" cx="9" cy="9" r="7" stroke-width="1.5"/><circle class="cdot" cx="9" cy="9" r="3"/></svg>Capital</div>
+  </div>
+  <div class="legend-col">
+    <h3>Territory</h3>
+    <div class="legend-row"><svg width="14" height="14"><rect class="china" x="1" y="1" width="12" height="12" stroke-width="1.5"/></svg>Chinese sovereignty</div>
+    <div class="legend-row"><svg width="14" height="14"><rect class="japan" x="1" y="1" width="12" height="12" stroke-width="1.5"/></svg>Japanese control</div>
+    <div class="legend-row"><svg width="14" height="14"><rect class="soviet" x="1" y="1" width="12" height="12" stroke-width="1.5"/></svg>Russian / Soviet control</div>
+  </div>
+  <div class="legend-col">
+    <h3>Railway ownership</h3>
+    <div class="legend-row"><svg width="20" height="10"><line class="rail-russian" x1="1" y1="5" x2="19" y2="5" stroke-width="2.5"/></svg>Russian-run (CER)</div>
+    <div class="legend-row"><svg width="20" height="10"><line class="rail-mantetsu" x1="1" y1="5" x2="19" y2="5" stroke-width="2.5"/></svg>Mantetsu-run</div>
+    <div class="legend-row"><svg width="20" height="10"><line class="rail-chinese" x1="1" y1="5" x2="19" y2="5" stroke-width="2.5"/></svg>Chinese state line</div>
+    <div class="legend-row"><svg width="20" height="10"><line class="rail-soviet" x1="1" y1="5" x2="19" y2="5" stroke-width="2.5"/></svg>Soviet-seized (1945)</div>
+  </div>
+</div>
+
+<svg width="100%" viewBox="0 0 680 750" role="img">
+<title>Manchuria, 1900-1949</title>
+<desc>Interactive map showing changing political control and railway ownership as the year slider moves.</desc>
+<defs>
+<marker id="arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M2 1L8 5L2 9" fill="none" stroke="context-stroke" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></marker>
+</defs>
+
+<path id="landmass" class="japan" stroke-width="1.5" stroke-dasharray="5 4" d="M220,90 L420,70 L560,170 L520,330 L470,410 L430,470 L380,550 L340,590 L320,700 L280,700 L260,590 L220,530 L170,450 L150,330 L160,190 Z"/>
+<path id="overlay" class="japan" style="opacity:0" stroke-width="1.5" stroke-dasharray="5 4" d="M220,530 L380,550 L340,590 L320,700 L280,700 L260,590 Z"/>
+
+<line id="rail-pa" class="rail-mantetsu" x1="285" y1="695" x2="300" y2="660" stroke-width="2" stroke-dasharray="9 3"/>
+<line id="rail-dm" class="rail-mantetsu" x1="300" y1="660" x2="300" y2="480" stroke-width="2" stroke-dasharray="9 3"/>
+<line id="rail-mc" class="rail-mantetsu" x1="300" y1="480" x2="330" y2="390" stroke-width="2" stroke-dasharray="9 3"/>
+<line id="rail-chh" class="rail-russian" x1="330" y1="390" x2="370" y2="260" stroke-width="2" stroke-dasharray="9 3"/>
+<line id="rail-ht" class="rail-russian" x1="370" y1="260" x2="230" y2="220" stroke-width="2" stroke-dasharray="9 3"/>
+<line id="rail-hm" class="rail-russian" x1="370" y1="260" x2="460" y2="330" stroke-width="2" stroke-dasharray="9 3"/>
+<line id="rail-chinchow" class="rail-chinese" x1="300" y1="480" x2="225" y2="490" stroke-width="2" stroke-dasharray="9 3"/>
+<line id="rail-antung" class="rail-mantetsu" x1="300" y1="480" x2="400" y2="505" stroke-width="2" stroke-dasharray="9 3"/>
+<line id="rail-kirin" class="rail-chinese" x1="330" y1="390" x2="410" y2="385" stroke-width="2" stroke-dasharray="9 3"/>
+
+<line x1="90" y1="95" x2="90" y2="55" stroke="#5F5E5A" stroke-width="1.5" marker-end="url(#arrow)"/>
+<text class="ts" x="90" y="45" text-anchor="middle" dominant-baseline="central">N</text>
+
+<text id="lbl-north" class="ts" x="390" y="50" text-anchor="middle" dominant-baseline="central">Soviet Union</text>
+<text class="ts" x="75" y="330" text-anchor="start" dominant-baseline="central">Mongolia</text>
+<text class="ts" x="560" y="600" text-anchor="start" dominant-baseline="central">Korea</text>
+<text class="ts" x="110" y="600" text-anchor="middle" dominant-baseline="central">China</text>
+<text class="ts" x="420" y="680" text-anchor="start" dominant-baseline="central" font-style="italic">Bohai Gulf</text>
+
+<circle class="cdot" cx="230" cy="220" r="5"/>
+<text id="lbl-ts-name" class="t" x="242" y="213" dominant-baseline="central">Tsitsihar</text>
+<text class="ts" x="242" y="228" dominant-baseline="central">斉斉哈爾</text>
+
+<circle class="cdot" cx="370" cy="260" r="5"/>
+<text class="t" x="382" y="253" dominant-baseline="central">Harbin</text>
+<text class="ts" x="382" y="268" dominant-baseline="central">哈爾浜</text>
+
+<circle class="cdot" cx="460" cy="330" r="5"/>
+<text class="t" x="472" y="323" dominant-baseline="central">Mudanjiang</text>
+<text class="ts" x="472" y="338" dominant-baseline="central">牡丹江</text>
+
+<circle id="cap-ring" class="capring" style="opacity:1" cx="330" cy="390" r="9" stroke-width="1.5"/>
+<circle class="cdot" cx="330" cy="390" r="4"/>
+<text id="lbl-cc-name" class="t" x="312" y="372" text-anchor="end" dominant-baseline="central">Hsinking</text>
+<text id="lbl-cc-kanji" class="ts" x="312" y="387" text-anchor="end" dominant-baseline="central">新京</text>
+<text id="lbl-cc-sub" class="ts" x="312" y="402" text-anchor="end" dominant-baseline="central">capital</text>
+
+<circle class="cdot" cx="410" cy="385" r="5"/>
+<text id="lbl-ki-name" class="t" x="422" y="378" dominant-baseline="central">Kirin</text>
+<text class="ts" x="422" y="393" dominant-baseline="central">吉林</text>
+
+<circle class="cdot" cx="300" cy="480" r="5"/>
+<text id="lbl-mk-name" class="t" x="312" y="473" dominant-baseline="central">Mukden</text>
+<text id="lbl-mk-kanji" class="ts" x="312" y="488" dominant-baseline="central">奉天</text>
+
+<circle class="cdot" cx="225" cy="490" r="5"/>
+<text id="lbl-ch-name" class="t" x="210" y="483" text-anchor="end" dominant-baseline="central">Chinchow</text>
+<text class="ts" x="210" y="498" text-anchor="end" dominant-baseline="central">錦州</text>
+
+<circle class="cdot" cx="400" cy="505" r="5"/>
+<text class="t" x="412" y="498" dominant-baseline="central">Antung</text>
+<text class="ts" x="412" y="513" dominant-baseline="central">安東</text>
+
+<circle class="cdot" cx="300" cy="660" r="5"/>
+<text id="lbl-dr-name" class="t" x="312" y="653" dominant-baseline="central">Dairen</text>
+<text id="lbl-dr-kanji" class="ts" x="312" y="668" dominant-baseline="central">大連</text>
+
+<circle class="cdot" cx="285" cy="695" r="5"/>
+<text class="t" x="297" y="688" dominant-baseline="central">Port Arthur</text>
+<text class="ts" x="297" y="703" dominant-baseline="central">旅順</text>
+
+</svg>
+
+<p class="sec" style="font-size:12px;margin-top:1rem;">Stylized, simplified boundaries. Railway colors show operating ownership, not just physical existence.</p>
+
+<script>
+var trunk = ['rail-pa','rail-dm','rail-mc'];
+var north = ['rail-chh','rail-ht','rail-hm'];
+var chinese = ['rail-chinchow','rail-kirin'];
+var antung = ['rail-antung'];
+
+var states = [
+ {y:1900,land:'china',ov:'soviet',ovShow:true,cap:false,north:'Russia',
+  cc:['Changchun','長春',''],mk:['Mukden','奉天'],dr:['Dalny',''],ki:'Kirin',ts:'Tsitsihar',ch:'Chinchow',
+  trunk:{show:false},north_:{show:false},chinese_:{show:false},antung_:{show:false},
+  txt:'Qing China administers the region; Russia leases the Kwantung Peninsula, but the railway itself is still under construction.',
+  kf:'Li Hongzhang (Qing statesman), Sergei Witte (Russian Finance Minister), Tsar Nicholas II',
+  also:'The 1896 Li-Lobanov Treaty gave Russia the right to build the Chinese Eastern Railway across Manchuria; the 1898 lease of the Liaodong Peninsula followed the same pattern of concessions extracted from a weakened Qing state.'},
+ {y:1903,land:'china',ov:'soviet',ovShow:true,cap:false,north:'Russia',
+  cc:['Changchun','長春',''],mk:['Mukden','奉天'],dr:['Dalny',''],ki:'Kirin',ts:'Tsitsihar',ch:'Chinchow',
+  trunk:{show:true,c:'rail-russian',w:2,d:'9 3'},north_:{show:true,c:'rail-russian',w:2,d:'9 3'},chinese_:{show:false},antung_:{show:false},
+  txt:"The Chinese Eastern Railway's southern branch opens (1903), a Russian-run line linking Harbin to the new port of Dalny and the naval base at Port Arthur.",
+  kf:'Sergei Witte',
+  also:'The new port of Dalny and naval base at Port Arthur were the whole point of the enterprise: a warm-water outlet the Trans-Siberian network had always lacked.'},
+ {y:1905,land:'china',ov:'japan',ovShow:true,cap:false,north:'Russia',
+  cc:['Changchun','長春',''],mk:['Mukden','奉天'],dr:['Dairen','大連'],ki:'Kirin',ts:'Tsitsihar',ch:'Chinchow',
+  trunk:{show:true,c:'rail-mantetsu',w:2,d:'9 3'},north_:{show:true,c:'rail-russian',w:2,d:'9 3'},chinese_:{show:false},antung_:{show:true,c:'rail-mantetsu',w:1,d:'4 2'},
+  txt:'Treaty of Portsmouth: Russia cedes the Kwantung Leased Territory and the Changchun-Dairen trunk to Japan; a temporary military line already runs to Antung.',
+  kf:"Komura Jutaro (Japan's chief negotiator), Sergei Witte (Russia's chief negotiator), Theodore Roosevelt (mediator, Portsmouth, New Hampshire)",
+  also:"Japan's victory in the Russo-Japanese War (1904-05) was won at enormous cost and yielded no indemnity, which fed domestic anger at the settlement (the Hibiya riots) even as it secured Japan's first major continental foothold."},
+ {y:1912,land:'china',ov:'japan',ovShow:true,cap:false,north:'Russia',
+  cc:['Changchun','長春',''],mk:['Mukden','奉天'],dr:['Dairen','大連'],ki:'Kirin',ts:'Tsitsihar',ch:'Chinchow',
+  trunk:{show:true,c:'rail-mantetsu',w:2,d:'9 3'},north_:{show:true,c:'rail-russian',w:2,d:'9 3'},chinese_:{show:true,c:'rail-chinese',w:2,d:'9 3'},antung_:{show:true,c:'rail-mantetsu',w:2,d:'9 3'},
+  txt:'The Antung line is rebuilt to standard gauge and linked to Korea by the new Yalu River bridge; the Chinese-owned Kirin branch and Peking-Mukden line also open.',
+  kf:'Yuan Shikai (President of the new Republic), Zhang Zuolin (Fengtian clique warlord)',
+  also:'The Qing abdication (Feb 1912) ended dynastic rule; in the power vacuum, Zhang Zuolin consolidated control over the Three Eastern Provinces as a semi-autonomous warlord, nominally loyal to Beijing but running Manchuria as his own domain.'},
+ {y:1931,land:'china',ov:'japan',ovShow:true,cap:false,north:'Soviet Union',
+  cc:['Changchun','長春',''],mk:['Mukden','奉天'],dr:['Dairen','大連'],ki:'Kirin',ts:'Tsitsihar',ch:'Chinchow',
+  trunk:{show:true,c:'rail-mantetsu',w:2,d:'9 3'},north_:{show:true,c:'rail-russian',w:2,d:'9 3'},chinese_:{show:true,c:'rail-chinese',w:2,d:'9 3'},antung_:{show:true,c:'rail-mantetsu',w:2,d:'9 3'},
+  txt:'Mukden Incident (18 Sept): the Kwantung Army occupies southern Manchuria by force; the rail network itself is unchanged.',
+  kf:'Itagaki Seishiro and Ishiwara Kanji (Kwantung Army staff officers who planned the incident), Zhang Xueliang (the "Young Marshal", ordered non-resistance), Hayashi Senjuro (Korean Army commander who crossed the border without authorization)',
+  also:'Zhang Zuolin, Zhang Xueliang\'s father, had already been assassinated by a Kwantung Army officer (Komoto Daisaku) in 1928. At Qiqihar, General Ma Zhanshan mounted one of the few armed defenses against the invasion before eventually being forced to submit.'},
+ {y:1932,land:'japan',ov:'japan',ovShow:false,cap:true,north:'Soviet Union',
+  cc:['Hsinking','新京','capital'],mk:['Mukden','奉天'],dr:['Dairen','大連'],ki:'Kirin',ts:'Tsitsihar',ch:'Chinchow',
+  trunk:{show:true,c:'rail-mantetsu',w:2,d:'9 3'},north_:{show:true,c:'rail-russian',w:2,d:'9 3'},chinese_:{show:true,c:'rail-mantetsu',w:2,d:'9 3'},antung_:{show:true,c:'rail-mantetsu',w:2,d:'9 3'},
+  txt:'Manchukuo is proclaimed; Puyi becomes Chief Executive. Former Chinese state railways are absorbed into the new Manchukuo National Railway.',
+  kf:'Puyi (last Qing Emperor, installed as Chief Executive), Zheng Xiaoxu (first Prime Minister), Doihara Kenji (smuggled Puyi out of Tianjin)',
+  also:'Puyi had been living in Japanese-protected exile in Tianjin since his 1912 abdication; his installation gave the new state a veneer of Qing restoration rather than naked Japanese annexation.'},
+ {y:1935,land:'japan',ov:'japan',ovShow:false,cap:true,north:'Soviet Union',
+  cc:['Hsinking','新京','capital'],mk:['Mukden','奉天'],dr:['Dairen','大連'],ki:'Kirin',ts:'Tsitsihar',ch:'Chinchow',
+  trunk:{show:true,c:'rail-mantetsu',w:2,d:'9 3'},north_:{show:true,c:'rail-mantetsu',w:2,d:'9 3'},chinese_:{show:true,c:'rail-mantetsu',w:2,d:'9 3'},antung_:{show:true,c:'rail-mantetsu',w:2,d:'9 3'},
+  txt:'The Soviet Union sells its stake in the Chinese Eastern Railway to Manchukuo, unifying the whole network under Japanese-administered control.',
+  kf:'Negotiated between the Soviet, Japanese and Manchukuo governments; Zhang Jinghui was Manchukuo\'s Prime Minister by this point',
+  also:'The sale, concluded after prolonged talks, went for a price well below the line\'s assessed value. It removed the last major foreign-owned rail asset inside Manchukuo and let Mantetsu integrate operations across the whole network.'},
+ {y:1945,land:'soviet',ov:'soviet',ovShow:false,cap:false,north:'Soviet Union',
+  cc:['Changchun','長春',''],mk:['Shenyang','瀋陽'],dr:['Dairen','大連'],ki:'Kirin',ts:'Tsitsihar',ch:'Chinchow',
+  trunk:{show:true,c:'rail-soviet',w:2,d:'9 3'},north_:{show:true,c:'rail-soviet',w:2,d:'9 3'},chinese_:{show:true,c:'rail-soviet',w:2,d:'9 3'},antung_:{show:true,c:'rail-soviet',w:2,d:'9 3'},
+  txt:'Soviet invasion (Aug): Manchukuo collapses and Puyi abdicates; Soviet forces seize the rail network and much of Manchuria\'s industrial plant.',
+  kf:'Marshal Alexander Vasilevsky (Soviet Far East Command), Puyi (abdicated a second time), Lin Biao (led Chinese Communist forces into the region afterward)',
+  also:'Operation August Storm overran the Kwantung Army in under two weeks. Soviet forces dismantled and shipped home a large share of Manchuria\'s industrial machinery before eventually withdrawing, a matter of lasting resentment on the Chinese side.'},
+ {y:1949,land:'china',ov:'china',ovShow:false,cap:false,north:'Soviet Union',
+  cc:['Changchun','長春',''],mk:['Shenyang','瀋陽'],dr:['Dalian','大連'],ki:'Jilin',ts:'Qiqihar',ch:'Jinzhou',
+  trunk:{show:true,c:'rail-chinese',w:2,d:'9 3'},north_:{show:true,c:'rail-chinese',w:2,d:'9 3'},chinese_:{show:true,c:'rail-chinese',w:2,d:'9 3'},antung_:{show:true,c:'rail-chinese',w:2,d:'9 3'},
+  txt:"The People's Republic of China is established; the entire network becomes Chinese state railways.",
+  kf:'Mao Zedong, Lin Biao (whose Northeast Field Army secured Manchuria in the Liaoshen Campaign, Sept-Nov 1948, before the PRC was even declared)',
+  also:'By the time Mao proclaimed the People\'s Republic in Beijing on 1 October 1949, Manchuria had already been under Communist control for close to a year, making it the base from which the rest of the civil war was largely won.'}
+];
+
+function setGroup(ids, cfg){
+  ids.forEach(function(id){
+    var el = document.getElementById(id);
+    if(!cfg || !cfg.show){ el.style.display = 'none'; return; }
+    el.style.display = '';
+    el.setAttribute('class', cfg.c);
+    el.style.strokeWidth = cfg.w;
+    el.style.strokeDasharray = cfg.d;
+  });
+}
+
+function update(i){
+  i = parseInt(i);
+  var s = states[i];
+  document.getElementById('year-label').textContent = s.y;
+  document.getElementById('caption').textContent = s.txt;
+  document.getElementById('key-figures').textContent = s.kf;
+  document.getElementById('also-text').textContent = s.also;
+  document.getElementById('landmass').setAttribute('class', s.land);
+  document.getElementById('overlay').setAttribute('class', s.ov);
+  document.getElementById('overlay').style.opacity = s.ovShow ? '1' : '0';
+  document.getElementById('cap-ring').style.opacity = s.cap ? '1' : '0';
+  document.getElementById('lbl-north').textContent = s.north;
+  document.getElementById('lbl-cc-name').textContent = s.cc[0];
+  document.getElementById('lbl-cc-kanji').textContent = s.cc[1];
+  document.getElementById('lbl-cc-sub').textContent = s.cc[2];
+  document.getElementById('lbl-mk-name').textContent = s.mk[0];
+  document.getElementById('lbl-mk-kanji').textContent = s.mk[1];
+  document.getElementById('lbl-dr-name').textContent = s.dr[0];
+  document.getElementById('lbl-dr-kanji').textContent = s.dr[1];
+  document.getElementById('lbl-ki-name').textContent = s.ki;
+  document.getElementById('lbl-ts-name').textContent = s.ts;
+  document.getElementById('lbl-ch-name').textContent = s.ch;
+  setGroup(trunk, s.trunk);
+  setGroup(north, s.north_);
+  setGroup(chinese, s.chinese_);
+  setGroup(antung, s.antung_);
+}
+update(5);
+</script>
+</body>
+</html>

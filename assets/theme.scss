@@ -30,5 +30,5 @@ $code-bg: #f5f5f5;
 .navbar-brand .navbar-title { font-weight: 600; letter-spacing: -.01em; }
 .nav-footer { border-top: 1px solid $border-color; font-size: .85rem; }
 h1, h2, h3, .title { letter-spacing: -.015em; }
-main a:not(.section-card):not(.tool-launch):not(.nav-link) { text-decoration: underline; text-decoration-color: rgba(31, 58, 95, .35); text-underline-offset: .2em; }
-main a:not(.section-card):not(.tool-launch):not(.nav-link):hover { text-decoration-color: currentColor; }
+#quarto-document-content :is(p, li, td, blockquote) a:not(.tool-launch) { text-decoration: underline; text-decoration-color: rgba(31, 58, 95, .35); text-underline-offset: .2em; }
+#quarto-document-content :is(p, li, td, blockquote) a:not(.tool-launch):hover { text-decoration-color: currentColor; }
