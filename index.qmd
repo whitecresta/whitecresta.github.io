@@ -31,6 +31,11 @@ listing:
 <h3>Archives &amp; Databases</h3>
 <p>Catalogues and indexes of primary sources.</p>
 </a>
+<a class="section-card" href="projects/index.html">
+<span class="jp">研究</span>
+<h3>Projects</h3>
+<p>Current research projects.</p>
+</a>
 <a class="section-card" href="notes/index.html">
 <span class="jp">覚書</span>
 <h3>Notes</h3>

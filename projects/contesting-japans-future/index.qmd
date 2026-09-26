@@ -1,0 +1,21 @@
+---
+title: "Contesting Japan's Future"
+subtitle: "Mapping Crisis, Governance, and Activism in the 1970s"
+description: "A new history of Japan's 1970s through the lens of crisis, with tools for tracing the actors and networks formed during the decade."
+toc: false
+---
+
+```{=html}
+<!-- The description is for the Projects list; the summary below already opens with it. -->
+<style>.quarto-title-block .description { display: none; }</style>
+```
+
+In the context of contemporary challenges to democratic governance and an apparent collapse in our collective capacity to imagine democratic futures, this project seeks historical lessons from a previously understudied crisis of governance, that of 1970s Japan. Our goal is to write a new history of Japan's 1970s through the lens of crisis, whilst providing new tools to support the academic community in tracing the actors and networks formed during this decade across the political spectrum.
+
+Japan's 1970s tends to be viewed in the literature as merely transitional, a lull between the New Left uprisings of the 1960s and the postmodern hedonism of the 1980s. Yet a close reading of the historical record paints a very different picture. Geopolitical shocks, including the oil crises, Nixon's visit to China, and the collapse of the Bretton Woods system, combined with more diffuse anxieties: the impact of automation and datafication, the ever-expanding reach of mass media, global population growth, and the challenge of managing an increasingly privatised, consumerist society.
+
+Japanese political elites of the period conceptualised this historical moment as a multidimensional crisis (*kiki*) of democratic ungovernability. For think tanks, intellectuals, and public officials, the decade marked a paradigm shift in state-citizen relations shaped by new technologies, information flows, and political practices. This was a crisis not just of governmental technique, but of governmental imagination. Simultaneously, after the state had suppressed the New Left's revolutionary challenge by the early 1970s, activists faced the task of reconceptualising their projects for a rapidly changing future. In doing so, they redirected their efforts into new fields: critiques of public relations thinking in state governance, concerns over the use and abuse of personal data, new intersections of feminist and disability rights activism, and artistic experiments in enacting and experiencing alternative futures.
+
+Our project examines this contested period of transformation in Japan, challenging the conventional interpretation of the decade as one of conservative consolidation. Instead, we investigate how multiple actors across Japanese society, including state officials, intellectuals, activists, and citizens, developed competing responses to systemic change. We ask: How did state and non-state actors develop competing visions for managing technological change, social upheaval, and economic uncertainty? What alternative models of citizenship, governance, and social organisation emerged? What lessons does Japan's navigation of this transformative decade offer for understanding how democratic societies adapt to periods of profound change?
+
+To answer these questions, we bring together scholars from history, political philosophy, art history, literature, and sociology to write an interdisciplinary political and cultural history of Japan's 1970s. The project will produce three major outputs: a co-edited volume that reinterprets the decade and its contemporary relevance; a digital mapping project using the online application Gephi to visualise networks of individuals, organisations, think tanks, and activist groups involved in debates over Japan's future; and a public-facing podcast series featuring interviews with contributors and scholars from beyond Japanese studies, drawing out the parallels between 1970s Japan and contemporary democratic challenges. Together, these outputs will serve as research infrastructure for future scholarship on postwar Japan whilst engaging broader audiences in the lessons this critical decade offers for our own era of democratic uncertainty.

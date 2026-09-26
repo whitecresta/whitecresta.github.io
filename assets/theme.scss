@@ -65,7 +65,7 @@ h1, h2, h3, .title { letter-spacing: -.015em; }
 .quarto-listing-table thead { border-bottom: 1px solid $ink; }
 .quarto-post { border-bottom: 1px solid $rule; }
 .listing-date, .listing-description { color: $ink-soft; }
-.quarto-post .listing-title { font-weight: 600; letter-spacing: -.015em; }
+.quarto-post .listing-title, .quarto-post .listing-title a { font-weight: 600; letter-spacing: -.015em; }
 .quarto-listing-table .listing-date { white-space: nowrap; }
 
 blockquote.blockquote, #quarto-document-content blockquote { color: $ink-soft; border-left: 2px solid $rule; overflow-wrap: anywhere; }
@@ -74,7 +74,7 @@ blockquote.blockquote, #quarto-document-content blockquote { color: $ink-soft; b
 .home-intro { max-width: 40rem; margin: 1.5rem 0 3rem; }
 .home-intro .lede { font-size: 1.2rem; line-height: 1.6; color: #333; }
 
-.section-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(14rem, 1fr)); gap: 0; margin: 1.5rem 0 3rem; border-top: 1px solid $ink; }
+.section-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(12rem, 1fr)); gap: 0; margin: 1.5rem 0 3rem; border-top: 1px solid $ink; }
 .section-grid a.section-card { display: block; padding: 1.1rem 1.2rem 1.3rem 0; border-bottom: 1px solid $rule; color: inherit; text-decoration: none; }
 .section-grid a.section-card:hover h3 { color: $accent; }
 .section-card h3 { margin: 0 0 .3rem; font-size: 1.05rem; transition: color .15s; }

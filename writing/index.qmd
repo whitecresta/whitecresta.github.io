@@ -4,6 +4,26 @@ subtitle: "Publications and translations."
 toc: false
 ---
 
-::: {.placeholder-note}
-To be filled in: selected publications, and translation projects including *The Departure of Futurology* (未来学の出発), Maruyama Masao's essay on the consciousness of freedom, and the *Shutaisei Reader*.
-:::
+## Edited volumes
+
+Perkins, Chris, and Ferran de Vargas, eds. 2025. *Political Thought and Japan's New Left Movements*. Bloomsbury.
+
+## Journal articles
+
+Perkins, Chris, and C. Frazier-Crawford Boerl. 2011. 'The Political Pluralisation of American Evangelicals: How Old Media Built a Movement and Why the Internet Is Poised to Change It.' *International Journal for the Study of the Christian Church* 11 (1): 66–78.
+
+Perkins, Chris. 2010. 'The Banality of Boundaries: Performance of the Nation in a Japanese Television Comedy.' *Television and New Media* 11 (5): 386–403.
+
+## Working papers
+
+Perkins, Chris. 2009. 'Fixing Subjectivities: The Politics of Belonging and Achieving the Nation.' Politics and International Relations Working Paper 12. Royal Holloway.
+
+## Reviews
+
+Perkins, Chris. 2009. Review of *A New Politics of Identity: Political Principles for an Interdependent World*, by Bhikhu Parekh. *Studies in Ethnicity and Nationalism* 9 (2): 348–49.
+
+## Translations in progress
+
+- *The Departure of Futurology* (未来学の出発)
+- Maruyama Masao's essay on the consciousness of freedom
+- The *Shutaisei Reader*

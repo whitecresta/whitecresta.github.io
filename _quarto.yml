@@ -17,6 +17,8 @@ website:
         text: Tools
       - href: archives/index.qmd
         text: Archives & Databases
+      - href: projects/index.qmd
+        text: Projects
       - href: notes/index.qmd
         text: Notes
       - href: writing/index.qmd
