@@ -1,0 +1,1920 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Network Mapper</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Noto+Sans+JP:wght@400;500&display=swap">
+<style>
+  /* ========== Design tokens ========== */
+  :root {
+    --bg: #f5f5f5;
+    --panel: #ffffff;
+    --ink: #111111;
+    --ink-soft: #555555;
+    --ink-faint: #888;
+    --line: #e0e0e0;
+    --line-soft: #eeeeee;
+    --accent: #1f3a5f;
+    --accent-soft: #8fa3bf;
+    --warn: #a04040;
+    --serif: 'Inter', 'Noto Sans JP', system-ui, -apple-system, sans-serif;
+    --sans: 'Inter', 'Noto Sans JP', system-ui, -apple-system, sans-serif;
+    --jp: 'Noto Sans JP', 'Hiragino Sans', 'Yu Gothic', sans-serif;
+
+    /* Node type colours (entity shapes carry type, these are accents) */
+    --type-person: #2a4d6e;
+    --type-org: #6e4d2a;
+    --type-event: #4d6e2a;
+    --type-output: #6e2a4d;
+
+    /* Default group palette (Tufte-ish, muted) */
+    --g1: #4a5c6e;
+    --g2: #8a6a3a;
+    --g3: #5c6e4a;
+    --g4: #6e4a5c;
+    --g5: #6e6e4a;
+    --g6: #4a6e6e;
+    --g7: #888;
+  }
+
+  * { box-sizing: border-box; }
+  html, body { height: 100%; margin: 0; }
+  body {
+    font-family: var(--sans);
+    color: var(--ink);
+    background: var(--panel);
+    font-size: 13px;
+    line-height: 1.4;
+    overflow: hidden;
+  }
+
+  /* ========== Layout ========== */
+  #app {
+    display: grid;
+    grid-template-rows: 44px 1fr 36px;
+    grid-template-columns: 280px 1fr 0px;
+    height: 100vh;
+    transition: grid-template-columns 0.2s;
+  }
+  #app.detail-open {
+    grid-template-columns: 280px 1fr 300px;
+  }
+  #app.figure-mode {
+    grid-template-rows: 0px 1fr 0px;
+    grid-template-columns: 0px 1fr 0px;
+  }
+
+  header {
+    grid-column: 1 / -1;
+    background: var(--panel);
+    border-bottom: 1px solid var(--line);
+    display: flex;
+    align-items: center;
+    padding: 0 12px;
+    gap: 8px;
+  }
+  header h1 {
+    font-family: var(--serif);
+    font-size: 16px;
+    font-weight: 600;
+    margin: 0;
+    padding-right: 8px;
+    border-right: 1px solid var(--line);
+  }
+  header select, header button, header input {
+    font: inherit;
+    font-size: 12px;
+    padding: 4px 8px;
+    border: 1px solid var(--line);
+    background: var(--panel);
+    color: var(--ink);
+    border-radius: 0;
+    cursor: pointer;
+  }
+  header button:hover, header select:hover { background: var(--bg); }
+  header .spacer { flex: 1; }
+  header .mode-toggle {
+    background: var(--ink);
+    color: white;
+    border-color: var(--ink);
+  }
+
+  aside.left {
+    background: var(--panel);
+    border-right: 1px solid var(--line);
+    overflow-y: auto;
+    padding: 12px;
+  }
+  aside.right {
+    background: var(--panel);
+    border-left: 1px solid var(--line);
+    overflow-y: auto;
+    padding: 12px;
+    display: none;
+  }
+  #app.detail-open aside.right { display: block; }
+
+  main {
+    position: relative;
+    background: var(--panel);
+    overflow: hidden;
+  }
+  main svg {
+    width: 100%;
+    height: 100%;
+    display: block;
+    cursor: grab;
+  }
+  main svg.dragging { cursor: grabbing; }
+
+  footer {
+    grid-column: 1 / -1;
+    background: var(--panel);
+    border-top: 1px solid var(--line);
+    display: flex;
+    align-items: center;
+    padding: 0 12px;
+    gap: 12px;
+    font-size: 11px;
+    color: var(--ink-soft);
+  }
+
+  /* ========== Forms ========== */
+  .section {
+    margin-bottom: 16px;
+    padding-bottom: 16px;
+    border-bottom: 1px solid var(--line-soft);
+  }
+  .section:last-child { border-bottom: none; }
+  .section h2 {
+    font-family: var(--serif);
+    font-size: 12px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    margin: 0 0 8px 0;
+    color: var(--ink-soft);
+  }
+  .field {
+    margin-bottom: 8px;
+  }
+  .field label {
+    display: block;
+    font-size: 11px;
+    color: var(--ink-soft);
+    margin-bottom: 2px;
+  }
+  .field input, .field select, .field textarea {
+    width: 100%;
+    font: inherit;
+    font-size: 12px;
+    padding: 4px 6px;
+    border: 1px solid var(--line);
+    background: var(--bg);
+    border-radius: 0;
+    color: var(--ink);
+  }
+  .field input.jp { font-family: var(--jp); }
+  .field textarea { min-height: 50px; resize: vertical; }
+  .row-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
+  button.primary {
+    background: var(--ink);
+    color: white;
+    border: 1px solid var(--ink);
+    padding: 6px 12px;
+    font: inherit;
+    font-size: 12px;
+    border-radius: 0;
+    cursor: pointer;
+    width: 100%;
+  }
+  button.primary:hover { opacity: 0.9; }
+  button.secondary {
+    background: var(--panel);
+    color: var(--ink);
+    border: 1px solid var(--line);
+    padding: 4px 8px;
+    font: inherit;
+    font-size: 11px;
+    border-radius: 0;
+    cursor: pointer;
+  }
+  button.secondary:hover { background: var(--bg); }
+  button.danger { color: var(--warn); border-color: var(--warn); }
+
+  /* ========== Lists ========== */
+  .item-list { list-style: none; padding: 0; margin: 0; max-height: 200px; overflow-y: auto; }
+  .item-list li {
+    padding: 4px 6px;
+    border-radius: 0;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 12px;
+  }
+  .item-list li:hover { background: var(--bg); }
+  .item-list li.selected { background: var(--line-soft); }
+  .item-list .icon {
+    width: 10px; height: 10px;
+    flex-shrink: 0;
+  }
+  .item-list .icon.person { border-radius: 50%; }
+  .item-list .icon.organisation { border-radius: 0; }
+  .item-list .icon.event { transform: rotate(45deg); }
+  .item-list .icon.output { clip-path: polygon(50% 0, 100% 100%, 0 100%); }
+
+  /* ========== Groups ========== */
+  .group-row {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    margin-bottom: 4px;
+    font-size: 11px;
+  }
+  .group-row input[type="color"] {
+    width: 22px;
+    height: 22px;
+    border: 1px solid var(--line);
+    padding: 0;
+    cursor: pointer;
+    background: none;
+  }
+  .group-row input[type="text"] {
+    flex: 1;
+    padding: 3px 5px;
+    font-size: 11px;
+  }
+  .group-row .del { font-size: 14px; color: var(--ink-faint); cursor: pointer; padding: 0 4px; }
+  .group-row .del:hover { color: var(--warn); }
+
+  /* ========== Filters ========== */
+  .filter-chip {
+    display: inline-block;
+    padding: 2px 6px;
+    margin: 2px 2px 2px 0;
+    border: 1px solid var(--line);
+    border-radius: 0;
+    font-size: 10px;
+    cursor: pointer;
+    background: var(--bg);
+  }
+  .filter-chip.active {
+    background: var(--ink);
+    color: white;
+    border-color: var(--ink);
+  }
+
+  /* ========== Year slider ========== */
+  #year-slider-wrap {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  #year-slider {
+    flex: 1;
+    height: 24px;
+    position: relative;
+  }
+  #year-slider .track {
+    position: absolute;
+    top: 11px;
+    left: 0; right: 0;
+    height: 2px;
+    background: var(--line);
+  }
+  #year-slider .range {
+    position: absolute;
+    top: 11px;
+    height: 2px;
+    background: var(--ink);
+  }
+  #year-slider .handle {
+    position: absolute;
+    top: 7px;
+    width: 10px;
+    height: 10px;
+    background: var(--panel);
+    border: 1px solid var(--ink);
+    border-radius: 50%;
+    cursor: ew-resize;
+    transform: translateX(-5px);
+  }
+  #year-display {
+    font-family: var(--serif);
+    font-size: 12px;
+    min-width: 110px;
+    text-align: right;
+  }
+
+  /* ========== Graph styling ========== */
+  .node-label {
+    font-family: var(--serif);
+    font-size: 11px;
+    fill: var(--ink);
+    pointer-events: none;
+    text-anchor: middle;
+  }
+  .node-label.jp {
+    font-family: var(--jp);
+    font-size: 12px;
+  }
+  .node-label.romaji {
+    font-size: 10px;
+    fill: var(--ink-soft);
+    font-style: italic;
+  }
+  .node {
+    cursor: pointer;
+    stroke: var(--ink);
+    stroke-width: 1px;
+  }
+  .node.selected {
+    stroke-width: 2.5px;
+    stroke: var(--accent);
+  }
+  .node.pinned {
+    stroke-dasharray: 2 2;
+  }
+  .edge {
+    stroke: var(--ink-soft);
+    stroke-opacity: 0.6;
+    fill: none;
+  }
+  .edge.class-institutional { stroke-dasharray: none; stroke-width: 1.5px; }
+  .edge.class-interpersonal { stroke-dasharray: none; stroke-width: 1px; }
+  .edge.class-ideological { stroke-dasharray: 4 3; stroke-width: 1px; }
+  .edge.class-event { stroke-dasharray: 1 3; stroke-width: 1px; }
+  .edge.class-temporal { stroke-dasharray: none; stroke-width: 1.5px; }
+  .edge.class-publication { stroke-dasharray: 6 2 1 2; stroke-width: 1px; }
+  .edge.selected { stroke: var(--accent); stroke-opacity: 1; stroke-width: 2.5px; }
+  .edge-label {
+    font-family: var(--sans);
+    font-size: 9px;
+    fill: var(--ink-soft);
+    pointer-events: none;
+    text-anchor: middle;
+  }
+  .arrowhead { fill: var(--ink-soft); }
+
+  /* ========== Tooltip ========== */
+  #tooltip {
+    position: absolute;
+    background: var(--ink);
+    color: white;
+    padding: 6px 10px;
+    border-radius: 0;
+    font-size: 11px;
+    pointer-events: none;
+    max-width: 260px;
+    opacity: 0;
+    transition: opacity 0.15s;
+    z-index: 1000;
+  }
+  #tooltip .tt-name {
+    font-family: var(--serif);
+    font-size: 13px;
+    margin-bottom: 2px;
+  }
+  #tooltip .tt-jp { font-family: var(--jp); }
+  #tooltip .tt-meta { color: rgba(255,255,255,0.7); font-size: 10px; }
+
+  /* ========== Modal ========== */
+  .modal-bg {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.4);
+    display: none;
+    z-index: 2000;
+    align-items: center;
+    justify-content: center;
+  }
+  .modal-bg.open { display: flex; }
+  .modal {
+    background: var(--panel);
+    border-radius: 0;
+    padding: 20px;
+    max-width: 600px;
+    width: 90%;
+    max-height: 80vh;
+    overflow-y: auto;
+  }
+  .modal h2 {
+    font-family: var(--serif);
+    margin-top: 0;
+  }
+  .modal textarea {
+    width: 100%;
+    min-height: 200px;
+    font-family: monospace;
+    font-size: 11px;
+    padding: 6px;
+    border: 1px solid var(--line);
+  }
+  .modal .actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 8px;
+    margin-top: 12px;
+  }
+
+  /* ========== Edge picker ========== */
+  #edge-picker {
+    position: absolute;
+    background: var(--panel);
+    border: 1px solid var(--line);
+    border-radius: 0;
+    padding: 8px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    z-index: 100;
+    display: none;
+    min-width: 220px;
+  }
+  #edge-picker.open { display: block; }
+  #edge-picker h3 {
+    font-family: var(--serif);
+    font-size: 12px;
+    margin: 0 0 6px 0;
+  }
+
+  /* Detail panel */
+  .detail h3 {
+    font-family: var(--serif);
+    font-size: 14px;
+    margin: 0 0 8px 0;
+  }
+  .detail .meta-row {
+    display: flex;
+    justify-content: space-between;
+    padding: 3px 0;
+    border-bottom: 1px solid var(--line-soft);
+    font-size: 11px;
+  }
+  .detail .meta-row .k { color: var(--ink-soft); }
+  .detail .meta-row .v { color: var(--ink); text-align: right; }
+
+  /* Keyboard shortcut hint */
+  kbd {
+    background: var(--line-soft);
+    padding: 1px 4px;
+    border-radius: 0;
+    font-family: monospace;
+    font-size: 10px;
+  }
+
+  /* Figure-mode: hide most controls */
+  #app.figure-mode header,
+  #app.figure-mode aside,
+  #app.figure-mode footer { display: none; }
+  #app.figure-mode #figure-exit {
+    display: block;
+    position: fixed;
+    top: 12px;
+    right: 12px;
+    z-index: 100;
+  }
+  #figure-exit { display: none; }
+</style>
+</head>
+<body>
+
+<div id="app">
+  <header>
+    <h1>Network Mapper</h1>
+    <select id="project-select" title="Active project"></select>
+    <button id="btn-new-project">+ New</button>
+    <button id="btn-rename-project">Rename</button>
+    <button id="btn-delete-project" class="danger">Delete</button>
+    <span class="spacer"></span>
+    <button id="btn-import">Import</button>
+    <button id="btn-export">Export</button>
+    <button id="btn-mode" class="mode-toggle">Figure mode</button>
+  </header>
+
+  <aside class="left">
+    <!-- Add node -->
+    <div class="section">
+      <h2>Add node <span style="float:right;color:var(--ink-faint);font-weight:400;text-transform:none;letter-spacing:0"><kbd>N</kbd></span></h2>
+      <div class="field">
+        <label>Type</label>
+        <select id="node-type">
+          <option value="person">Person</option>
+          <option value="organisation">Organisation</option>
+          <option value="event">Event</option>
+          <option value="output">Output (publication etc.)</option>
+        </select>
+      </div>
+      <div class="field">
+        <label>Name (Japanese, optional)</label>
+        <input type="text" id="node-name-ja" class="jp" placeholder="安倍源基">
+      </div>
+      <div class="field">
+        <label>Name (romanised / English)</label>
+        <input type="text" id="node-name-en" placeholder="Abe Genki">
+      </div>
+      <div class="row-2">
+        <div class="field">
+          <label>Start year</label>
+          <input type="number" id="node-start" placeholder="1894">
+        </div>
+        <div class="field">
+          <label>End year</label>
+          <input type="number" id="node-end" placeholder="1989">
+        </div>
+      </div>
+      <div class="field">
+        <label>Group (colour)</label>
+        <select id="node-group"></select>
+      </div>
+      <div class="field">
+        <label>Role / position</label>
+        <input type="text" id="node-role" placeholder="Home Ministry official">
+      </div>
+      <div class="field">
+        <label>Ideology / orientation</label>
+        <input type="text" id="node-ideology" placeholder="">
+      </div>
+      <div class="field">
+        <label>Notes</label>
+        <textarea id="node-notes"></textarea>
+      </div>
+      <div class="field">
+        <label>Source / citation</label>
+        <input type="text" id="node-source" placeholder="">
+      </div>
+      <button class="primary" id="btn-add-node">Add node</button>
+    </div>
+
+    <!-- Add edge -->
+    <div class="section">
+      <h2>Add connection <span style="float:right;color:var(--ink-faint);font-weight:400;text-transform:none;letter-spacing:0"><kbd>E</kbd></span></h2>
+      <div class="field">
+        <label>From</label>
+        <select id="edge-source"></select>
+      </div>
+      <div class="field">
+        <label>To</label>
+        <select id="edge-target"></select>
+      </div>
+      <div class="field">
+        <label>Relationship</label>
+        <select id="edge-type"></select>
+      </div>
+      <div class="row-2">
+        <div class="field">
+          <label>Start year</label>
+          <input type="number" id="edge-start">
+        </div>
+        <div class="field">
+          <label>End year</label>
+          <input type="number" id="edge-end">
+        </div>
+      </div>
+      <div class="field">
+        <label>
+          <input type="checkbox" id="edge-directional" style="width:auto"> Directional (A → B)
+        </label>
+      </div>
+      <div class="field">
+        <label>Source / citation</label>
+        <input type="text" id="edge-source-cite">
+      </div>
+      <button class="primary" id="btn-add-edge">Add connection</button>
+    </div>
+
+    <!-- Groups -->
+    <div class="section">
+      <h2>Groups (colours)</h2>
+      <div id="groups-list"></div>
+      <button class="secondary" id="btn-add-group">+ Add group</button>
+    </div>
+
+    <!-- Filters -->
+    <div class="section">
+      <h2>Show / hide</h2>
+      <div id="type-filters">
+        <span class="filter-chip active" data-type="person">Persons</span>
+        <span class="filter-chip active" data-type="organisation">Orgs</span>
+        <span class="filter-chip active" data-type="event">Events</span>
+        <span class="filter-chip active" data-type="output">Outputs</span>
+      </div>
+      <div style="margin-top:6px">
+        <label style="font-size:11px;color:var(--ink-soft)"><input type="checkbox" id="show-labels" checked style="width:auto"> Show labels</label>
+      </div>
+      <div>
+        <label style="font-size:11px;color:var(--ink-soft)"><input type="checkbox" id="show-edge-labels" style="width:auto"> Show edge labels</label>
+      </div>
+    </div>
+
+    <!-- Nodes list -->
+    <div class="section">
+      <h2>Nodes (<span id="node-count">0</span>)</h2>
+      <input type="text" id="node-filter" placeholder="Filter..." style="width:100%;font-size:11px;padding:3px;margin-bottom:4px;border:1px solid var(--line)">
+      <ul class="item-list" id="nodes-list"></ul>
+    </div>
+  </aside>
+
+  <main>
+    <svg id="graph">
+      <defs>
+        <marker id="arrow" viewBox="0 -5 10 10" refX="8" refY="0" markerWidth="6" markerHeight="6" orient="auto">
+          <path class="arrowhead" d="M0,-5L10,0L0,5"></path>
+        </marker>
+        <marker id="arrow-selected" viewBox="0 -5 10 10" refX="8" refY="0" markerWidth="6" markerHeight="6" orient="auto">
+          <path fill="#1f3a5f" d="M0,-5L10,0L0,5"></path>
+        </marker>
+      </defs>
+      <g id="zoom-group">
+        <g id="edges-layer"></g>
+        <g id="nodes-layer"></g>
+      </g>
+    </svg>
+    <div id="tooltip"></div>
+    <button id="figure-exit" class="secondary">Exit figure mode</button>
+  </main>
+
+  <aside class="right" id="detail-panel">
+    <div class="detail" id="detail-content"></div>
+  </aside>
+
+  <footer>
+    <span id="year-slider-wrap">
+      <span style="font-size:11px;color:var(--ink-soft)">Year range:</span>
+      <div id="year-slider">
+        <div class="track"></div>
+        <div class="range"></div>
+        <div class="handle" data-handle="min"></div>
+        <div class="handle" data-handle="max"></div>
+      </div>
+      <span id="year-display">all years</span>
+    </span>
+    <span id="status"></span>
+  </footer>
+</div>
+
+<!-- Modal -->
+<div class="modal-bg" id="modal-bg">
+  <div class="modal" id="modal-content"></div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.8.5/d3.min.js"></script>
+<script>
+/* ============================================================
+   NETWORK MAPPER
+   Built for historical network mapping in Japan Studies and beyond.
+   Browser-local storage, multi-project, bilingual labels.
+   ============================================================ */
+
+/* ---------- Edge vocabulary ---------- */
+const EDGE_TYPES = [
+  // Interpersonal
+  { id: 'mentored', label: 'mentored', class: 'interpersonal', defaultDirectional: true, allowedSource: ['person'], allowedTarget: ['person'] },
+  { id: 'collaborated', label: 'collaborated with', class: 'interpersonal', defaultDirectional: false, allowedSource: ['person'], allowedTarget: ['person'] },
+  { id: 'co-authored', label: 'co-authored with', class: 'interpersonal', defaultDirectional: false, allowedSource: ['person'], allowedTarget: ['person'] },
+  { id: 'opposed-p', label: 'opposed', class: 'interpersonal', defaultDirectional: false, allowedSource: ['person'], allowedTarget: ['person'] },
+  { id: 'succeeded', label: 'succeeded (in role)', class: 'temporal', defaultDirectional: true, allowedSource: ['person'], allowedTarget: ['person'] },
+  { id: 'family', label: 'family / married', class: 'interpersonal', defaultDirectional: false, allowedSource: ['person'], allowedTarget: ['person'] },
+
+  // Person → Organisation
+  { id: 'member-of', label: 'member of', class: 'institutional', defaultDirectional: true, allowedSource: ['person'], allowedTarget: ['organisation'] },
+  { id: 'founded', label: 'founded', class: 'institutional', defaultDirectional: true, allowedSource: ['person'], allowedTarget: ['organisation'] },
+  { id: 'led', label: 'led', class: 'institutional', defaultDirectional: true, allowedSource: ['person'], allowedTarget: ['organisation'] },
+  { id: 'funded-by', label: 'funded by', class: 'institutional', defaultDirectional: true, allowedSource: ['person','organisation'], allowedTarget: ['organisation','person'] },
+  { id: 'expelled-from', label: 'expelled from', class: 'institutional', defaultDirectional: true, allowedSource: ['person'], allowedTarget: ['organisation'] },
+
+  // Person → Event
+  { id: 'attended', label: 'attended', class: 'event', defaultDirectional: true, allowedSource: ['person','organisation'], allowedTarget: ['event'] },
+  { id: 'organised', label: 'organised', class: 'event', defaultDirectional: true, allowedSource: ['person','organisation'], allowedTarget: ['event'] },
+  { id: 'spoke-at', label: 'spoke at', class: 'event', defaultDirectional: true, allowedSource: ['person'], allowedTarget: ['event'] },
+
+  // Person → Output
+  { id: 'authored', label: 'authored', class: 'publication', defaultDirectional: true, allowedSource: ['person'], allowedTarget: ['output'] },
+  { id: 'edited', label: 'edited', class: 'publication', defaultDirectional: true, allowedSource: ['person'], allowedTarget: ['output'] },
+  { id: 'translated', label: 'translated', class: 'publication', defaultDirectional: true, allowedSource: ['person'], allowedTarget: ['output'] },
+
+  // Org → Org
+  { id: 'successor-of', label: 'successor of', class: 'temporal', defaultDirectional: true, allowedSource: ['organisation'], allowedTarget: ['organisation'] },
+  { id: 'splinter-of', label: 'splinter of', class: 'temporal', defaultDirectional: true, allowedSource: ['organisation'], allowedTarget: ['organisation'] },
+  { id: 'allied', label: 'allied with', class: 'institutional', defaultDirectional: false, allowedSource: ['organisation'], allowedTarget: ['organisation'] },
+  { id: 'opposed-o', label: 'opposed', class: 'institutional', defaultDirectional: false, allowedSource: ['organisation'], allowedTarget: ['organisation'] },
+
+  // Ideological
+  { id: 'aligned', label: 'ideologically aligned with', class: 'ideological', defaultDirectional: false, allowedSource: ['person','organisation'], allowedTarget: ['person','organisation'] },
+  { id: 'influenced', label: 'influenced by', class: 'ideological', defaultDirectional: true, allowedSource: ['person','organisation','output'], allowedTarget: ['person','organisation','output'] },
+  { id: 'broke-from', label: 'broke from', class: 'ideological', defaultDirectional: true, allowedSource: ['person','organisation'], allowedTarget: ['person','organisation'] },
+];
+
+const DEFAULT_GROUPS = [
+  { id: 'g_a', name: 'Group A', colour: '#4a5c6e' },
+  { id: 'g_b', name: 'Group B', colour: '#8a6a3a' },
+  { id: 'g_c', name: 'Group C', colour: '#5c6e4a' },
+  { id: 'unaffiliated', name: 'Unaffiliated', colour: '#888888' },
+];
+
+const STORAGE_KEY = 'network_mapper_v1';
+
+/* ---------- State ---------- */
+let state = {
+  activeProject: null,
+  projects: {},
+};
+
+let selectedNodeId = null;
+let selectedEdgeId = null;
+let typeFilters = { person: true, organisation: true, event: true, output: true };
+let yearFilter = { min: null, max: null, active: false };
+let showLabels = true;
+let showEdgeLabels = false;
+let simulation = null;
+let figureMode = false;
+
+/* ---------- Storage ---------- */
+function loadState() {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if (raw) {
+      state = JSON.parse(raw);
+    }
+  } catch (e) {
+    console.error('Failed to load state', e);
+  }
+  if (!state.projects || Object.keys(state.projects).length === 0) {
+    const id = newProject('Untitled project');
+    state.activeProject = id;
+  }
+  if (!state.activeProject || !state.projects[state.activeProject]) {
+    state.activeProject = Object.keys(state.projects)[0];
+  }
+}
+
+function saveState() {
+  try {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+  } catch (e) {
+    setStatus('Save failed: ' + e.message);
+  }
+}
+
+function activeProject() {
+  return state.projects[state.activeProject];
+}
+
+function newProject(name) {
+  const id = 'p_' + Date.now() + '_' + Math.random().toString(36).slice(2,6);
+  state.projects[id] = {
+    name: name,
+    created: Date.now(),
+    nodes: [],
+    edges: [],
+    groups: JSON.parse(JSON.stringify(DEFAULT_GROUPS)),
+  };
+  return id;
+}
+
+/* ---------- Helpers ---------- */
+function uid(prefix) {
+  return prefix + '_' + Date.now().toString(36) + Math.random().toString(36).slice(2,6);
+}
+function findNode(id) { return activeProject().nodes.find(n => n.id === id); }
+function findEdge(id) { return activeProject().edges.find(e => e.id === id); }
+function findGroup(id) {
+  const p = activeProject();
+  return p.groups.find(g => g.id === id) || p.groups[p.groups.length - 1];
+}
+function findEdgeType(id) { return EDGE_TYPES.find(t => t.id === id); }
+
+function nodeActiveInYear(node, year) {
+  if (year === null) return true;
+  const s = node.start, e = node.end;
+  if (s === null && e === null) return true;
+  if (s !== null && year < s) return false;
+  if (e !== null && year > e) return false;
+  return true;
+}
+function edgeActiveInYear(edge, year) {
+  if (year === null) return true;
+  const s = edge.start, e = edge.end;
+  if (s === null && e === null) return true;
+  if (s !== null && year < s) return false;
+  if (e !== null && year > e) return false;
+  return true;
+}
+
+function setStatus(msg) {
+  document.getElementById('status').textContent = msg;
+  if (msg) setTimeout(() => { document.getElementById('status').textContent = ''; }, 3000);
+}
+
+/* ---------- Render: project selector ---------- */
+function renderProjectSelect() {
+  const sel = document.getElementById('project-select');
+  sel.innerHTML = '';
+  Object.entries(state.projects).forEach(([id, p]) => {
+    const opt = document.createElement('option');
+    opt.value = id;
+    opt.textContent = p.name;
+    if (id === state.activeProject) opt.selected = true;
+    sel.appendChild(opt);
+  });
+}
+
+/* ---------- Render: groups ---------- */
+function renderGroups() {
+  const wrap = document.getElementById('groups-list');
+  wrap.innerHTML = '';
+  const p = activeProject();
+  p.groups.forEach((g, i) => {
+    const row = document.createElement('div');
+    row.className = 'group-row';
+    row.innerHTML = `
+      <input type="color" value="${escapeHtml(g.colour)}" data-gid="${escapeHtml(g.id)}" class="g-colour">
+      <input type="text" value="${escapeHtml(g.name)}" data-gid="${escapeHtml(g.id)}" class="g-name">
+      <span class="del" data-gid="${escapeHtml(g.id)}" title="Delete group">×</span>
+    `;
+    wrap.appendChild(row);
+  });
+  wrap.querySelectorAll('.g-colour').forEach(el => {
+    el.addEventListener('change', (ev) => {
+      const g = findGroup(ev.target.dataset.gid);
+      g.colour = ev.target.value;
+      saveState();
+      drawGraph();
+    });
+  });
+  wrap.querySelectorAll('.g-name').forEach(el => {
+    el.addEventListener('change', (ev) => {
+      const g = findGroup(ev.target.dataset.gid);
+      g.name = ev.target.value;
+      saveState();
+      renderNodeGroupSelect();
+    });
+  });
+  wrap.querySelectorAll('.del').forEach(el => {
+    el.addEventListener('click', (ev) => {
+      const gid = ev.target.dataset.gid;
+      if (p.groups.length <= 1) { setStatus('Need at least one group'); return; }
+      if (!confirm('Delete this group? Nodes will move to first remaining group.')) return;
+      const idx = p.groups.findIndex(g => g.id === gid);
+      p.groups.splice(idx, 1);
+      const fallback = p.groups[0].id;
+      p.nodes.forEach(n => { if (n.group === gid) n.group = fallback; });
+      saveState();
+      renderGroups();
+      renderNodeGroupSelect();
+      drawGraph();
+    });
+  });
+}
+
+function renderNodeGroupSelect() {
+  const sel = document.getElementById('node-group');
+  const prev = sel.value;
+  sel.innerHTML = '';
+  activeProject().groups.forEach(g => {
+    const opt = document.createElement('option');
+    opt.value = g.id;
+    opt.textContent = g.name;
+    sel.appendChild(opt);
+  });
+  if (prev) sel.value = prev;
+}
+
+/* ---------- Render: edge type select ---------- */
+function renderEdgeTypeSelect() {
+  const sel = document.getElementById('edge-type');
+  sel.innerHTML = '';
+  const groups = {
+    'Interpersonal': ['mentored', 'collaborated', 'co-authored', 'opposed-p', 'succeeded', 'family'],
+    'Person → Organisation': ['member-of', 'founded', 'led', 'funded-by', 'expelled-from'],
+    'Person → Event': ['attended', 'organised', 'spoke-at'],
+    'Person → Output': ['authored', 'edited', 'translated'],
+    'Organisation': ['successor-of', 'splinter-of', 'allied', 'opposed-o'],
+    'Ideological': ['aligned', 'influenced', 'broke-from'],
+  };
+  Object.entries(groups).forEach(([label, ids]) => {
+    const og = document.createElement('optgroup');
+    og.label = label;
+    ids.forEach(id => {
+      const t = findEdgeType(id);
+      const opt = document.createElement('option');
+      opt.value = id;
+      opt.textContent = t.label;
+      og.appendChild(opt);
+    });
+    sel.appendChild(og);
+  });
+  sel.addEventListener('change', () => {
+    const t = findEdgeType(sel.value);
+    document.getElementById('edge-directional').checked = t.defaultDirectional;
+  });
+}
+
+/* ---------- Render: node-pair selects ---------- */
+function renderNodePairSelects() {
+  const src = document.getElementById('edge-source');
+  const tgt = document.getElementById('edge-target');
+  const prevS = src.value, prevT = tgt.value;
+  src.innerHTML = ''; tgt.innerHTML = '';
+  activeProject().nodes.forEach(n => {
+    const label = displayName(n);
+    [src, tgt].forEach(sel => {
+      const opt = document.createElement('option');
+      opt.value = n.id;
+      opt.textContent = label + ' (' + n.type + ')';
+      sel.appendChild(opt);
+    });
+  });
+  if (prevS) src.value = prevS;
+  if (prevT) tgt.value = prevT;
+}
+
+function displayName(n) {
+  return n.nameEn || n.nameJa || '(unnamed)';
+}
+
+/* ---------- Render: nodes list ---------- */
+function renderNodesList() {
+  const ul = document.getElementById('nodes-list');
+  const filter = document.getElementById('node-filter').value.toLowerCase();
+  ul.innerHTML = '';
+  const p = activeProject();
+  document.getElementById('node-count').textContent = p.nodes.length;
+  p.nodes
+    .filter(n => {
+      const blob = (n.nameJa + ' ' + n.nameEn + ' ' + (n.role||'') + ' ' + (n.ideology||'')).toLowerCase();
+      return blob.includes(filter);
+    })
+    .sort((a, b) => displayName(a).localeCompare(displayName(b)))
+    .forEach(n => {
+      const li = document.createElement('li');
+      if (n.id === selectedNodeId) li.classList.add('selected');
+      const g = findGroup(n.group);
+      li.innerHTML = `
+        <span class="icon ${escapeHtml(n.type)}" style="background:${escapeHtml(g.colour)}"></span>
+        <span>${escapeHtml(displayName(n))}</span>
+      `;
+      li.addEventListener('click', () => {
+        selectedNodeId = n.id;
+        selectedEdgeId = null;
+        showDetail();
+        renderNodesList();
+        drawGraph();
+        centreOnNode(n.id);
+      });
+      ul.appendChild(li);
+    });
+}
+
+/* ---------- Detail panel ---------- */
+function showDetail() {
+  const panel = document.getElementById('detail-content');
+  const app = document.getElementById('app');
+  if (selectedNodeId) {
+    const n = findNode(selectedNodeId);
+    if (!n) { app.classList.remove('detail-open'); return; }
+    const g = findGroup(n.group);
+    const incoming = activeProject().edges.filter(e => e.target === n.id || (!findEdgeType(e.type).defaultDirectional && e.source === n.id));
+    const outgoing = activeProject().edges.filter(e => e.source === n.id && findEdgeType(e.type).defaultDirectional);
+    const connections = activeProject().edges.filter(e => e.source === n.id || e.target === n.id);
+
+    panel.innerHTML = `
+      <h3>${escapeHtml(displayName(n))}</h3>
+      ${n.nameJa ? `<div style="font-family:var(--jp);font-size:14px;margin-bottom:8px">${escapeHtml(n.nameJa)}</div>` : ''}
+      <div class="meta-row"><span class="k">Type</span><span class="v">${escapeHtml(n.type)}</span></div>
+      <div class="meta-row"><span class="k">Group</span><span class="v"><span style="display:inline-block;width:8px;height:8px;background:${escapeHtml(g.colour)};margin-right:4px"></span>${escapeHtml(g.name)}</span></div>
+      ${n.start || n.end ? `<div class="meta-row"><span class="k">Dates</span><span class="v">${escapeHtml(n.start || '?')}–${escapeHtml(n.end || '?')}</span></div>` : ''}
+      ${n.role ? `<div class="meta-row"><span class="k">Role</span><span class="v">${escapeHtml(n.role)}</span></div>` : ''}
+      ${n.ideology ? `<div class="meta-row"><span class="k">Ideology</span><span class="v">${escapeHtml(n.ideology)}</span></div>` : ''}
+      ${n.notes ? `<div style="margin-top:8px;font-size:11px;padding:6px;background:var(--bg);border-radius:2px">${escapeHtml(n.notes)}</div>` : ''}
+      ${n.source ? `<div style="margin-top:6px;font-size:10px;color:var(--ink-soft);font-style:italic">Source: ${escapeHtml(n.source)}</div>` : ''}
+
+      <div style="margin-top:12px;display:flex;gap:6px">
+        <button class="secondary" id="btn-edit-node">Edit</button>
+        <button class="secondary" id="btn-pin-node">${n.pinned ? 'Unpin' : 'Pin'}</button>
+        <button class="secondary danger" id="btn-delete-node">Delete</button>
+      </div>
+
+      <h3 style="margin-top:16px">Connections (${connections.length})</h3>
+      <div style="font-size:11px">
+        ${connections.map(e => {
+          const other = e.source === n.id ? findNode(e.target) : findNode(e.source);
+          const t = findEdgeType(e.type);
+          const arrow = t.defaultDirectional && e.source === n.id ? ' → ' : (t.defaultDirectional && e.target === n.id ? ' ← ' : ' — ');
+          return `<div style="padding:3px 0;border-bottom:1px solid var(--line-soft);cursor:pointer" data-eid="${escapeHtml(e.id)}" class="conn-row">
+            <span style="color:var(--ink-soft)">${t.label}</span>${arrow}<strong>${escapeHtml(displayName(other))}</strong>
+            ${e.start || e.end ? `<span style="color:var(--ink-faint);font-size:10px"> (${escapeHtml(e.start||'?')}–${escapeHtml(e.end||'?')})</span>` : ''}
+          </div>`;
+        }).join('')}
+      </div>
+    `;
+
+    document.getElementById('btn-edit-node').addEventListener('click', () => editNodeForm(n));
+    document.getElementById('btn-pin-node').addEventListener('click', () => {
+      n.pinned = !n.pinned;
+      if (!n.pinned) { n.fx = null; n.fy = null; }
+      else { n.fx = n.x; n.fy = n.y; }
+      saveState();
+      showDetail();
+      drawGraph();
+    });
+    document.getElementById('btn-delete-node').addEventListener('click', () => {
+      if (!confirm('Delete this node and all its connections?')) return;
+      const p = activeProject();
+      p.edges = p.edges.filter(e => e.source !== n.id && e.target !== n.id);
+      p.nodes = p.nodes.filter(x => x.id !== n.id);
+      selectedNodeId = null;
+      app.classList.remove('detail-open');
+      saveState();
+      refresh();
+    });
+    panel.querySelectorAll('.conn-row').forEach(el => {
+      el.addEventListener('click', () => {
+        selectedEdgeId = el.dataset.eid;
+        selectedNodeId = null;
+        showDetail();
+        drawGraph();
+      });
+    });
+    app.classList.add('detail-open');
+  } else if (selectedEdgeId) {
+    const e = findEdge(selectedEdgeId);
+    if (!e) { app.classList.remove('detail-open'); return; }
+    const t = findEdgeType(e.type);
+    const s = findNode(e.source), tg = findNode(e.target);
+    panel.innerHTML = `
+      <h3>Connection</h3>
+      <div style="font-size:13px;margin-bottom:8px">
+        <strong>${escapeHtml(displayName(s))}</strong> ${e.directional ? '→' : '—'} <strong>${escapeHtml(displayName(tg))}</strong>
+      </div>
+      <div class="meta-row"><span class="k">Type</span><span class="v">${t.label}</span></div>
+      <div class="meta-row"><span class="k">Class</span><span class="v">${t.class}</span></div>
+      ${e.start || e.end ? `<div class="meta-row"><span class="k">Dates</span><span class="v">${escapeHtml(e.start || '?')}–${escapeHtml(e.end || '?')}</span></div>` : ''}
+      ${e.sourceCite ? `<div style="margin-top:6px;font-size:10px;color:var(--ink-soft);font-style:italic">Source: ${escapeHtml(e.sourceCite)}</div>` : ''}
+      <div style="margin-top:12px;display:flex;gap:6px">
+        <button class="secondary danger" id="btn-delete-edge">Delete</button>
+      </div>
+    `;
+    document.getElementById('btn-delete-edge').addEventListener('click', () => {
+      if (!confirm('Delete this connection?')) return;
+      activeProject().edges = activeProject().edges.filter(x => x.id !== e.id);
+      selectedEdgeId = null;
+      app.classList.remove('detail-open');
+      saveState();
+      refresh();
+    });
+    app.classList.add('detail-open');
+  } else {
+    app.classList.remove('detail-open');
+  }
+}
+
+function escapeHtml(s) {
+  return String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
+
+/* ---------- Edit node ---------- */
+function editNodeForm(n) {
+  document.getElementById('node-type').value = n.type;
+  document.getElementById('node-name-ja').value = n.nameJa || '';
+  document.getElementById('node-name-en').value = n.nameEn || '';
+  document.getElementById('node-start').value = n.start || '';
+  document.getElementById('node-end').value = n.end || '';
+  document.getElementById('node-group').value = n.group;
+  document.getElementById('node-role').value = n.role || '';
+  document.getElementById('node-ideology').value = n.ideology || '';
+  document.getElementById('node-notes').value = n.notes || '';
+  document.getElementById('node-source').value = n.source || '';
+  document.getElementById('btn-add-node').textContent = 'Update node';
+  document.getElementById('btn-add-node').dataset.editing = n.id;
+}
+
+/* ---------- Graph rendering ---------- */
+function drawGraph() {
+  const svg = d3.select('#graph');
+  const width = svg.node().clientWidth;
+  const height = svg.node().clientHeight;
+
+  const p = activeProject();
+  const year = yearFilter.active ? yearFilter.max : null;
+  const yearWindow = yearFilter.active;
+
+  // Filter
+  const visibleNodes = p.nodes.filter(n => {
+    if (!typeFilters[n.type]) return false;
+    if (yearWindow) {
+      // node visible if its active period intersects [yearFilter.min, yearFilter.max]
+      const ns = n.start, ne = n.end;
+      if (ns === null && ne === null) return true;
+      if (ns !== null && ns > yearFilter.max) return false;
+      if (ne !== null && ne < yearFilter.min) return false;
+    }
+    return true;
+  });
+  const visibleSet = new Set(visibleNodes.map(n => n.id));
+  const visibleEdges = p.edges.filter(e => {
+    if (!visibleSet.has(e.source.id || e.source) || !visibleSet.has(e.target.id || e.target)) return false;
+    if (yearWindow) {
+      const es = e.start, ee = e.end;
+      if (es === null && ee === null) return true;
+      if (es !== null && es > yearFilter.max) return false;
+      if (ee !== null && ee < yearFilter.min) return false;
+    }
+    return true;
+  });
+
+  // Stop any previous simulation
+  if (simulation) simulation.stop();
+
+  // Set up simulation. Nodes are mutated in place to retain x/y.
+  const nodesById = new Map();
+  visibleNodes.forEach(n => {
+    if (n.x === undefined) n.x = width/2 + (Math.random()-0.5)*100;
+    if (n.y === undefined) n.y = height/2 + (Math.random()-0.5)*100;
+    if (n.pinned) { n.fx = n.x; n.fy = n.y; }
+    nodesById.set(n.id, n);
+  });
+
+  // D3 wants link objects with source/target as references
+  const linkObjs = visibleEdges.map(e => {
+    return Object.assign({}, e, {
+      source: nodesById.get(e.source.id || e.source),
+      target: nodesById.get(e.target.id || e.target),
+      _id: e.id,
+    });
+  });
+
+  simulation = d3.forceSimulation(visibleNodes)
+    .force('link', d3.forceLink(linkObjs).id(d => d.id).distance(90).strength(0.4))
+    .force('charge', d3.forceManyBody().strength(-200))
+    .force('centre', d3.forceCenter(width/2, height/2))
+    .force('collide', d3.forceCollide(28));
+
+  // ---------- Edges layer ----------
+  const edgesLayer = svg.select('#edges-layer');
+  const edgeSel = edgesLayer.selectAll('g.edge-g').data(linkObjs, d => d._id);
+  edgeSel.exit().remove();
+  const edgeEnter = edgeSel.enter().append('g').attr('class', 'edge-g');
+  edgeEnter.append('path').attr('class', 'edge');
+  edgeEnter.append('text').attr('class', 'edge-label');
+  const edgeMerged = edgeEnter.merge(edgeSel);
+  edgeMerged.select('path')
+    .attr('class', d => {
+      const t = findEdgeType(d.type);
+      return 'edge class-' + (t ? t.class : 'institutional') + (d._id === selectedEdgeId ? ' selected' : '');
+    })
+    .attr('marker-end', d => d.directional ? (d._id === selectedEdgeId ? 'url(#arrow-selected)' : 'url(#arrow)') : null)
+    .on('click', (ev, d) => {
+      selectedEdgeId = d._id;
+      selectedNodeId = null;
+      showDetail();
+      drawGraph();
+    })
+    .style('cursor', 'pointer');
+  edgeMerged.select('text')
+    .text(d => showEdgeLabels ? (findEdgeType(d.type)?.label || '') : '');
+
+  // ---------- Nodes layer ----------
+  const nodesLayer = svg.select('#nodes-layer');
+  const nodeSel = nodesLayer.selectAll('g.node-g').data(visibleNodes, d => d.id);
+  nodeSel.exit().remove();
+  const nodeEnter = nodeSel.enter().append('g').attr('class', 'node-g');
+
+  nodeEnter.each(function(d) {
+    const g = d3.select(this);
+    appendShape(g, d);
+    g.append('text').attr('class', 'node-label jp').attr('y', -16);
+    g.append('text').attr('class', 'node-label romaji').attr('y', 22);
+  });
+
+  const nodeMerged = nodeEnter.merge(nodeSel);
+
+  // Update shape (in case type changed) — easiest: remove and re-add shape
+  nodeMerged.each(function(d) {
+    const g = d3.select(this);
+    g.select('.node').remove();
+    appendShape(g, d);
+  });
+
+  nodeMerged.select('.node')
+    .attr('class', d => 'node' + (d.id === selectedNodeId ? ' selected' : '') + (d.pinned ? ' pinned' : ''))
+    .style('fill', d => findGroup(d.group).colour)
+    .on('click', (ev, d) => {
+      ev.stopPropagation();
+      selectedNodeId = d.id;
+      selectedEdgeId = null;
+      showDetail();
+      renderNodesList();
+      drawGraph();
+    })
+    .on('dblclick', (ev, d) => {
+      ev.stopPropagation();
+      d.pinned = !d.pinned;
+      if (d.pinned) { d.fx = d.x; d.fy = d.y; } else { d.fx = null; d.fy = null; }
+      saveState();
+      drawGraph();
+    })
+    .on('mouseover', (ev, d) => showTooltip(ev, d))
+    .on('mouseout', hideTooltip)
+    .call(d3.drag()
+      .on('start', (ev, d) => { if (!ev.active) simulation.alphaTarget(0.3).restart(); d.fx = d.x; d.fy = d.y; })
+      .on('drag', (ev, d) => { d.fx = ev.x; d.fy = ev.y; })
+      .on('end', (ev, d) => {
+        if (!ev.active) simulation.alphaTarget(0);
+        if (!d.pinned) { d.fx = null; d.fy = null; }
+        saveState();
+      })
+    );
+
+  nodeMerged.select('.node-label.jp')
+    .text(d => showLabels && d.nameJa ? d.nameJa : '');
+  nodeMerged.select('.node-label.romaji')
+    .text(d => showLabels ? (d.nameEn || '') : '');
+
+  // ---------- Tick ----------
+  simulation.on('tick', () => {
+    edgeMerged.select('path').attr('d', d => {
+      const sx = d.source.x, sy = d.source.y, tx = d.target.x, ty = d.target.y;
+      return `M${sx},${sy}L${tx},${ty}`;
+    });
+    edgeMerged.select('text')
+      .attr('x', d => (d.source.x + d.target.x)/2)
+      .attr('y', d => (d.source.y + d.target.y)/2);
+    nodeMerged.attr('transform', d => `translate(${d.x},${d.y})`);
+
+    // persist positions
+    visibleNodes.forEach(n => {
+      const stored = p.nodes.find(x => x.id === n.id);
+      if (stored) { stored.x = n.x; stored.y = n.y; if (n.fx != null) stored.fx = n.fx; if (n.fy != null) stored.fy = n.fy; }
+    });
+  });
+}
+
+function appendShape(g, d) {
+  // Insert shape as first child so labels render above
+  let shape;
+  if (d.type === 'person') {
+    shape = g.insert('circle', ':first-child').attr('r', 9);
+  } else if (d.type === 'organisation') {
+    shape = g.insert('rect', ':first-child').attr('x', -9).attr('y', -9).attr('width', 18).attr('height', 18);
+  } else if (d.type === 'event') {
+    shape = g.insert('rect', ':first-child').attr('x', -8).attr('y', -8).attr('width', 16).attr('height', 16).attr('transform', 'rotate(45)');
+  } else if (d.type === 'output') {
+    shape = g.insert('polygon', ':first-child').attr('points', '0,-10 9,8 -9,8');
+  }
+  shape.attr('class', 'node');
+}
+
+function showTooltip(ev, d) {
+  const tt = document.getElementById('tooltip');
+  let html = `<div class="tt-name">${escapeHtml(displayName(d))}</div>`;
+  if (d.nameJa) html += `<div class="tt-name tt-jp">${escapeHtml(d.nameJa)}</div>`;
+  const bits = [];
+  if (d.start || d.end) bits.push(`${d.start||'?'}–${d.end||'?'}`);
+  if (d.role) bits.push(d.role);
+  if (d.ideology) bits.push(d.ideology);
+  if (bits.length) html += `<div class="tt-meta">${bits.map(escapeHtml).join(' · ')}</div>`;
+  if (d.notes) html += `<div class="tt-meta" style="margin-top:3px">${escapeHtml(d.notes.slice(0,120))}${d.notes.length>120?'…':''}</div>`;
+  tt.innerHTML = html;
+  tt.style.opacity = 1;
+  const rect = document.querySelector('main').getBoundingClientRect();
+  tt.style.left = (ev.clientX - rect.left + 12) + 'px';
+  tt.style.top = (ev.clientY - rect.top + 12) + 'px';
+}
+function hideTooltip() {
+  document.getElementById('tooltip').style.opacity = 0;
+}
+
+function centreOnNode(id) {
+  const n = findNode(id);
+  if (!n || n.x == null) return;
+  const svg = document.getElementById('graph');
+  const w = svg.clientWidth, h = svg.clientHeight;
+  const dx = w/2 - n.x, dy = h/2 - n.y;
+  const cur = d3.select('#zoom-group').attr('transform') || 'translate(0,0)';
+  // Simple animated translate. Zoom level preserved.
+  d3.select('#zoom-group').transition().duration(400).attr('transform', `translate(${dx},${dy})`);
+}
+
+/* ---------- Zoom/pan ---------- */
+function setupZoom() {
+  const svg = d3.select('#graph');
+  const zoom = d3.zoom()
+    .scaleExtent([0.2, 4])
+    .on('zoom', (ev) => {
+      d3.select('#zoom-group').attr('transform', ev.transform);
+    });
+  svg.call(zoom);
+  svg.on('dblclick.zoom', null);
+  svg.on('click', () => {
+    selectedNodeId = null;
+    selectedEdgeId = null;
+    showDetail();
+    drawGraph();
+    renderNodesList();
+  });
+}
+
+/* ---------- Year slider ---------- */
+function computeYearRange() {
+  const p = activeProject();
+  let min = Infinity, max = -Infinity;
+  p.nodes.forEach(n => {
+    if (n.start != null) { min = Math.min(min, n.start); max = Math.max(max, n.start); }
+    if (n.end != null) { min = Math.min(min, n.end); max = Math.max(max, n.end); }
+  });
+  p.edges.forEach(e => {
+    if (e.start != null) { min = Math.min(min, e.start); max = Math.max(max, e.start); }
+    if (e.end != null) { min = Math.min(min, e.end); max = Math.max(max, e.end); }
+  });
+  if (min === Infinity) return null;
+  return { min: min - 1, max: max + 1 };
+}
+
+let sliderRange = null;
+function setupYearSlider() {
+  const slider = document.getElementById('year-slider');
+  const handles = slider.querySelectorAll('.handle');
+  let dragging = null;
+
+  function setHandlePositions() {
+    if (!sliderRange) return;
+    const w = slider.clientWidth;
+    const range = sliderRange.max - sliderRange.min;
+    const lo = yearFilter.min ?? sliderRange.min;
+    const hi = yearFilter.max ?? sliderRange.max;
+    const xLo = ((lo - sliderRange.min) / range) * w;
+    const xHi = ((hi - sliderRange.min) / range) * w;
+    handles[0].style.left = xLo + 'px';
+    handles[1].style.left = xHi + 'px';
+    slider.querySelector('.range').style.left = xLo + 'px';
+    slider.querySelector('.range').style.width = (xHi - xLo) + 'px';
+    if (yearFilter.active) {
+      document.getElementById('year-display').textContent = `${lo} – ${hi}`;
+    } else {
+      document.getElementById('year-display').textContent = 'all years';
+    }
+  }
+
+  handles.forEach(h => {
+    h.addEventListener('mousedown', (ev) => {
+      dragging = h.dataset.handle;
+      yearFilter.active = true;
+      ev.preventDefault();
+    });
+  });
+  document.addEventListener('mousemove', (ev) => {
+    if (!dragging || !sliderRange) return;
+    const rect = slider.getBoundingClientRect();
+    let x = ev.clientX - rect.left;
+    x = Math.max(0, Math.min(rect.width, x));
+    const year = Math.round(sliderRange.min + (x / rect.width) * (sliderRange.max - sliderRange.min));
+    if (dragging === 'min') {
+      yearFilter.min = Math.min(year, yearFilter.max ?? sliderRange.max);
+    } else {
+      yearFilter.max = Math.max(year, yearFilter.min ?? sliderRange.min);
+    }
+    setHandlePositions();
+    drawGraph();
+  });
+  document.addEventListener('mouseup', () => { dragging = null; });
+
+  // Double-click slider to reset
+  slider.addEventListener('dblclick', () => {
+    yearFilter.active = false;
+    yearFilter.min = null;
+    yearFilter.max = null;
+    setHandlePositions();
+    drawGraph();
+  });
+
+  // Initialise
+  refreshYearSlider();
+  window.addEventListener('resize', setHandlePositions);
+
+  function refreshYearSlider() {
+    sliderRange = computeYearRange();
+    if (sliderRange) {
+      if (yearFilter.min == null) yearFilter.min = sliderRange.min;
+      if (yearFilter.max == null) yearFilter.max = sliderRange.max;
+      setHandlePositions();
+    } else {
+      document.getElementById('year-display').textContent = 'no dated items';
+    }
+  }
+  window._refreshYearSlider = refreshYearSlider;
+}
+
+/* ---------- Add node handler ---------- */
+function setupAddNode() {
+  document.getElementById('btn-add-node').addEventListener('click', () => {
+    const btn = document.getElementById('btn-add-node');
+    const editingId = btn.dataset.editing;
+    const type = document.getElementById('node-type').value;
+    const nameJa = document.getElementById('node-name-ja').value.trim();
+    const nameEn = document.getElementById('node-name-en').value.trim();
+    if (!nameJa && !nameEn) { setStatus('Need a name in Japanese or English'); return; }
+    const start = parseInt(document.getElementById('node-start').value) || null;
+    const end = parseInt(document.getElementById('node-end').value) || null;
+    const group = document.getElementById('node-group').value;
+    const role = document.getElementById('node-role').value.trim();
+    const ideology = document.getElementById('node-ideology').value.trim();
+    const notes = document.getElementById('node-notes').value.trim();
+    const source = document.getElementById('node-source').value.trim();
+
+    if (editingId) {
+      const n = findNode(editingId);
+      Object.assign(n, { type, nameJa, nameEn, start, end, group, role, ideology, notes, source });
+      setStatus('Node updated');
+      btn.textContent = 'Add node';
+      delete btn.dataset.editing;
+    } else {
+      activeProject().nodes.push({
+        id: uid('n'),
+        type, nameJa, nameEn, start, end, group, role, ideology, notes, source,
+        x: null, y: null, pinned: false,
+      });
+      setStatus('Node added');
+    }
+    // Reset form
+    document.getElementById('node-name-ja').value = '';
+    document.getElementById('node-name-en').value = '';
+    document.getElementById('node-start').value = '';
+    document.getElementById('node-end').value = '';
+    document.getElementById('node-role').value = '';
+    document.getElementById('node-ideology').value = '';
+    document.getElementById('node-notes').value = '';
+    document.getElementById('node-source').value = '';
+    saveState();
+    refresh();
+  });
+}
+
+/* ---------- Add edge handler ---------- */
+function setupAddEdge() {
+  document.getElementById('btn-add-edge').addEventListener('click', () => {
+    const src = document.getElementById('edge-source').value;
+    const tgt = document.getElementById('edge-target').value;
+    if (!src || !tgt) { setStatus('Pick two nodes'); return; }
+    if (src === tgt) { setStatus('Source and target must differ'); return; }
+    const type = document.getElementById('edge-type').value;
+    const start = parseInt(document.getElementById('edge-start').value) || null;
+    const end = parseInt(document.getElementById('edge-end').value) || null;
+    const directional = document.getElementById('edge-directional').checked;
+    const sourceCite = document.getElementById('edge-source-cite').value.trim();
+    activeProject().edges.push({
+      id: uid('e'),
+      source: src, target: tgt, type, start, end, directional, sourceCite,
+    });
+    document.getElementById('edge-start').value = '';
+    document.getElementById('edge-end').value = '';
+    document.getElementById('edge-source-cite').value = '';
+    saveState();
+    setStatus('Connection added');
+    refresh();
+  });
+}
+
+/* ---------- Filters ---------- */
+function setupFilters() {
+  document.querySelectorAll('#type-filters .filter-chip').forEach(chip => {
+    chip.addEventListener('click', () => {
+      const t = chip.dataset.type;
+      typeFilters[t] = !typeFilters[t];
+      chip.classList.toggle('active', typeFilters[t]);
+      drawGraph();
+    });
+  });
+  document.getElementById('show-labels').addEventListener('change', (ev) => {
+    showLabels = ev.target.checked;
+    drawGraph();
+  });
+  document.getElementById('show-edge-labels').addEventListener('change', (ev) => {
+    showEdgeLabels = ev.target.checked;
+    drawGraph();
+  });
+  document.getElementById('node-filter').addEventListener('input', renderNodesList);
+}
+
+/* ---------- Groups ---------- */
+function setupGroups() {
+  document.getElementById('btn-add-group').addEventListener('click', () => {
+    const palette = ['#4a5c6e','#8a6a3a','#5c6e4a','#6e4a5c','#6e6e4a','#4a6e6e','#3a6e8a','#8a4a4a'];
+    const p = activeProject();
+    p.groups.push({
+      id: uid('g'),
+      name: 'Group ' + (p.groups.length + 1),
+      colour: palette[p.groups.length % palette.length],
+    });
+    saveState();
+    renderGroups();
+    renderNodeGroupSelect();
+  });
+}
+
+/* ---------- Projects ---------- */
+function setupProjects() {
+  document.getElementById('project-select').addEventListener('change', (ev) => {
+    state.activeProject = ev.target.value;
+    selectedNodeId = null;
+    selectedEdgeId = null;
+    saveState();
+    refresh();
+  });
+  document.getElementById('btn-new-project').addEventListener('click', () => {
+    const name = prompt('Project name?', 'New project');
+    if (!name) return;
+    const id = newProject(name);
+    state.activeProject = id;
+    saveState();
+    refresh();
+  });
+  document.getElementById('btn-rename-project').addEventListener('click', () => {
+    const p = activeProject();
+    const name = prompt('Rename project:', p.name);
+    if (!name) return;
+    p.name = name;
+    saveState();
+    renderProjectSelect();
+  });
+  document.getElementById('btn-delete-project').addEventListener('click', () => {
+    if (Object.keys(state.projects).length <= 1) { setStatus('Cannot delete the last project'); return; }
+    if (!confirm('Delete project "' + activeProject().name + '"?')) return;
+    delete state.projects[state.activeProject];
+    state.activeProject = Object.keys(state.projects)[0];
+    saveState();
+    refresh();
+  });
+}
+
+/* ---------- Import / Export ---------- */
+function setupImportExport() {
+  document.getElementById('btn-export').addEventListener('click', () => openExportModal());
+  document.getElementById('btn-import').addEventListener('click', () => openImportModal());
+}
+
+function openExportModal() {
+  const p = activeProject();
+  const json = JSON.stringify(p, null, 2);
+  const modal = document.getElementById('modal-content');
+  modal.innerHTML = `
+    <h2>Export</h2>
+    <p style="font-size:12px;color:var(--ink-soft)">Pick a format:</p>
+    <div style="display:flex;gap:6px;margin-bottom:12px;flex-wrap:wrap">
+      <button class="secondary" id="ex-json">Download JSON</button>
+      <button class="secondary" id="ex-svg">Download SVG</button>
+      <button class="secondary" id="ex-png">Download PNG</button>
+      <button class="secondary" id="ex-html">Standalone HTML</button>
+      <button class="secondary" id="ex-csv-n">Nodes CSV</button>
+      <button class="secondary" id="ex-csv-e">Edges CSV</button>
+    </div>
+    <textarea readonly>${escapeHtml(json)}</textarea>
+    <div class="actions">
+      <button class="secondary" id="ex-close">Close</button>
+    </div>
+  `;
+  document.getElementById('modal-bg').classList.add('open');
+  document.getElementById('ex-close').addEventListener('click', closeModal);
+  document.getElementById('ex-json').addEventListener('click', () => downloadFile(p.name + '.json', json, 'application/json'));
+  document.getElementById('ex-svg').addEventListener('click', exportSVG);
+  document.getElementById('ex-png').addEventListener('click', exportPNG);
+  document.getElementById('ex-html').addEventListener('click', exportStandaloneHTML);
+  document.getElementById('ex-csv-n').addEventListener('click', () => downloadFile(p.name + '_nodes.csv', nodesToCSV(p.nodes), 'text/csv'));
+  document.getElementById('ex-csv-e').addEventListener('click', () => downloadFile(p.name + '_edges.csv', edgesToCSV(p.edges, p.nodes), 'text/csv'));
+}
+
+function nodesToCSV(nodes) {
+  const header = ['id','type','nameJa','nameEn','start','end','group','role','ideology','notes','source'];
+  const rows = nodes.map(n => header.map(k => csvEscape(n[k] ?? '')).join(','));
+  return [header.join(','), ...rows].join('\n');
+}
+function edgesToCSV(edges, nodes) {
+  const nameOf = id => { const n = nodes.find(x => x.id === id); return n ? displayName(n) : id; };
+  const header = ['id','source_id','source_name','target_id','target_name','type','directional','start','end','sourceCite'];
+  const rows = edges.map(e => [
+    csvEscape(e.id), csvEscape(e.source), csvEscape(nameOf(e.source)),
+    csvEscape(e.target), csvEscape(nameOf(e.target)),
+    csvEscape(e.type), e.directional ? 'true' : 'false',
+    csvEscape(e.start ?? ''), csvEscape(e.end ?? ''),
+    csvEscape(e.sourceCite ?? ''),
+  ].join(','));
+  return [header.join(','), ...rows].join('\n');
+}
+function csvEscape(v) {
+  v = String(v);
+  if (/[",\n]/.test(v)) return '"' + v.replace(/"/g, '""') + '"';
+  return v;
+}
+
+function downloadFile(name, content, mime) {
+  const blob = new Blob([content], { type: mime });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = name;
+  a.click();
+  URL.revokeObjectURL(url);
+}
+
+function exportSVG() {
+  const svg = document.getElementById('graph').cloneNode(true);
+  // Inline computed styles for the cloned SVG
+  const style = document.createElement('style');
+  style.textContent = `
+    .node-label { font-family: Inter, sans-serif; font-size: 11px; fill: #111111; text-anchor: middle; }
+    .node-label.jp { font-size: 12px; }
+    .node-label.romaji { font-size: 10px; fill: #555555; font-style: italic; }
+    .node { stroke: #111111; stroke-width: 1px; }
+    .node.pinned { stroke-dasharray: 2 2; }
+    .edge { stroke: #555555; stroke-opacity: 0.6; fill: none; }
+    .edge.class-institutional { stroke-width: 1.5px; }
+    .edge.class-ideological { stroke-dasharray: 4 3; }
+    .edge.class-event { stroke-dasharray: 1 3; }
+    .edge.class-publication { stroke-dasharray: 6 2 1 2; }
+    .edge-label { font-family: Inter, sans-serif; font-size: 9px; fill: #555555; text-anchor: middle; }
+    .arrowhead { fill: #555555; }
+  `;
+  svg.insertBefore(style, svg.firstChild);
+  svg.setAttribute('xmlns', 'http://www.w3.org/2000/svg');
+  const serializer = new XMLSerializer();
+  const out = '<?xml version="1.0" encoding="UTF-8"?>\n' + serializer.serializeToString(svg);
+  downloadFile(activeProject().name + '.svg', out, 'image/svg+xml');
+}
+
+function exportPNG() {
+  const svg = document.getElementById('graph');
+  const rect = svg.getBoundingClientRect();
+  const cloned = svg.cloneNode(true);
+  const style = document.createElement('style');
+  style.textContent = `
+    .node-label { font-family: Inter, sans-serif; font-size: 11px; fill: #111111; text-anchor: middle; }
+    .node-label.romaji { font-size: 10px; fill: #555555; font-style: italic; }
+    .node { stroke: #111111; stroke-width: 1px; }
+    .edge { stroke: #555555; stroke-opacity: 0.6; fill: none; }
+    .edge.class-ideological { stroke-dasharray: 4 3; }
+    .edge.class-event { stroke-dasharray: 1 3; }
+    .edge-label { font-family: Inter, sans-serif; font-size: 9px; fill: #555555; text-anchor: middle; }
+    .arrowhead { fill: #555555; }
+  `;
+  cloned.insertBefore(style, cloned.firstChild);
+  cloned.setAttribute('xmlns', 'http://www.w3.org/2000/svg');
+  cloned.setAttribute('width', rect.width);
+  cloned.setAttribute('height', rect.height);
+  const xml = new XMLSerializer().serializeToString(cloned);
+  const svg64 = btoa(unescape(encodeURIComponent(xml)));
+  const img = new Image();
+  img.onload = () => {
+    const scale = 2; // 2x for crisper output
+    const canvas = document.createElement('canvas');
+    canvas.width = rect.width * scale;
+    canvas.height = rect.height * scale;
+    const ctx = canvas.getContext('2d');
+    ctx.fillStyle = '#ffffff';
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+    ctx.scale(scale, scale);
+    ctx.drawImage(img, 0, 0);
+    canvas.toBlob(blob => {
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url; a.download = activeProject().name + '.png'; a.click();
+      URL.revokeObjectURL(url);
+    });
+  };
+  img.src = 'data:image/svg+xml;base64,' + svg64;
+}
+
+function exportStandaloneHTML() {
+  const p = activeProject();
+  const data = JSON.stringify(p);
+  const html = `<!DOCTYPE html><html><head><meta charset="UTF-8"><title>${escapeHtml(p.name)}</title>
+<style>
+body{font-family:Inter,sans-serif;margin:0;background:#ffffff;color:#111111}
+h1{font-size:18px;padding:12px;margin:0;background:#fff;border-bottom:1px solid #ddd}
+#g{width:100vw;height:calc(100vh - 50px)}
+.node{stroke:#111111;stroke-width:1px;cursor:pointer}
+.edge{stroke:#555555;stroke-opacity:0.6;fill:none}
+.edge.class-ideological{stroke-dasharray:4 3}
+.edge.class-event{stroke-dasharray:1 3}
+.label{font-family:Inter,sans-serif;font-size:11px;fill:#111111;text-anchor:middle;pointer-events:none}
+.label.jp{font-size:12px}
+.label.r{font-size:10px;fill:#555555;font-style:italic}
+</style></head><body>
+<h1>${escapeHtml(p.name)}</h1>
+<svg id="g"><defs><marker id="a" viewBox="0 -5 10 10" refX="8" refY="0" markerWidth="6" markerHeight="6" orient="auto"><path fill="#555555" d="M0,-5L10,0L0,5"/></marker></defs></svg>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.8.5/d3.min.js"><\/script>
+<script>
+const data=${data};
+const svg=d3.select('#g');const w=window.innerWidth,h=window.innerHeight-50;
+const groupColour=id=>{const g=data.groups.find(x=>x.id===id);return g?g.colour:'#888'};
+const edgeClass=t=>{const m={mentored:'i',collaborated:'i','co-authored':'i','opposed-p':'i',succeeded:'t',family:'i','member-of':'inst',founded:'inst',led:'inst','funded-by':'inst','expelled-from':'inst',attended:'event',organised:'event','spoke-at':'event',authored:'pub',edited:'pub',translated:'pub','successor-of':'t','splinter-of':'t',allied:'inst','opposed-o':'inst',aligned:'ideological',influenced:'ideological','broke-from':'ideological'};return m[t]||'inst'};
+data.nodes.forEach(n=>{n.x=n.x||w/2;n.y=n.y||h/2;if(n.pinned){n.fx=n.x;n.fy=n.y}});
+const links=data.edges.map(e=>Object.assign({},e));
+const sim=d3.forceSimulation(data.nodes).force('link',d3.forceLink(links).id(d=>d.id).distance(90)).force('charge',d3.forceManyBody().strength(-200)).force('centre',d3.forceCenter(w/2,h/2)).force('collide',d3.forceCollide(28));
+const edgeG=svg.append('g').selectAll('path').data(links).enter().append('path').attr('class',d=>'edge class-'+edgeClass(d.type)).attr('marker-end',d=>d.directional?'url(#a)':null);
+const nodeG=svg.append('g').selectAll('g').data(data.nodes).enter().append('g');
+nodeG.each(function(d){const s=d3.select(this);if(d.type==='person')s.append('circle').attr('r',9).attr('class','node').style('fill',groupColour(d.group));else if(d.type==='organisation')s.append('rect').attr('x',-9).attr('y',-9).attr('width',18).attr('height',18).attr('class','node').style('fill',groupColour(d.group));else if(d.type==='event')s.append('rect').attr('x',-8).attr('y',-8).attr('width',16).attr('height',16).attr('transform','rotate(45)').attr('class','node').style('fill',groupColour(d.group));else s.append('polygon').attr('points','0,-10 9,8 -9,8').attr('class','node').style('fill',groupColour(d.group))});
+nodeG.append('text').attr('class','label jp').attr('y',-16).text(d=>d.nameJa||'');
+nodeG.append('text').attr('class','label r').attr('y',22).text(d=>d.nameEn||'');
+nodeG.append('title').text(d=>(d.nameEn||d.nameJa)+(d.role?' — '+d.role:''));
+nodeG.call(d3.drag().on('start',(e,d)=>{if(!e.active)sim.alphaTarget(0.3).restart();d.fx=d.x;d.fy=d.y}).on('drag',(e,d)=>{d.fx=e.x;d.fy=e.y}).on('end',(e,d)=>{if(!e.active)sim.alphaTarget(0);if(!d.pinned){d.fx=null;d.fy=null}}));
+sim.on('tick',()=>{edgeG.attr('d',d=>'M'+d.source.x+','+d.source.y+'L'+d.target.x+','+d.target.y);nodeG.attr('transform',d=>'translate('+d.x+','+d.y+')')});
+<\/script></body></html>`;
+  downloadFile(p.name + '_standalone.html', html, 'text/html');
+}
+
+function openImportModal() {
+  const modal = document.getElementById('modal-content');
+  modal.innerHTML = `
+    <h2>Import</h2>
+    <p style="font-size:12px;color:var(--ink-soft)">Paste JSON (full project) or CSV (nodes only). For CSV, the first row must contain column names matching the JSON keys (type, nameJa, nameEn, start, end, group, role, ideology, notes, source).</p>
+    <div style="margin:8px 0">
+      <label style="font-size:11px;display:inline-flex;align-items:center;gap:4px"><input type="radio" name="imp-mode" value="json" checked>JSON (replace project)</label>
+      <label style="font-size:11px;margin-left:12px;display:inline-flex;align-items:center;gap:4px"><input type="radio" name="imp-mode" value="json-merge">JSON (merge into current)</label>
+      <label style="font-size:11px;margin-left:12px;display:inline-flex;align-items:center;gap:4px"><input type="radio" name="imp-mode" value="csv">CSV nodes (append)</label>
+    </div>
+    <textarea id="imp-data" placeholder="Paste data here..."></textarea>
+    <div class="actions">
+      <button class="secondary" id="imp-cancel">Cancel</button>
+      <button class="primary" id="imp-go" style="width:auto">Import</button>
+    </div>
+  `;
+  document.getElementById('modal-bg').classList.add('open');
+  document.getElementById('imp-cancel').addEventListener('click', closeModal);
+  document.getElementById('imp-go').addEventListener('click', () => {
+    const mode = document.querySelector('input[name="imp-mode"]:checked').value;
+    const raw = document.getElementById('imp-data').value.trim();
+    if (!raw) { setStatus('Nothing to import'); return; }
+    try {
+      if (mode === 'json') {
+        const parsed = JSON.parse(raw);
+        if (!parsed.nodes || !parsed.edges) throw new Error('JSON must contain nodes and edges arrays');
+        // Replace current project
+        const id = state.activeProject;
+        state.projects[id] = parsed;
+        if (!parsed.groups) parsed.groups = JSON.parse(JSON.stringify(DEFAULT_GROUPS));
+        if (!parsed.name) parsed.name = 'Imported';
+        saveState();
+        closeModal();
+        refresh();
+        setStatus('Imported');
+      } else if (mode === 'json-merge') {
+        const parsed = JSON.parse(raw);
+        const p = activeProject();
+        // Map old IDs to new IDs to avoid collisions
+        const idMap = {};
+        (parsed.nodes || []).forEach(n => {
+          const newId = uid('n');
+          idMap[n.id] = newId;
+          p.nodes.push(Object.assign({}, n, { id: newId, x: null, y: null }));
+        });
+        (parsed.edges || []).forEach(e => {
+          if (!idMap[e.source] || !idMap[e.target]) return;
+          p.edges.push(Object.assign({}, e, { id: uid('e'), source: idMap[e.source], target: idMap[e.target] }));
+        });
+        saveState();
+        closeModal();
+        refresh();
+        setStatus('Merged ' + (parsed.nodes?.length || 0) + ' nodes, ' + (parsed.edges?.length || 0) + ' edges');
+      } else if (mode === 'csv') {
+        const rows = parseCSV(raw);
+        if (rows.length < 2) throw new Error('CSV needs a header and at least one row');
+        const header = rows[0];
+        const p = activeProject();
+        let added = 0;
+        for (let i = 1; i < rows.length; i++) {
+          const row = rows[i];
+          if (row.length === 1 && row[0] === '') continue;
+          const obj = {};
+          header.forEach((h, j) => { obj[h] = row[j] || ''; });
+          if (!obj.nameJa && !obj.nameEn) continue;
+          p.nodes.push({
+            id: uid('n'),
+            type: obj.type || 'person',
+            nameJa: obj.nameJa || '',
+            nameEn: obj.nameEn || '',
+            start: parseInt(obj.start) || null,
+            end: parseInt(obj.end) || null,
+            group: obj.group || (p.groups[p.groups.length - 1].id),
+            role: obj.role || '',
+            ideology: obj.ideology || '',
+            notes: obj.notes || '',
+            source: obj.source || '',
+            x: null, y: null, pinned: false,
+          });
+          added++;
+        }
+        saveState();
+        closeModal();
+        refresh();
+        setStatus('Imported ' + added + ' nodes');
+      }
+    } catch (e) {
+      alert('Import failed: ' + e.message);
+    }
+  });
+}
+
+function parseCSV(text) {
+  const rows = [];
+  let cur = '', row = [], inQ = false;
+  for (let i = 0; i < text.length; i++) {
+    const c = text[i];
+    if (inQ) {
+      if (c === '"' && text[i+1] === '"') { cur += '"'; i++; }
+      else if (c === '"') { inQ = false; }
+      else cur += c;
+    } else {
+      if (c === '"') inQ = true;
+      else if (c === ',') { row.push(cur); cur = ''; }
+      else if (c === '\n') { row.push(cur); rows.push(row); row = []; cur = ''; }
+      else if (c === '\r') { /* skip */ }
+      else cur += c;
+    }
+  }
+  if (cur || row.length) { row.push(cur); rows.push(row); }
+  return rows;
+}
+
+function closeModal() {
+  document.getElementById('modal-bg').classList.remove('open');
+}
+
+/* ---------- Mode toggle ---------- */
+function setupModeToggle() {
+  document.getElementById('btn-mode').addEventListener('click', () => {
+    figureMode = true;
+    document.getElementById('app').classList.add('figure-mode');
+    setTimeout(drawGraph, 50);
+  });
+  document.getElementById('figure-exit').addEventListener('click', () => {
+    figureMode = false;
+    document.getElementById('app').classList.remove('figure-mode');
+    setTimeout(drawGraph, 50);
+  });
+}
+
+/* ---------- Keyboard ---------- */
+function setupKeyboard() {
+  document.addEventListener('keydown', (ev) => {
+    if (ev.target.tagName === 'INPUT' || ev.target.tagName === 'TEXTAREA' || ev.target.tagName === 'SELECT') return;
+    if (ev.key === 'n' || ev.key === 'N') {
+      document.getElementById('node-name-en').focus();
+    } else if (ev.key === 'e' || ev.key === 'E') {
+      document.getElementById('edge-source').focus();
+    } else if (ev.key === 'Escape') {
+      selectedNodeId = null;
+      selectedEdgeId = null;
+      showDetail();
+      drawGraph();
+      closeModal();
+      if (figureMode) {
+        document.getElementById('figure-exit').click();
+      }
+    } else if (ev.key === 'f' || ev.key === 'F') {
+      document.getElementById('btn-mode').click();
+    }
+  });
+}
+
+/* ---------- Refresh ---------- */
+function refresh() {
+  renderProjectSelect();
+  renderGroups();
+  renderNodeGroupSelect();
+  renderNodePairSelects();
+  renderNodesList();
+  drawGraph();
+  if (window._refreshYearSlider) window._refreshYearSlider();
+}
+
+/* ---------- Init ---------- */
+function init() {
+  loadState();
+  // ensure default project has groups
+  Object.values(state.projects).forEach(p => {
+    if (!p.groups) p.groups = JSON.parse(JSON.stringify(DEFAULT_GROUPS));
+    p.nodes.forEach(n => { if (!n.id) n.id = uid('n'); });
+    p.edges.forEach(e => { if (!e.id) e.id = uid('e'); });
+  });
+  renderEdgeTypeSelect();
+  renderNodeGroupSelect();
+  setupAddNode();
+  setupAddEdge();
+  setupFilters();
+  setupGroups();
+  setupProjects();
+  setupImportExport();
+  setupZoom();
+  setupYearSlider();
+  setupModeToggle();
+  setupKeyboard();
+  refresh();
+  // resize handling
+  window.addEventListener('resize', () => drawGraph());
+}
+
+init();
+</script>
+</body>
+</html>

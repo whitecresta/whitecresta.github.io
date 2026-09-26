@@ -31,7 +31,6 @@ format:
   html:
     theme:
       light: [cosmo, assets/theme.scss]
-    css: assets/custom.css
     toc: true
     toc-location: right
     lang: en-GB

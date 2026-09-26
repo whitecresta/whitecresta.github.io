@@ -1,17 +1,25 @@
 /*-- scss:defaults --*/
+// All site styling lives here. It is compiled into Quarto's hashed Bootstrap
+// stylesheet, so browsers pick up changes on every deploy.
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Noto+Sans+JP:wght@400;500&display=swap');
 
+$ink: #111111;
+$ink-soft: #555555;
+$ink-faint: #888888;
+$rule: #e5e5e5;
+$accent: #1f3a5f;          // deep indigo (ai-iro)
+
 $body-bg: #ffffff;
-$body-color: #111111;
-$primary: #1f3a5f;          // deep indigo (ai-iro)
-$link-color: #1f3a5f;
-$secondary: #666666;
+$body-color: $ink;
+$primary: $accent;
+$link-color: $accent;
+$secondary: $ink-soft;
 
 $navbar-bg: #ffffff;
-$navbar-fg: #111111;
-$navbar-hl: #1f3a5f;
+$navbar-fg: $ink;
+$navbar-hl: $accent;
 $footer-bg: #ffffff;
-$footer-fg: #777777;
+$footer-fg: $ink-faint;
 
 $font-family-sans-serif: "Inter", "Noto Sans JP", system-ui, -apple-system, sans-serif;
 $font-family-base: $font-family-sans-serif;
@@ -19,16 +27,82 @@ $headings-font-family: $font-family-sans-serif;
 $headings-font-weight: 600;
 $font-size-base: 1rem;
 $line-height-base: 1.7;
-$border-color: #e5e5e5;
+$border-color: $rule;
 $border-radius: 0;
+$border-radius-sm: 0;
+$border-radius-lg: 0;
 $link-decoration: none;
-$code-color: #1f3a5f;
+$code-color: $accent;
 $code-bg: #f5f5f5;
+$blockquote-border-color: $rule;
+$input-border-color: $rule;
 
 /*-- scss:rules --*/
-.navbar { border-bottom: 1px solid $border-color; }
+// ---- Chrome ----
+.navbar { border-bottom: 1px solid $rule; box-shadow: none; }
 .navbar-brand .navbar-title { font-weight: 600; letter-spacing: -.01em; }
-.nav-footer { border-top: 1px solid $border-color; font-size: .85rem; }
+.nav-footer { border-top: 1px solid $rule; font-size: .85rem; }
 h1, h2, h3, .title { letter-spacing: -.015em; }
-#quarto-document-content :is(p, li, td, blockquote) a:not(.tool-launch) { text-decoration: underline; text-decoration-color: rgba(31, 58, 95, .35); text-underline-offset: .2em; }
-#quarto-document-content :is(p, li, td, blockquote) a:not(.tool-launch):hover { text-decoration-color: currentColor; }
+.quarto-title .subtitle { color: $ink-soft; font-weight: 400; }
+.quarto-title-meta-heading { color: $ink-faint; letter-spacing: .06em; }
+
+// Body-text links: quiet underline that firms up on hover
+#quarto-document-content :is(p, li, td, blockquote) a:not(.tool-launch) {
+  text-decoration: underline; text-decoration-color: rgba($accent, .35); text-underline-offset: .2em;
+  &:hover { text-decoration-color: currentColor; }
+}
+
+// Table of contents
+#TOC .nav-link.active, .sidebar nav[role="doc-toc"] ul > li > a.active { color: $accent; border-left-color: $accent; }
+
+// Category tags and listing chrome
+.quarto-category, .listing-categories .listing-category {
+  border: 1px solid $rule; border-radius: 0; color: $ink-soft; background: transparent;
+  font-size: .7rem; letter-spacing: .04em;
+}
+.quarto-listing-category .category.active, .quarto-listing-category .category:hover { color: $accent; }
+.quarto-listing-filter .input-group-text, .quarto-listing-filter input { border-color: $rule; background: #fff; }
+.quarto-listing-table thead { border-bottom: 1px solid $ink; }
+.quarto-post { border-bottom: 1px solid $rule; }
+.listing-date, .listing-description { color: $ink-soft; }
+.quarto-post .listing-title { font-weight: 600; letter-spacing: -.015em; }
+.quarto-listing-table .listing-date { white-space: nowrap; }
+
+blockquote.blockquote, #quarto-document-content blockquote { color: $ink-soft; border-left: 2px solid $rule; overflow-wrap: anywhere; }
+
+// ---- Home page ----
+.home-intro { max-width: 40rem; margin: 1.5rem 0 3rem; }
+.home-intro .lede { font-size: 1.2rem; line-height: 1.6; color: #333; }
+
+.section-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(14rem, 1fr)); gap: 0; margin: 1.5rem 0 3rem; border-top: 1px solid $ink; }
+.section-grid a.section-card { display: block; padding: 1.1rem 1.2rem 1.3rem 0; border-bottom: 1px solid $rule; color: inherit; text-decoration: none; }
+.section-grid a.section-card:hover h3 { color: $accent; }
+.section-card h3 { margin: 0 0 .3rem; font-size: 1.05rem; transition: color .15s; }
+.section-card p { margin: 0; font-size: .92rem; color: $ink-soft; }
+.section-card .jp { font-family: "Noto Sans JP", sans-serif; font-size: .8rem; color: $accent; display: block; margin-bottom: .35rem; letter-spacing: .1em; }
+
+// ---- Tool cards and pages ----
+.quarto-grid-item.card { border: 1px solid $rule; background: #fff; box-shadow: none; }
+.quarto-grid-item.card:hover { border-color: $ink; }
+.quarto-grid-item .card-title { font-weight: 600; }
+
+.tool-meta { display: flex; flex-wrap: wrap; gap: .4rem 1.5rem; font-size: .85rem; color: $ink-soft; margin: .5rem 0 1.5rem; padding: .75rem 0; border-top: 1px solid $rule; border-bottom: 1px solid $rule; }
+.tool-meta strong { color: $ink; font-weight: 600; }
+.tool-launch { display: inline-block; font-weight: 500; background: $ink; color: #fff !important; padding: .5rem 1rem; text-decoration: none; margin: .25rem 0 1rem; }
+.tool-launch:hover { background: $accent; }
+.app-frame { width: 100%; height: 360px; border: 1px solid $rule; background: #fff; }
+.app-frame.app-frame-tall { height: 1380px; }
+.app-frame.app-frame-wide { height: 760px; }
+.desktop-only-note { display: none; }
+
+.placeholder-note { font-size: .9rem; color: #444; background: #fff; border-left: 3px solid $accent; padding: .4rem 0 .4rem 1rem; }
+
+@media (max-width: 600px) {
+  .home-intro .lede { font-size: 1.1rem; }
+  .app-frame { height: 420px; }
+  .app-frame.app-frame-tall { height: 1280px; }
+  // The network mapper needs a desktop-width screen; link out instead of embedding
+  .app-frame.app-frame-wide { display: none; }
+  .desktop-only-note { display: block; }
+  .hide-mobile { display: none; }
+}

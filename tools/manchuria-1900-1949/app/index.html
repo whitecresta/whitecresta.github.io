@@ -2,14 +2,17 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Noto+Sans+JP:wght@400;500&display=swap">
 <title>Manchuria, 1900-1949</title>
 <style>
-  body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Helvetica,Arial,sans-serif;max-width:780px;margin:2rem auto;padding:0 1.5rem;background:#ffffff;color:#2C2C2A}
-  .sec{color:#5F5E5A}
-  .t{font-size:14px;fill:#2C2C2A}
-  .ts{font-size:12px;fill:#5F5E5A}
-  input[type=range]{flex:1}
-  h3{font-size:12px;text-transform:uppercase;letter-spacing:.03em;margin:0 0 6px;color:#5F5E5A;font-weight:600}
+  body{font-family:"Inter","Noto Sans JP",system-ui,-apple-system,sans-serif;max-width:780px;margin:2rem auto;padding:0 1.5rem;background:#ffffff;color:#111111;line-height:1.55}
+  .sec{color:#555555}
+  .t{font-size:14px;fill:#111111}
+  .ts{font-size:12px;fill:#555555}
+  input[type=range]{flex:1;accent-color:#1f3a5f}
+  h3{font-size:12px;text-transform:uppercase;letter-spacing:.03em;margin:0 0 6px;color:#555555;font-weight:600}
+  h1{letter-spacing:-.015em}
   .legend-col{min-width:150px}
   .legend-row{display:flex;align-items:center;gap:6px;font-size:12.5px;margin:3px 0}
   .china{fill:#F1EFE8;stroke:#5F5E5A}
@@ -25,18 +28,18 @@
 </head>
 <body>
 
-<h1 style="font-size:20px;font-weight:500;margin:0 0 1rem;">Manchuria, 1900-1949</h1>
+<h1 style="font-size:20px;font-weight:600;margin:0 0 1rem;">Manchuria, 1900-1949</h1>
 
 <div style="display:flex;align-items:center;gap:12px;margin:0 0 8px;">
 <label class="sec" style="font-size:14px;">Year</label>
 <input type="range" min="0" max="8" step="1" value="5" id="yr" oninput="update(this.value)">
-<span style="font-size:16px;font-weight:500;min-width:48px;text-align:right;" id="year-label">1932</span>
+<span style="font-size:16px;font-weight:600;color:#1f3a5f;min-width:48px;text-align:right;" id="year-label">1932</span>
 </div>
 <p style="font-size:14px;margin:0 0 6px;" id="caption">Manchukuo is proclaimed; Puyi becomes Chief Executive. Former Chinese state railways are absorbed into the new Manchukuo National Railway.</p>
 <p class="sec" style="font-size:13px;margin:0 0 4px;"><strong>Key figures: </strong><span id="key-figures">Puyi (last Qing Emperor, installed as Chief Executive), Zheng Xiaoxu (first Prime Minister), Doihara Kenji (smuggled Puyi out of Tianjin)</span></p>
 <p class="sec" style="font-size:13px;margin:0 0 16px;"><span id="also-text">Puyi had been living in Japanese-protected exile in Tianjin since his 1912 abdication; his installation gave the new state a veneer of Qing restoration rather than naked Japanese annexation.</span></p>
 
-<div style="display:flex;flex-wrap:wrap;gap:20px 32px;margin:0 0 20px;padding:12px 16px;border:1px solid #5F5E5A33;border-radius:8px;">
+<div style="display:flex;flex-wrap:wrap;gap:20px 32px;margin:0 0 20px;padding:12px 0;border-top:1px solid #e5e5e5;border-bottom:1px solid #e5e5e5;">
   <div class="legend-col">
     <h3>Markers</h3>
     <div class="legend-row"><svg width="14" height="14"><circle class="cdot" cx="7" cy="7" r="5"/></svg>City</div>

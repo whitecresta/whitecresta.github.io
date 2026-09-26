@@ -1,0 +1,53 @@
+---
+title: "Network Mapper"
+description: "Build, filter and export networks of people, organisations, events and publications, with Japanese and romanised names side by side."
+date: 2026-09-26
+categories: [network, mapping, prosopography]
+toc: true
+---
+
+```{=html}
+<div class="tool-meta">
+<span><strong>Status:</strong> Beta</span>
+<span><strong>Version:</strong> 0.1</span>
+<span><strong>Language:</strong> English / 日本語</span>
+<span><strong>Updated:</strong> September 2026</span>
+</div>
+```
+
+[Open the Network Mapper full screen](app/index.html){.tool-launch}
+
+## What it does
+
+Network Mapper is a workspace for historical network analysis. You add people, organisations, events and outputs such as publications, then connect them with typed relationships: mentored, member of, founded, attended, authored, splinter of, influenced by and so on. Each node can carry a Japanese name, a romanised or English name, dates, a role, an ideological orientation, notes and a source citation.
+
+The graph lays itself out and can be dragged, pinned and zoomed. A year-range slider shows only the people and ties active in a given period, and you can hide node types or colour nodes by your own groups.
+
+## Try it here
+
+::: {.desktop-only-note .placeholder-note}
+The Network Mapper needs a desktop-width screen. Use the button above to open it on a larger display.
+:::
+
+<iframe class="app-frame app-frame-wide" src="app/index.html" title="Network Mapper"></iframe>
+
+::: {.hide-mobile}
+The embedded version is small. For real work, open it full screen with the button above.
+:::
+
+## How to use it
+
+1. **Add nodes** in the left panel. Choose a type, give a Japanese and/or romanised name, and add dates, role and a source. Press <kbd>N</kbd> to jump to the form.
+2. **Add connections** by picking two nodes and a relationship. Directional ties (A → B) are drawn with arrows. Press <kbd>E</kbd> to jump to the form.
+3. **Explore**: drag nodes, double-click to pin them, scroll to zoom, and click a node or tie for its details and connections.
+4. **Filter** by node type, or drag the year-range handles at the bottom (double-click the slider to reset).
+5. **Present**: *Figure mode* (<kbd>F</kbd>) hides the controls for screenshots and teaching. Press <kbd>Esc</kbd> to leave it.
+6. **Export** as JSON, SVG, PNG, a standalone HTML page, or node and edge CSVs. **Import** JSON (replacing or merging) or a CSV of nodes.
+
+## Sources and data
+
+The tool has no data of its own. Everything you enter is saved only in your own browser's local storage and never leaves your computer. Clearing your browser data will delete it, so export your projects to JSON regularly to keep a copy or to share them.
+
+## How to cite
+
+> Perkins, Chris. 2026. *Network Mapper*, version 0.1. https://whitecresta.github.io/tools/network-mapper/
