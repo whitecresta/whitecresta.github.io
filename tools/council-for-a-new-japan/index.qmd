@@ -1,0 +1,61 @@
+---
+title: "The Council for a New Japan, 1958–59"
+description: "Interactive figures on the Shin Nippon Kyōgi Kai (新日本協議会): its officer network, and four transwar trajectories that converged on its Third Way doctrine."
+date: 2026-09-26
+categories: [network, figures, postwar right, Abe Genki]
+toc: true
+---
+
+```{=html}
+<div class="tool-meta">
+<span><strong>Status:</strong> Working figures</span>
+<span><strong>Version:</strong> 0.1</span>
+<span><strong>Language:</strong> English / 日本語</span>
+<span><strong>Updated:</strong> September 2026</span>
+</div>
+```
+
+[Open the figures full screen](app/index.html){.tool-launch}
+
+## What it shows
+
+These figures come from my work on Abe Genki (安倍源基), the former head of the Special Higher Police (Tokkō) and Japan's last wartime Home Minister. In January 1958 Abe became a representative director of the Shin Nippon Kyōgi Kai (新日本協議会), the Council for a New Japan, a national anti-communist organisation whose doctrinal manifesto was *Daisan no michi* (第三の道, *The Third Way*).
+
+Figure 1 maps the Council's organisation around 1958–59 from the officer roster printed in *Daisan no michi*. Directors are grouped by the intellectual or institutional tradition they brought with them, alongside the Council's funding, publications and the wider right-wing milieu it drew on.
+
+Figure 2 sets out four transwar trajectories, those of Abe Genki, Rōyama Masamichi, Nishio Suehiro and Nabeyama Sadachika, which began in very different places in interwar political thought and ended at the same organicist anthropology set out in *Daisan no michi*.
+
+## The figures
+
+::: {.column-screen-inset}
+<iframe class="app-frame app-frame-auto" src="app/index.html" title="The Council for a New Japan, 1958–59" scrolling="no"></iframe>
+:::
+
+```{=html}
+<script>
+// Size the embedded figures to their content. Same-origin, so the parent can read the frame's height.
+document.querySelectorAll('iframe.app-frame-auto').forEach(function (frame) {
+  function fit() {
+    try { frame.style.height = frame.contentDocument.documentElement.scrollHeight + 'px'; } catch (e) {}
+  }
+  frame.addEventListener('load', function () {
+    fit();
+    try { new ResizeObserver(fit).observe(frame.contentDocument.body); } catch (e) {}
+  });
+});
+</script>
+```
+
+## How to use it
+
+1. Click any box in either figure. A panel below the figure explains who or what it is and its place in the argument.
+2. In Figure 1, the box for the 20 further directors lists the rest of the roster.
+3. A dagger (†) marks identifications that still need to be verified.
+
+## Sources
+
+Officer roster printed in *Daisan no michi: hon-kai no shidō rinen* (Shin Nippon Kyōgi Kai, 1959), 42. Secondary literature including Large (1976), Mimura (2011), Hofmann (2020) and Starrs (2023).
+
+## How to cite
+
+> Perkins, Chris. 2026. *The Council for a New Japan, 1958–59*, version 0.1. https://whitecresta.github.io/tools/council-for-a-new-japan/

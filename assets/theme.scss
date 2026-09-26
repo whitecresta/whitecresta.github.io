@@ -108,6 +108,7 @@ a.book:hover .book-cover { border-color: $ink; }
 .app-frame.app-frame-tall { height: 1380px; }
 .app-frame.app-frame-wide { height: 760px; }
 .desktop-only-note { display: none; }
+.app-frame.app-frame-auto { height: 2600px; } // fallback until the page script sizes it
 
 .placeholder-note { font-size: .9rem; color: #444; background: #fff; border-left: 3px solid $accent; padding: .4rem 0 .4rem 1rem; }
 

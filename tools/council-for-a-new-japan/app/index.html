@@ -1,0 +1,777 @@
+<!DOCTYPE html>
+<html lang="en-GB">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Shin Nippon Kyōgi Kai — organisational and analytical charts</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Noto+Sans+JP:wght@400;500&display=swap" rel="stylesheet" />
+<style>
+  :root {
+    --ink: #111111;
+    --ink-soft: #555555;
+    --ink-faint: #888888;
+    --rule: #e5e5e5;
+    --rule-soft: #eeeeee;
+    --paper: #ffffff;
+    --paper-warm: #fafafa;
+    --accent: #7f1d1d;
+    --accent-soft: #991b1b;
+    --site-accent: #1f3a5f;
+    --kyoto: #1e3a5f;
+    --military: #3f3f46;
+    --business: #854d0e;
+    --tenko: #6b21a8;
+    --religious: #065f46;
+    --academic: #0c4a6e;
+    --confucian: #713f12;
+    --convergence: #7f1d1d;
+  }
+
+  * { box-sizing: border-box; }
+
+  html, body {
+    margin: 0;
+    padding: 0;
+    background: var(--paper);
+    color: var(--ink);
+    font-family: 'Inter', 'Noto Sans JP', system-ui, -apple-system, sans-serif;
+    font-size: 16px;
+    line-height: 1.6;
+  }
+
+  .frame {
+    max-width: 1280px;
+    margin: 0 auto;
+    padding: 48px 32px 96px;
+  }
+
+  header {
+    border-bottom: 1px solid var(--rule);
+    padding-bottom: 28px;
+    margin-bottom: 40px;
+  }
+
+  .eyebrow {
+    font-family: 'Inter', sans-serif;
+    font-size: 10.5px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--ink-faint);
+    font-weight: 500;
+    margin-bottom: 10px;
+  }
+
+  h1 {
+    font-size: 28px;
+    font-weight: 600;
+    line-height: 1.22;
+    margin: 0 0 10px;
+    letter-spacing: -0.005em;
+  }
+
+  h1 em {
+    font-style: italic;
+    font-weight: 500;
+  }
+
+  .byline {
+    font-size: 15px;
+    color: var(--ink-soft);
+    font-style: italic;
+  }
+
+  .chart-section {
+    margin-top: 56px;
+  }
+
+  .chart-title {
+    display: flex;
+    align-items: baseline;
+    gap: 14px;
+    margin-bottom: 6px;
+  }
+
+  .chart-num {
+    font-family: 'Inter', sans-serif;
+    font-size: 11px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--site-accent);
+    font-weight: 600;
+  }
+
+  h2 {
+    font-size: 21px;
+    font-weight: 600;
+    margin: 0;
+    letter-spacing: -0.005em;
+  }
+
+  .chart-lede {
+    color: var(--ink-soft);
+    font-size: 15.5px;
+    max-width: 62ch;
+    margin: 6px 0 24px;
+  }
+
+  .legend {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 16px 22px;
+    margin: 0 0 24px;
+    padding: 16px 20px;
+    background: var(--paper-warm);
+    border: 1px solid var(--rule-soft);
+    font-family: 'Inter', sans-serif;
+    font-size: 11.5px;
+    color: var(--ink-soft);
+    letter-spacing: 0.01em;
+  }
+
+  .legend-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .swatch {
+    display: inline-block;
+    width: 14px;
+    height: 14px;
+    border-radius: 0;
+    border: 1px solid rgba(0,0,0,0.1);
+  }
+
+  .chart-wrap {
+    background: var(--paper-warm);
+    border: 1px solid var(--rule);
+    padding: 18px;
+    overflow: auto;
+  }
+
+  svg { display: block; max-width: 100%; height: auto; }
+
+  /* node styling */
+  .node rect, .node circle, .node path {
+    cursor: pointer;
+    transition: filter 0.2s ease, transform 0.2s ease;
+  }
+  .node:hover rect, .node:hover circle, .node:hover path {
+    filter: brightness(1.04) drop-shadow(0 2px 6px rgba(0,0,0,0.18));
+  }
+  .node text {
+    pointer-events: none;
+    font-family: 'Inter', 'Noto Sans JP', system-ui, -apple-system, sans-serif;
+    text-anchor: middle;
+    dominant-baseline: middle;
+    fill: #fff;
+  }
+  .node .jp {
+    font-size: 10px;
+    fill: rgba(255,255,255,0.82);
+  }
+  .node.light text,
+  .node.light-bordered text { fill: var(--ink); }
+  .node.light .jp,
+  .node.light-bordered .jp { fill: var(--ink-soft); }
+  .node.selected rect, .node.selected circle, .node.selected path {
+    stroke: var(--accent);
+    stroke-width: 2.5;
+  }
+
+  /* Info panel */
+  .panel {
+    margin-top: 22px;
+    min-height: 88px;
+    padding: 18px 22px;
+    background: #fff;
+    border: 1px solid var(--rule);
+    border-left: 3px solid var(--site-accent);
+    font-size: 15.5px;
+    line-height: 1.6;
+  }
+  .panel .placeholder {
+    color: var(--ink-faint);
+    font-style: italic;
+  }
+  .panel h3 {
+    font-size: 18px;
+    margin: 0 0 4px;
+    font-weight: 600;
+  }
+  .panel .japanese {
+    font-size: 14px;
+    color: var(--ink-soft);
+    margin-bottom: 10px;
+    font-style: italic;
+  }
+  .panel .role {
+    font-family: 'Inter', sans-serif;
+    font-size: 10.5px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--site-accent);
+    font-weight: 600;
+    margin-bottom: 12px;
+  }
+  .panel p { margin: 0 0 10px; }
+  .panel p:last-child { margin-bottom: 0; }
+
+  footer {
+    margin-top: 80px;
+    padding-top: 28px;
+    border-top: 1px solid var(--rule);
+    font-size: 13px;
+    color: var(--ink-faint);
+    font-family: 'Inter', sans-serif;
+  }
+
+  @media (max-width: 900px) {
+    h1 { font-size: 24px; }
+    h2 { font-size: 19px; }
+    .frame { padding: 32px 18px 60px; }
+    .legend { font-size: 10.5px; }
+  }
+</style>
+</head>
+<body>
+<div class="frame">
+  <header>
+    <div class="eyebrow">Chris Perkins · Abe Genki paper · Figures</div>
+    <h1>Shin Nippon Kyōgi Kai <em>(The Council for a New Japan)</em><br/>Organisational network and analytical convergence</h1>
+    <div class="byline">Based on the officer roster in <em>Daisan no michi</em> (1959) and secondary literature. Click any node for detail.</div>
+  </header>
+
+  <!-- ============================================================ -->
+  <!-- CHART 1 — ORGANISATIONAL NETWORK                              -->
+  <!-- ============================================================ -->
+  <section class="chart-section">
+    <div class="chart-title">
+      <span class="chart-num">Figure 1</span>
+      <h2>The Council's organisational network, c. 1958–59</h2>
+    </div>
+    <p class="chart-lede">Leadership structure and director tributaries as listed in the officer roster, with funding, publications, and the broader right-wing milieu the Council drew on and fed into.</p>
+
+    <div class="legend">
+      <div class="legend-item"><span class="swatch" style="background:var(--kyoto)"></span>Kyoto School intellectual</div>
+      <div class="legend-item"><span class="swatch" style="background:var(--confucian)"></span>Confucian personalist</div>
+      <div class="legend-item"><span class="swatch" style="background:var(--military)"></span>Military / wartime state</div>
+      <div class="legend-item"><span class="swatch" style="background:var(--business)"></span>Business / zaibatsu</div>
+      <div class="legend-item"><span class="swatch" style="background:var(--tenko)"></span>Tenkōsha / post-communist</div>
+      <div class="legend-item"><span class="swatch" style="background:var(--religious)"></span>Religious nationalism</div>
+      <div class="legend-item"><span class="swatch" style="background:var(--academic)"></span>Academic / legal / journalistic</div>
+      <div class="legend-item"><span class="swatch" style="background:var(--accent)"></span>Council apex</div>
+    </div>
+
+    <div class="chart-wrap">
+      <svg id="chart1" viewBox="0 0 1240 1020" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <marker id="arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+            <path d="M 0 0 L 10 5 L 0 10 z" fill="#57534e"/>
+          </marker>
+          <marker id="arrow-faint" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="5" markerHeight="5" orient="auto">
+            <path d="M 0 0 L 10 5 L 0 10 z" fill="#a8a29e"/>
+          </marker>
+        </defs>
+
+        <!-- Background zones (subtle) -->
+        <rect x="20" y="20" width="1200" height="80" fill="none" stroke="#e7e5e4" stroke-dasharray="3,3"/>
+        <text x="32" y="42" font-family="Inter, sans-serif" font-size="10" letter-spacing="0.14em" fill="#a8a29e">ADVISORS (顧問)</text>
+
+        <rect x="20" y="120" width="1200" height="110" fill="none" stroke="#e7e5e4" stroke-dasharray="3,3"/>
+        <text x="32" y="142" font-family="Inter, sans-serif" font-size="10" letter-spacing="0.14em" fill="#a8a29e">REPRESENTATIVE DIRECTORS (代表理事)</text>
+
+        <rect x="20" y="250" width="1200" height="500" fill="none" stroke="#e7e5e4" stroke-dasharray="3,3"/>
+        <text x="32" y="272" font-family="Inter, sans-serif" font-size="10" letter-spacing="0.14em" fill="#a8a29e">DIRECTORS (理事) — GROUPED BY INTELLECTUAL/INSTITUTIONAL TRIBUTARY</text>
+
+        <rect x="20" y="770" width="1200" height="110" fill="none" stroke="#e7e5e4" stroke-dasharray="3,3"/>
+        <text x="32" y="790" font-family="Inter, sans-serif" font-size="10" letter-spacing="0.14em" fill="#a8a29e">PUBLICATIONS &amp; OPERATIONAL APPARATUS</text>
+
+        <rect x="20" y="900" width="1200" height="100" fill="none" stroke="#e7e5e4" stroke-dasharray="3,3"/>
+        <text x="32" y="920" font-family="Inter, sans-serif" font-size="10" letter-spacing="0.14em" fill="#a8a29e">ADJACENT / GENEALOGICAL</text>
+
+        <!-- ADVISORS row -->
+        <g class="node light" data-id="sakakura">
+          <rect x="290" y="52" width="170" height="44" rx="4" fill="#f7f7f7" stroke="#d6d3d1" stroke-width="1"/>
+          <text x="375" y="68" font-size="13" font-weight="500">Sakakura Takuzō</text>
+          <text x="375" y="85" class="jp">坂倉卓造</text>
+        </g>
+        <g class="node light" data-id="kamikawa">
+          <rect x="535" y="52" width="170" height="44" rx="4" fill="#f7f7f7" stroke="#d6d3d1" stroke-width="1"/>
+          <text x="620" y="68" font-size="13" font-weight="500">Kamikawa Hikomatsu</text>
+          <text x="620" y="85" class="jp">神川彦松 · Tokyo Imp. U.</text>
+        </g>
+        <g class="node light" data-id="sakuta">
+          <rect x="780" y="52" width="170" height="44" rx="4" fill="#f7f7f7" stroke="#d6d3d1" stroke-width="1"/>
+          <text x="865" y="68" font-size="13" font-weight="500">Sakuta Sōichi</text>
+          <text x="865" y="85" class="jp">作田荘一 · Kyoto Imp. U.</text>
+        </g>
+
+        <!-- REPRESENTATIVE DIRECTORS -->
+        <g class="node" data-id="abe">
+          <rect x="290" y="155" width="190" height="60" rx="4" fill="#7f1d1d"/>
+          <text x="385" y="178" font-size="15" font-weight="600">Abe Genki</text>
+          <text x="385" y="195" class="jp">安倍源基</text>
+          <text x="385" y="208" font-size="9.5" font-family="Inter, sans-serif">ex-Tokkō chief · Home Minister 1945</text>
+        </g>
+        <g class="node" data-id="kimura">
+          <rect x="525" y="155" width="190" height="60" rx="4" fill="#7f1d1d"/>
+          <text x="620" y="178" font-size="15" font-weight="600">Kimura Tokutarō</text>
+          <text x="620" y="195" class="jp">木村篤太郎</text>
+          <text x="620" y="208" font-size="9.5" font-family="Inter, sans-serif">ex-Attorney General · Defense Agency</text>
+        </g>
+        <g class="node" data-id="yasuoka">
+          <rect x="760" y="155" width="190" height="60" rx="4" fill="#7f1d1d"/>
+          <text x="855" y="178" font-size="15" font-weight="600">Yasuoka Masahiro</text>
+          <text x="855" y="195" class="jp">安岡正篤</text>
+          <text x="855" y="208" font-size="9.5" font-family="Inter, sans-serif">Confucian nationalist · LDP advisor</text>
+        </g>
+
+        <!-- Central Council node -->
+        <g class="node" data-id="council">
+          <rect x="500" y="245" width="240" height="44" rx="3" fill="#1c1917"/>
+          <text x="620" y="262" font-size="14" font-weight="600">Shin Nippon Kyōgi Kai</text>
+          <text x="620" y="279" class="jp" font-size="11">新日本協議会 · est. January 1958</text>
+        </g>
+
+        <!-- Lines from rep directors down to Council -->
+        <line x1="385" y1="215" x2="560" y2="245" stroke="#57534e" stroke-width="1.5"/>
+        <line x1="620" y1="215" x2="620" y2="245" stroke="#57534e" stroke-width="1.5"/>
+        <line x1="855" y1="215" x2="680" y2="245" stroke="#57534e" stroke-width="1.5"/>
+
+        <!-- Lines from Council up to advisors -->
+        <line x1="560" y1="245" x2="375" y2="96" stroke="#a8a29e" stroke-width="1" stroke-dasharray="2,3"/>
+        <line x1="620" y1="245" x2="620" y2="96" stroke="#a8a29e" stroke-width="1" stroke-dasharray="2,3"/>
+        <line x1="680" y1="245" x2="865" y2="96" stroke="#a8a29e" stroke-width="1" stroke-dasharray="2,3"/>
+
+        <!-- ===================== DIRECTOR TRIBUTARIES ===================== -->
+
+        <!-- Tributary 1: Kyoto School intellectual (left) -->
+        <text x="60" y="300" font-family="Inter, sans-serif" font-size="10.5" font-weight="600" letter-spacing="0.08em" fill="#1e3a5f">KYOTO SCHOOL INTELLECTUAL</text>
+        <line x1="60" y1="306" x2="260" y2="306" stroke="#1e3a5f" stroke-width="0.75"/>
+        <g class="node" data-id="koyama">
+          <rect x="40" y="315" width="195" height="46" rx="3" fill="#1e3a5f"/>
+          <text x="137" y="335" font-size="13" font-weight="500">Kōyama Iwao</text>
+          <text x="137" y="351" class="jp">高山岩男 · Nihon U.</text>
+        </g>
+        <g class="node" data-id="tabata">
+          <rect x="40" y="375" width="195" height="40" rx="3" fill="#3b5a7f"/>
+          <text x="137" y="397" font-size="12">Tabata Gensui</text>
+        </g>
+
+        <!-- Tributary 2: Confucian personalist (also left, grouped with advisors on intellectual side) -->
+        <text x="60" y="445" font-family="Inter, sans-serif" font-size="10.5" font-weight="600" letter-spacing="0.08em" fill="#713f12">CONFUCIAN PERSONALIST</text>
+        <line x1="60" y1="451" x2="260" y2="451" stroke="#713f12" stroke-width="0.75"/>
+        <g class="node" data-id="confucian-note">
+          <rect x="40" y="460" width="195" height="46" rx="3" fill="#713f12"/>
+          <text x="137" y="478" font-size="12">Yasuoka network</text>
+          <text x="137" y="495" class="jp" font-size="10">see Rep. Directors row</text>
+        </g>
+
+        <!-- Tributary 3: Military / wartime state -->
+        <text x="285" y="300" font-family="Inter, sans-serif" font-size="10.5" font-weight="600" letter-spacing="0.08em" fill="#3f3f46">MILITARY / WARTIME STATE</text>
+        <line x1="285" y1="306" x2="475" y2="306" stroke="#3f3f46" stroke-width="0.75"/>
+        <g class="node" data-id="tanaka">
+          <rect x="270" y="315" width="195" height="46" rx="3" fill="#3f3f46"/>
+          <text x="367" y="335" font-size="13" font-weight="500">Tanaka Shin'ichi †</text>
+          <text x="367" y="351" class="jp">田中新一 · fmr IJA Lt-Gen</text>
+        </g>
+        <g class="node" data-id="uemura">
+          <rect x="270" y="375" width="195" height="40" rx="3" fill="#57575e"/>
+          <text x="367" y="397" font-size="12">Uemura Kentarō</text>
+        </g>
+
+        <!-- Tributary 4: Religious nationalism -->
+        <text x="495" y="300" font-family="Inter, sans-serif" font-size="10.5" font-weight="600" letter-spacing="0.08em" fill="#065f46">RELIGIOUS NATIONALISM</text>
+        <line x1="495" y1="306" x2="685" y2="306" stroke="#065f46" stroke-width="0.75"/>
+        <g class="node" data-id="omori">
+          <rect x="480" y="315" width="195" height="46" rx="3" fill="#065f46"/>
+          <text x="577" y="335" font-size="13" font-weight="500">Ōmori Sōgen</text>
+          <text x="577" y="351" class="jp">大森曹玄 · Rinzai Zen master</text>
+        </g>
+
+        <!-- Tributary 5: Business / zaibatsu -->
+        <text x="705" y="300" font-family="Inter, sans-serif" font-size="10.5" font-weight="600" letter-spacing="0.08em" fill="#854d0e">BUSINESS / ZAIBATSU</text>
+        <line x1="705" y1="306" x2="895" y2="306" stroke="#854d0e" stroke-width="0.75"/>
+        <g class="node" data-id="takasugi">
+          <rect x="690" y="315" width="195" height="46" rx="3" fill="#854d0e"/>
+          <text x="787" y="335" font-size="13" font-weight="500">Takasugi Shin'ichi</text>
+          <text x="787" y="351" class="jp">高杉晋一 · Mitsubishi Elec.</text>
+        </g>
+        <g class="node" data-id="oya">
+          <rect x="690" y="375" width="195" height="40" rx="3" fill="#a06e1f"/>
+          <text x="787" y="397" font-size="12">Ōya Genkō</text>
+        </g>
+
+        <!-- Tributary 6: Tenkōsha / post-communist -->
+        <text x="915" y="300" font-family="Inter, sans-serif" font-size="10.5" font-weight="600" letter-spacing="0.08em" fill="#6b21a8">TENKŌSHA / POST-COMMUNIST</text>
+        <line x1="915" y1="306" x2="1185" y2="306" stroke="#6b21a8" stroke-width="0.75"/>
+        <g class="node" data-id="nabeyama">
+          <rect x="900" y="315" width="195" height="46" rx="3" fill="#6b21a8"/>
+          <text x="997" y="335" font-size="13" font-weight="500">Nabeyama Sadachika</text>
+          <text x="997" y="351" class="jp">鍋山貞親 · 1933 tenkō</text>
+        </g>
+        <g class="node" data-id="sano">
+          <rect x="900" y="375" width="195" height="46" rx="3" fill="#8134bd"/>
+          <text x="997" y="395" font-size="12">Sano Hiroshi</text>
+          <text x="997" y="411" class="jp" font-size="10">佐野博 · nephew of Sano Manabu</text>
+        </g>
+
+        <!-- Tributary 7: Academic / legal / journalistic (bottom, wider) -->
+        <text x="285" y="445" font-family="Inter, sans-serif" font-size="10.5" font-weight="600" letter-spacing="0.08em" fill="#0c4a6e">ACADEMIC / LEGAL / JOURNALISTIC</text>
+        <line x1="285" y1="451" x2="1185" y2="451" stroke="#0c4a6e" stroke-width="0.75"/>
+        <g class="node" data-id="tamura">
+          <rect x="270" y="460" width="195" height="46" rx="3" fill="#0c4a6e"/>
+          <text x="367" y="478" font-size="13" font-weight="500">Tamura Kōsaku</text>
+          <text x="367" y="495" class="jp">田村幸策 · Hōsei U.</text>
+        </g>
+        <g class="node" data-id="nakayama">
+          <rect x="480" y="460" width="195" height="46" rx="3" fill="#0c4a6e"/>
+          <text x="577" y="478" font-size="13" font-weight="500">Nakayama Masaru</text>
+          <text x="577" y="495" class="jp">中山優 · pan-Asianist</text>
+        </g>
+        <g class="node" data-id="mitarai">
+          <rect x="690" y="460" width="195" height="46" rx="3" fill="#164e6c"/>
+          <text x="787" y="478" font-size="13" font-weight="500">Mitarai Tatsuo</text>
+          <text x="787" y="495" class="jp">御手洗辰雄 · journalist</text>
+        </g>
+        <g class="node" data-id="others">
+          <rect x="900" y="460" width="195" height="46" rx="3" fill="#1e6d8f"/>
+          <text x="997" y="478" font-size="13" font-weight="500">20 further directors</text>
+          <text x="997" y="495" font-size="10.5" font-family="Inter, sans-serif">click for full list</text>
+        </g>
+
+        <!-- Lines from tributaries to Council (drawn behind via reference but placed here) -->
+        <g stroke="#a8a29e" stroke-width="0.9" fill="none">
+          <line x1="137" y1="315" x2="560" y2="289"/>
+          <line x1="367" y1="315" x2="580" y2="289"/>
+          <line x1="577" y1="315" x2="620" y2="289"/>
+          <line x1="787" y1="315" x2="660" y2="289"/>
+          <line x1="997" y1="315" x2="680" y2="289"/>
+          <line x1="367" y1="460" x2="560" y2="289"/>
+          <line x1="577" y1="460" x2="580" y2="289"/>
+          <line x1="787" y1="460" x2="660" y2="289"/>
+          <line x1="997" y1="460" x2="680" y2="289"/>
+          <line x1="137" y1="460" x2="560" y2="289"/>
+        </g>
+
+        <!-- ===================== FUNDING & OPERATIONAL ===================== -->
+        <!-- Funding arrow from Takasugi/business to Council (separate annotation) -->
+        <g class="node light-bordered" data-id="funding">
+          <rect x="905" y="545" width="190" height="46" rx="3" fill="#f7f7f7" stroke="#854d0e" stroke-width="1"/>
+          <text x="1000" y="565" font-size="12" font-weight="600">Business community</text>
+          <text x="1000" y="582" font-size="10.5" fill="#44403c">¥ hundreds of millions (reported)</text>
+        </g>
+        <path d="M 900 568 Q 780 510 740 289" stroke="#854d0e" stroke-width="1.2" fill="none" stroke-dasharray="5,4" marker-end="url(#arrow-faint)"/>
+        <text x="810" y="440" font-family="Inter, sans-serif" font-size="10" fill="#854d0e" transform="rotate(-30 810 440)">funds</text>
+
+        <!-- Regional offices -->
+        <g class="node light-bordered" data-id="regional">
+          <rect x="135" y="545" width="200" height="46" rx="3" fill="#f7f7f7" stroke="#d6d3d1"/>
+          <text x="235" y="565" font-size="12" font-weight="600">23 prefectural offices</text>
+          <text x="235" y="582" font-size="10.5" fill="#44403c">(by 1959)</text>
+        </g>
+        <path d="M 340 568 Q 450 510 500 289" stroke="#78716c" stroke-width="1" fill="none" stroke-dasharray="4,4"/>
+
+        <!-- PUBLICATIONS ROW -->
+        <g class="node" data-id="daisan">
+          <rect x="395" y="805" width="280" height="56" rx="3" fill="#7f1d1d" stroke="#4a0e0e" stroke-width="1"/>
+          <text x="535" y="826" font-size="15" font-weight="600" font-style="italic">Daisan no michi</text>
+          <text x="535" y="843" class="jp" font-size="11">第三の道 · doctrinal manifesto · 1958/1959</text>
+        </g>
+        <g class="node light-bordered" data-id="nikkyo">
+          <rect x="700" y="805" width="190" height="56" rx="3" fill="#f7f7f7" stroke="#78716c"/>
+          <text x="795" y="822" font-size="12" font-weight="600">Shin Nikkyō series</text>
+          <text x="795" y="838" font-size="10.5">14 tactical pamphlets</text>
+          <text x="795" y="852" font-size="10" fill="#78716c">Nikkyōso · Anpo · Zengakuren</text>
+        </g>
+        <g class="node light-bordered" data-id="nihonseikai">
+          <rect x="905" y="805" width="190" height="56" rx="3" fill="#f7f7f7" stroke="#78716c"/>
+          <text x="1000" y="822" font-size="12" font-weight="600">Nihon to Sekai</text>
+          <text x="1000" y="838" class="jp">日本と世界 · magazine</text>
+        </g>
+        <g class="node light-bordered" data-id="shushi">
+          <rect x="145" y="805" width="220" height="56" rx="3" fill="#f7f7f7" stroke="#78716c"/>
+          <text x="255" y="822" font-size="12" font-weight="600">Four-point charter</text>
+          <text x="255" y="838" font-size="10.5" fill="#44403c">drafted by Yasuoka</text>
+        </g>
+
+        <!-- Lines from Council to publications -->
+        <line x1="560" y1="289" x2="425" y2="805" stroke="#a8a29e" stroke-width="0.8" stroke-dasharray="3,3"/>
+        <line x1="620" y1="289" x2="535" y2="805" stroke="#7f1d1d" stroke-width="1.5"/>
+        <line x1="680" y1="289" x2="795" y2="805" stroke="#a8a29e" stroke-width="0.8" stroke-dasharray="3,3"/>
+        <line x1="680" y1="289" x2="1000" y2="805" stroke="#a8a29e" stroke-width="0.8" stroke-dasharray="3,3"/>
+        <line x1="560" y1="289" x2="255" y2="805" stroke="#a8a29e" stroke-width="0.8" stroke-dasharray="3,3"/>
+
+        <!-- ADJACENT / GENEALOGICAL -->
+        <g class="node light" data-id="genyosha">
+          <rect x="40" y="935" width="195" height="46" rx="3" fill="#ffffff" stroke="#d6d3d1" stroke-dasharray="4,3"/>
+          <text x="137" y="955" font-size="12" font-weight="500" fill="#1c1917">Genyōsha lineage</text>
+          <text x="137" y="971" class="jp" font-size="10" fill="#78716c">玄洋社 · 1881– · right-wing genealogy</text>
+        </g>
+        <g class="node light" data-id="ldpcommittee">
+          <rect x="260" y="935" width="230" height="46" rx="3" fill="#ffffff" stroke="#d6d3d1" stroke-dasharray="4,3"/>
+          <text x="375" y="955" font-size="12" font-weight="500" fill="#1c1917">LDP Security Committee</text>
+          <text x="375" y="971" class="jp" font-size="10" fill="#78716c">est. 1956 · Abe as advisor</text>
+        </g>
+        <g class="node light" data-id="planning-board">
+          <rect x="510" y="935" width="230" height="46" rx="3" fill="#ffffff" stroke="#d6d3d1" stroke-dasharray="4,3"/>
+          <text x="625" y="955" font-size="12" font-weight="500" fill="#1c1917">Prewar Planning Board</text>
+          <text x="625" y="971" class="jp" font-size="10" fill="#78716c">企画院 · reform bureaucrat network</text>
+        </g>
+        <g class="node light" data-id="nipponkaigi">
+          <rect x="760" y="935" width="230" height="46" rx="3" fill="#ffffff" stroke="#d6d3d1" stroke-dasharray="4,3"/>
+          <text x="875" y="955" font-size="12" font-weight="500" fill="#1c1917">Nippon Kaigi (forward-link)</text>
+          <text x="875" y="971" class="jp" font-size="10" fill="#78716c">日本会議 · 1997– · successor milieu</text>
+        </g>
+        <g class="node light" data-id="democracy-institute">
+          <rect x="1010" y="935" width="185" height="46" rx="3" fill="#ffffff" stroke="#d6d3d1" stroke-dasharray="4,3"/>
+          <text x="1102" y="955" font-size="12" font-weight="500" fill="#1c1917">Democracy Study Inst.</text>
+          <text x="1102" y="971" class="jp" font-size="10" fill="#78716c">民主主義研究所 · Nabeyama/Sano H.</text>
+        </g>
+
+        <!-- Dashed genealogical connections to Council -->
+        <path d="M 137 935 Q 200 880 500 289" stroke="#a8a29e" stroke-width="0.8" fill="none" stroke-dasharray="2,4"/>
+        <path d="M 375 935 Q 400 880 560 289" stroke="#a8a29e" stroke-width="0.8" fill="none" stroke-dasharray="2,4"/>
+        <path d="M 625 935 Q 620 870 620 289" stroke="#a8a29e" stroke-width="0.8" fill="none" stroke-dasharray="2,4"/>
+        <path d="M 875 935 Q 840 870 680 289" stroke="#a8a29e" stroke-width="0.8" fill="none" stroke-dasharray="2,4"/>
+        <path d="M 1102 935 Q 1050 880 720 289" stroke="#a8a29e" stroke-width="0.8" fill="none" stroke-dasharray="2,4"/>
+
+      </svg>
+    </div>
+    <div class="panel" id="panel1">
+      <p class="placeholder">Click any node to see its role in the Council and its significance for the paper's argument.</p>
+    </div>
+  </section>
+
+  <!-- ============================================================ -->
+  <!-- CHART 2 — CONVERGENCE ARGUMENT                                -->
+  <!-- ============================================================ -->
+  <section class="chart-section">
+    <div class="chart-title">
+      <span class="chart-num">Figure 2</span>
+      <h2>Four trajectories converging on the Third Way</h2>
+    </div>
+    <p class="chart-lede">The Council's <em>Daisan no michi</em> as shared endpoint for four distinct transwar trajectories. Each trajectory starts at a different point in interwar Japanese political thought and ends at the same organicist-solidary anthropology that rejects the shared individualism of liberalism and communism.</p>
+
+    <div class="chart-wrap">
+      <svg id="chart2" viewBox="0 0 1240 760" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <marker id="arrow2" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto">
+            <path d="M 0 0 L 10 5 L 0 10 z" fill="#7f1d1d"/>
+          </marker>
+        </defs>
+
+        <!-- Axis label -->
+        <text x="620" y="30" text-anchor="middle" font-family="Inter, sans-serif" font-size="10" letter-spacing="0.16em" fill="#a8a29e">STARTING POINT · INTERWAR/WARTIME · POSTWAR CONVERGENCE</text>
+
+        <!-- Central endpoint node (Third Way / Daisan no michi) -->
+        <g class="node" data-id="c-daisan">
+          <rect x="470" y="330" width="300" height="100" rx="3" fill="#7f1d1d" stroke="#4a0e0e" stroke-width="1.5"/>
+          <text x="620" y="362" font-size="16" font-weight="600" font-style="italic">Daisan no michi</text>
+          <text x="620" y="381" class="jp" font-size="12">第三の道 · 1959 doctrinal manifesto</text>
+          <text x="620" y="402" font-size="11" font-family="Inter, sans-serif" fill="rgba(255,255,255,0.88)">Rejection of the shared anthropology</text>
+          <text x="620" y="418" font-size="11" font-family="Inter, sans-serif" fill="rgba(255,255,255,0.88)">of liberalism and communism</text>
+        </g>
+
+        <!-- Trajectory 1: Abe / technocratic nationalism (top-left) -->
+        <text x="100" y="90" font-family="Inter, sans-serif" font-size="10.5" font-weight="600" letter-spacing="0.08em" fill="#7f1d1d">ABE GENKI — TECHNOCRATIC NATIONALISM</text>
+        <g class="node light" data-id="t1-start">
+          <rect x="60" y="105" width="210" height="52" rx="3" fill="#ffffff" stroke="#7f1d1d" stroke-width="1"/>
+          <text x="165" y="125" font-size="12" font-weight="500">Uesugi kokutai</text>
+          <text x="165" y="143" font-size="10.5" fill="#44403c">Tokyo Imp. U., 1918–</text>
+        </g>
+        <g class="node light" data-id="t1-mid">
+          <rect x="290" y="105" width="210" height="52" rx="3" fill="#ffffff" stroke="#7f1d1d" stroke-width="1"/>
+          <text x="395" y="125" font-size="12" font-weight="500">Tokkō + Planning Board</text>
+          <text x="395" y="143" font-size="10.5" fill="#44403c">1932–45</text>
+        </g>
+        <g class="node light" data-id="t1-end">
+          <rect x="520" y="105" width="210" height="52" rx="3" fill="#ffffff" stroke="#7f1d1d" stroke-width="1"/>
+          <text x="625" y="125" font-size="12" font-weight="500">Third Way technocracy</text>
+          <text x="625" y="143" font-size="10.5" fill="#44403c">1958 Council founding</text>
+        </g>
+        <line x1="270" y1="131" x2="290" y2="131" stroke="#7f1d1d" stroke-width="1.2"/>
+        <line x1="500" y1="131" x2="520" y2="131" stroke="#7f1d1d" stroke-width="1.2"/>
+        <path d="M 625 157 Q 625 240 600 330" stroke="#7f1d1d" stroke-width="1.5" fill="none" marker-end="url(#arrow2)"/>
+
+        <!-- Trajectory 2: Rōyama / ex-fascist democratic socialism (top-right) -->
+        <text x="860" y="90" font-family="Inter, sans-serif" font-size="10.5" font-weight="600" letter-spacing="0.08em" fill="#7f1d1d">RŌYAMA MASAMICHI — FASCIST TO DEMOCRATIC SOCIALIST</text>
+        <g class="node light" data-id="t2-start">
+          <rect x="820" y="105" width="210" height="52" rx="3" fill="#ffffff" stroke="#7f1d1d" stroke-width="1"/>
+          <text x="925" y="125" font-size="12" font-weight="500">Shinjinkai liberalism</text>
+          <text x="925" y="143" font-size="10.5" fill="#44403c">Taishō era</text>
+        </g>
+        <g class="node light" data-id="t2-mid">
+          <rect x="1050" y="105" width="170" height="52" rx="3" fill="#ffffff" stroke="#7f1d1d" stroke-width="1"/>
+          <text x="1135" y="125" font-size="12" font-weight="500">New Order ideologue</text>
+          <text x="1135" y="143" font-size="10.5" fill="#44403c">1940</text>
+        </g>
+        <line x1="1030" y1="131" x2="1050" y2="131" stroke="#7f1d1d" stroke-width="1.2"/>
+        <g class="node light" data-id="t2-end">
+          <rect x="950" y="185" width="230" height="52" rx="3" fill="#ffffff" stroke="#7f1d1d" stroke-width="1"/>
+          <text x="1065" y="205" font-size="12" font-weight="500">Democratic Socialism</text>
+          <text x="1065" y="223" font-size="10.5" fill="#44403c">postwar (corporatist core preserved)</text>
+        </g>
+        <path d="M 1135 157 Q 1135 170 1065 185" stroke="#7f1d1d" stroke-width="1.2" fill="none"/>
+        <path d="M 1065 237 Q 900 280 775 360" stroke="#7f1d1d" stroke-width="1.5" fill="none" marker-end="url(#arrow2)"/>
+
+        <!-- Trajectory 3: Nishio / realist socialism (bottom-left) -->
+        <text x="100" y="605" font-family="Inter, sans-serif" font-size="10.5" font-weight="600" letter-spacing="0.08em" fill="#7f1d1d">NISHIO SUEHIRO — REALIST SOCIALISM</text>
+        <g class="node light" data-id="t3-start">
+          <rect x="60" y="620" width="210" height="52" rx="3" fill="#ffffff" stroke="#7f1d1d" stroke-width="1"/>
+          <text x="165" y="640" font-size="12" font-weight="500">Anti-communist labour</text>
+          <text x="165" y="658" font-size="10.5" fill="#44403c">1920s–30s</text>
+        </g>
+        <g class="node light" data-id="t3-mid">
+          <rect x="290" y="620" width="210" height="52" rx="3" fill="#ffffff" stroke="#7f1d1d" stroke-width="1"/>
+          <text x="395" y="640" font-size="12" font-weight="500">Right-JSP leadership</text>
+          <text x="395" y="658" font-size="10.5" fill="#44403c">1945–59</text>
+        </g>
+        <g class="node light" data-id="t3-end">
+          <rect x="520" y="620" width="210" height="52" rx="3" fill="#ffffff" stroke="#7f1d1d" stroke-width="1"/>
+          <text x="625" y="640" font-size="12" font-weight="500">DSP Third Way rhetoric</text>
+          <text x="625" y="658" font-size="10.5" fill="#44403c">1960 founding</text>
+        </g>
+        <line x1="270" y1="646" x2="290" y2="646" stroke="#7f1d1d" stroke-width="1.2"/>
+        <line x1="500" y1="646" x2="520" y2="646" stroke="#7f1d1d" stroke-width="1.2"/>
+        <path d="M 625 620 Q 625 520 610 430" stroke="#7f1d1d" stroke-width="1.5" fill="none" marker-end="url(#arrow2)"/>
+
+        <!-- Trajectory 4: Nabeyama / tenkōsha (bottom-right) -->
+        <text x="820" y="605" font-family="Inter, sans-serif" font-size="10.5" font-weight="600" letter-spacing="0.08em" fill="#7f1d1d">NABEYAMA SADACHIKA — TENKŌSHA</text>
+        <g class="node light" data-id="t4-start">
+          <rect x="780" y="620" width="210" height="52" rx="3" fill="#ffffff" stroke="#7f1d1d" stroke-width="1"/>
+          <text x="885" y="640" font-size="12" font-weight="500">JCP leadership</text>
+          <text x="885" y="658" font-size="10.5" fill="#44403c">–1929</text>
+        </g>
+        <g class="node light" data-id="t4-mid">
+          <rect x="1010" y="620" width="210" height="52" rx="3" fill="#ffffff" stroke="#7f1d1d" stroke-width="1"/>
+          <text x="1115" y="640" font-size="12" font-weight="500">Ichigaya declaration</text>
+          <text x="1115" y="658" font-size="10.5" fill="#44403c">1933</text>
+        </g>
+        <g class="node light" data-id="t4-end">
+          <rect x="895" y="530" width="230" height="52" rx="3" fill="#ffffff" stroke="#7f1d1d" stroke-width="1"/>
+          <text x="1010" y="550" font-size="12" font-weight="500">Council directorship</text>
+          <text x="1010" y="568" font-size="10.5" fill="#44403c">1958 · postwar anti-communism</text>
+        </g>
+        <line x1="990" y1="646" x2="1010" y2="646" stroke="#7f1d1d" stroke-width="1.2"/>
+        <path d="M 1115 620 Q 1115 600 1010 582" stroke="#7f1d1d" stroke-width="1.2" fill="none"/>
+        <path d="M 1010 530 Q 900 480 775 420" stroke="#7f1d1d" stroke-width="1.5" fill="none" marker-end="url(#arrow2)"/>
+
+        <!-- Shared endpoint label -->
+        <g>
+          <rect x="320" y="470" width="600" height="60" rx="3" fill="none" stroke="#78716c" stroke-dasharray="4,3" stroke-width="1"/>
+          <text x="620" y="492" text-anchor="middle" font-family="Inter, sans-serif" font-size="10.5" fill="#78716c" letter-spacing="0.08em">SHARED DOCTRINAL ENDPOINT</text>
+          <text x="620" y="513" text-anchor="middle" font-size="14" fill="#1c1917">An organicist-solidary anthropology in which social bonds are</text>
+          <text x="620" y="528" text-anchor="middle" font-size="14" fill="#1c1917">ontologically prior to individual choice</text>
+        </g>
+
+      </svg>
+    </div>
+    <div class="panel" id="panel2">
+      <p class="placeholder">Click any node to see the step in the trajectory and what it contributes to the convergence argument.</p>
+    </div>
+  </section>
+
+  <footer>
+    Sources: officer roster printed in <em>Daisan no michi: hon-kai no shidō rinen</em> (Shin Nippon Kyōgi Kai, 1959), 42; <em>Uyokutero.pdf</em> (secondary source, n.d.); Hofmann 2020; Starrs 2023; Large 1976; Mimura 2011. † indicates identifications marked for verification.
+  </footer>
+</div>
+
+<script>
+const data = {
+  // CHART 1 nodes
+  sakakura: { title: "Sakakura Takuzō", jp: "坂倉卓造", role: "ADVISOR", body: ["Advisor to the Council, appearing in the advisory row of the 1959 officer roster. Context for his specific affiliation at the date of the Council's formation is not securely established in the secondary literature I have checked, but his presence in the advisor trio alongside two senior imperial-university nationalist academics suggests a figure of comparable standing."] },
+  kamikawa: { title: "Kamikawa Hikomatsu", jp: "神川彦松 · Tokyo Imperial University", role: "ADVISOR", body: ["Chair of international politics at Tokyo Imperial University. Long-standing academic presence in prewar and postwar Japanese international relations scholarship. His presence in the advisory row gives the Council academic respectability at the apex of the Tokyo university system, complementing Sakuta's corresponding position at Kyoto."] },
+  sakuta: { title: "Sakuta Sōichi", jp: "作田荘一 · Kyoto Imperial University", role: "ADVISOR", body: ["Senior Kyoto Imperial University economist whose prewar and wartime writings helped articulate the intellectual case for Japanese statist political economy. His presence as advisor confirms that the Council's Kyoto-nationalist intellectual support is broader than Kōyama individually, and that it was drawn as an institutional milieu, not just through a single director."] },
+
+  abe: { title: "Abe Genki", jp: "安倍源基 (1894–1989)", role: "REPRESENTATIVE DIRECTOR", body: ["Former Head of the Tokkō (Special Higher Police), Superintendent-General of the Metropolitan Police, and Japan's last wartime Home Minister (April 1945). Held in Sugamo as a Class A suspect; released 24 December 1949.", "In the Council he represents the security-bureaucracy tributary: the ex-Home Ministry network, the tokkō apparatus, and the reform-bureaucrat planning tradition. His chairmanship makes the Council a public re-assembly of the prewar security state on a civil-society basis."] },
+  kimura: { title: "Kimura Tokutarō", jp: "木村篤太郎 (1886–1982)", role: "REPRESENTATIVE DIRECTOR", body: ["Former Attorney General, postwar Minister of Justice under Yoshida, and subsequent Defense Agency director-general under Hatoyama. Key figure in the 1950s rearmament push and in the legal-political establishment's anti-communist orientation.", "In the Council he represents the postwar legal-political establishment, giving the organisation a direct line into the LDP's security policy apparatus and specifically into the rearmament debate."] },
+  yasuoka: { title: "Yasuoka Masahiro", jp: "安岡正篤 (1898–1983)", role: "REPRESENTATIVE DIRECTOR", body: ["The most important Confucian-conservative intellectual of twentieth-century Japan. Author of the Council's four-point charter. Advisor to successive LDP prime ministers; his Kinkeigakuin and related networks supplied conservative moral-philosophical resources to both elite and corporate Japan for four decades.", "His status as representative director — not advisor, as the existing secondary literature has sometimes assumed — is analytically central. It places him inside the Council's executive, not at its periphery, and supports the reading of Daisan no michi as a collaborative Kōyama–Yasuoka production rather than as Kōyama's sole work."] },
+
+  council: { title: "Shin Nippon Kyōgi Kai", jp: "新日本協議会 (The Council for a New Japan)", role: "THE COUNCIL", body: ["Founded January 1958. Headquarters at Kanda Mitoshiro-chō 6, Chiyoda-ku, Tokyo. Three representative directors, three advisors, approximately 25 directors, 23 prefectural branches by 1959.", "Self-described as a national front uniting those who share its patriotic and anti-communist aspirations. The centrepiece of the paper's argument: a civil-society reconstruction of prewar right-wing networks under democratic conditions, with Daisan no michi as its doctrinal core."] },
+
+  koyama: { title: "Kōyama Iwao", jp: "高山岩男 (1905–1993)", role: "DIRECTOR · KYOTO SCHOOL", body: ["Nihon University philosopher, key Kyoto School figure. Participant in the 1942–43 Chūōkōron roundtables on the 'world-historical standpoint', author of Sekai-shi no tetsugaku (1942), central articulator of Japan's wartime world-historical mission doctrine. Purged during occupation, rehabilitated in the 1950s.", "Primary philosophical author of Daisan no michi, with Yasuoka's Confucian substrate in the anthropological chapters. His directorship places the Kyoto School project inside the organisational apparatus of the postwar right, not adjacent to it."] },
+  tabata: { title: "Tabata Gensui", jp: "田畑厳穂", role: "DIRECTOR · KYOTO SCHOOL MILIEU", body: ["Listed in the director roster. Association with the Kyoto-school milieu is my tentative reading based on the name cluster; identification should be verified before the paper commits to it."] },
+  "confucian-note": { title: "Yasuoka's Confucian network", jp: "", role: "TRIBUTARY SUMMARY", body: ["Yasuoka's own network (Kinkeigakuin and its wider orbit) supplied the Confucian-personalist substrate visible in the anthropological chapters of Daisan no michi. Yasuoka himself is formally in the representative-directors row, but as a tributary his Confucian reach into corporate and LDP Japan was far broader than the Council's roster alone reveals."] },
+
+  tanaka: { title: "Tanaka Shin'ichi †", jp: "田中新一 (1893–1976)", role: "DIRECTOR · MILITARY / WARTIME STATE", body: ["Former Lieutenant General in the Imperial Japanese Army and chief of the Army General Staff's Operations Section in the early Pacific War. Major advocate of war with the United States. Held in Sugamo as a Class A suspect.", "† The identification as this Tanaka Shin'ichi is made on the basis of the name and the Council's known composition but should be verified. If correct, his directorship gives the Council a direct line to the wartime military command, complementing the civilian-security line that runs through Abe."] },
+  uemura: { title: "Uemura Kentarō", jp: "上村健太郎", role: "DIRECTOR", body: ["Director listed in the 1959 roster. Specific biographical identification pending verification. Placed here on the provisional assumption of a bureaucratic or military-associated career; if this is the senior Home Ministry civil servant of the same name, he would sit naturally in the Abe tributary."] },
+
+  omori: { title: "Ōmori Sōgen", jp: "大森曹玄 (1904–1994)", role: "DIRECTOR · RELIGIOUS NATIONALISM", body: ["Rinzai Zen master, calligrapher, martial-arts teacher, and head of Tesshū-kai. Abbot of Hosshinji. Longstanding connection between militant Zen practice and Japanese nationalist thought; wartime figure in the militarist-Zen tradition that Brian Victoria has documented.", "His directorship gives the Council an explicit religious-nationalist connection, distinct from but adjacent to the Kyoto School's philosophical idiom."] },
+
+  takasugi: { title: "Takasugi Shin'ichi", jp: "高杉晋一 (1892–1978)", role: "DIRECTOR · BUSINESS / ZAIBATSU", body: ["Chairman of Mitsubishi Electric and a central figure in the postwar zaibatsu leadership. Later famous for the 1965 'Takasugi remark' during normalisation talks with South Korea.", "Handled the Council's fundraising. His presence is the Council's primary business-community anchor, enabling the reported annual budget of several hundred million yen and giving the organisation a direct line into Japan's industrial conservatism."] },
+  oya: { title: "Ōya Genkō", jp: "大屋源幸", role: "DIRECTOR · BUSINESS", body: ["Director listed in the 1959 roster. Note that this is Ōya Genkō (大屋源幸), not Ōya Shinzō (大屋晋三, the Teijin chairman and later minister). Specific biographical identification pending. Placed in the business tributary provisionally."] },
+
+  nabeyama: { title: "Nabeyama Sadachika", jp: "鍋山貞親 (1901–1979)", role: "DIRECTOR · TENKŌSHA", body: ["Co-author with Sano Manabu of the 1933 Ichigaya Prison joint declaration, the landmark tenkō of the prewar period. The declaration, issued during Abe's tenure as head of the Tokyo Tokkō, became the canonical template for the mass tenkō that followed.", "His directorship of the Council in 1958 is therefore not incidental. It is the institutional afterlife of the state technique Abe administered in the 1930s, now reconstituted as organisational collaboration between the former converter and the most famous of the former converted. For the paper's convergence argument, Nabeyama is the clearest empirical case of transit from Marxist collectivism through tenkō to postwar national-organicist anti-communism — a trajectory that ends at the same anthropological endpoint as Abe's, Rōyama's, and Nishio's."] },
+  sano: { title: "Sano Hiroshi", jp: "佐野博 (nephew of Sano Manabu 佐野学)", role: "DIRECTOR · TENKŌSHA", body: ["Not to be confused with Sano Manabu (佐野学), the 1933 Ichigaya Prison tenkō declarant. Sano Manabu died in March 1953 and cannot have been on the 1958 Council board; Sano Hiroshi is his nephew, active through the postwar Democracy Study Institute (民主主義研究所) and related anti-communist organisational networks.", "His directorship alongside Nabeyama strengthens the tenkōsha tributary and, with it, the convergence argument about former communist collectivism as one of the routes into the Council's organicist anti-liberalism."] },
+
+  tamura: { title: "Tamura Kōsaku", jp: "田村幸策", role: "DIRECTOR · ACADEMIC", body: ["Hōsei University professor of international relations, prewar and postwar diplomatic historian. His presence gives the Council academic-international-politics respectability at the director level, complementing Kamikawa's at the advisory level."] },
+  nakayama: { title: "Nakayama Masaru", jp: "中山優", role: "DIRECTOR · PAN-ASIANISM", body: ["Pan-Asianist writer and China specialist, associated with the Manchukuo cultural-policy apparatus and with the broader pan-Asianist networks around Ishiwara Kanji. His directorship gives the Council a direct link to the prewar pan-Asianist tradition that Daisan no michi's tenth chapter softens but preserves in its repurposed form as 'commonality of historical destiny'."] },
+  mitarai: { title: "Mitarai Tatsuo", jp: "御手洗辰雄", role: "DIRECTOR · JOURNALIST", body: ["Conservative journalist and political commentator. Key node for the Council's media reach into the wider conservative press, complementing the tactical-pamphlet machinery of the Shin Nikkyō series and giving the organisation outlets in the mainstream commercial press."] },
+  others: { title: "20 further directors", jp: "", role: "ROSTER OVERFLOW", body: ["Ibe Masaichi, Ōnishi Kunitoshi, Kurihara Minoru, Sakura Shigeo, Suzuki Zen'ichi, Nakagawa Hiroshi, Nakamura Kinujirō, Kusaka Tōgo, Furuya Shigeru, Masuo Hikotarō, Mitsuma Shingo, Yumiie Shichirō, Yokota Jūzaemon, and others. Each has a specific trajectory; several are plausibly in the bureaucratic, military, or business tributaries above but have not been individually researched for this paper."] },
+
+  funding: { title: "Business-community funding", jp: "", role: "OPERATIONAL", body: ["Council members paid annual fees of ¥10,000 (individual), but the bulk of operational funding came from business community contributions managed by Takasugi. Reported total contributions reaching several hundred million yen (source: Uyokutero.pdf). This funding enabled the 23 prefectural offices and the sustained publication programme."] },
+  regional: { title: "23 prefectural offices", jp: "", role: "OPERATIONAL · BY 1959", body: ["By 1959 the Council had branch offices in 23 prefectures, giving it national propaganda reach alongside its Tokyo-centred leadership and publications apparatus. This regional footprint distinguishes the Council from a purely metropolitan intellectual coterie and supports the paper's claim about the publicly institutional character of the postwar right's ideological work."] },
+
+  daisan: { title: "Daisan no michi", jp: "第三の道 · 本会の指導理念", role: "DOCTRINAL MANIFESTO", body: ["The Council's 27-page doctrinal pamphlet, published 1958 and reprinted 27 November 1959 to circulate into the Anpo build-up. Self-described as the Council's shidō rinen (guiding philosophy).", "Analytically, the paper's single most important primary source. Its ten chapters move through a critique of liberal-communist shared individualism (chs. 4–6), a positive organicist anthropology (chs. 5–6), an argument for constitutional emergency provisions (ch. 7), a rejection of neutralism-within-great-power-rivalry (ch. 9), and a concluding assignment of world-historical mission to the Japanese people (ch. 10).", "Best read as a collaborative Kōyama–Yasuoka production: Kyoto School philosophical architecture plus Confucian moral substance."] },
+  nikkyo: { title: "Shin Nikkyō pamphlet series", jp: "14 tactical pamphlets", role: "OPERATIONAL · PUBLICATIONS", body: ["Fourteen numbered tactical pamphlets catalogued in the back matter of Daisan no michi. Subject distribution: five on the Japan Teachers Union (including the 1957–58 teacher-evaluation dispute), two on the Security Treaty and neutralism, three on the Socialist and Communist parties, one each on Zengakuren, the Kimigayo anthem, international communism, and Soviet/Chinese conditions.", "The operational arm of the Council's civil-society counter-mobilisation. The tactical register complements the doctrinal register of Daisan no michi itself."] },
+  nihonseikai: { title: "Nihon to Sekai", jp: "日本と世界", role: "OPERATIONAL · MAGAZINE", body: ["The Council's monthly magazine, targeted at a broader readership than the Shin Nikkyō tactical pamphlets and giving the organisation a more sustained presence in the conservative press ecosystem."] },
+  shushi: { title: "The Four-Point Charter", jp: "本会の趣旨", role: "FOUNDATIONAL DOCUMENT", body: ["The Council's shorter founding statement, drafted by Yasuoka and printed alongside Daisan no michi in the same volume. Four points: (1) democratic new Japan in accordance with history and tradition; (2) independence and morality; (3) elimination of 'foreign conspiracies' and 'communist defeatism'; (4) cooperation with the free world.", "The charter's formula of 'democratic Japan in accordance with history and tradition' encapsulates the translation problem the whole Third Way programme was trying to solve."] },
+
+  genyosha: { title: "Genyōsha lineage", jp: "玄洋社 (1881–1946)", role: "ADJACENT · PREWAR RIGHT-WING GENEALOGY", body: ["Founded 1881 as a pan-Asianist and ultranationalist society; proscribed by SCAP in 1946. Genyōsha and its successor organisations (notably Kokuryūkai) provided much of the organisational vocabulary and network substrate that postwar right-wing groupings drew on.", "Adjacent rather than directly connected: the Council does not descend from Genyōsha organisationally, but it operates within a milieu shaped by the Genyōsha genealogy, and several of its directors have links to that milieu."] },
+  ldpcommittee: { title: "LDP Special Committee on Public Security", jp: "est. 1956", role: "ADJACENT · CONSERVATIVE POLICY APPARATUS", body: ["The LDP Special Committee on Public Security Measures, established in 1956, transmitted prewar-security-state knowledge and technique to a new generation of postwar security officials. Abe advised the committee, and Kimura's Defense Agency work overlapped with its remit. The committee provides institutional continuity between the Council's civil-society work and the LDP's security-policy apparatus."] },
+  "planning-board": { title: "Prewar Planning Board", jp: "企画院", role: "ADJACENT · REFORM BUREAUCRAT NETWORK", body: ["The central organ of Japan's wartime economic controls, responsible for unified annual plans for resource mobilisation. Abe served on it in the final phase of his wartime career. The 'new bureaucrats' or 'reform bureaucrats' who staffed it and the Manchukuo industrial-policy apparatus form the technocratic-nationalist background Mimura 2011 documents. This network is the genealogical background to Abe's own technocratic nationalism."] },
+  nipponkaigi: { title: "Nippon Kaigi (forward-link)", jp: "日本会議 (1997–)", role: "ADJACENT · SUCCESSOR MILIEU", body: ["Founded 1997 from the merger of Nihon o Mamoru Kai and Nihon o Mamoru Kokumin Kaigi. Not a direct descendant of the Shin Nippon Kyōgi Kai, but part of the same right-wing civil-society genealogy and inheriting several of its themes (constitutional revision, education policy, national-anthem politics, moral-traditionalist anti-liberalism).", "Shown here as a forward genealogical link: the Council's civil-society mode of postwar right-wing mobilisation has continuing descendants, and the constitutional-revisionist thread of Daisan no michi chapter 7 runs through to contemporary Nippon Kaigi advocacy."] },
+  "democracy-institute": { title: "Democracy Study Institute", jp: "民主主義研究所", role: "ADJACENT · TENKŌSHA INFRASTRUCTURE", body: ["The postwar anti-communist organisational network that Nabeyama and Sano Hiroshi worked through. Not a direct affiliate of the Council, but the primary institutional home of the tenkōsha tributary that Nabeyama and Sano brought with them into the Council's directorship."] },
+
+  // CHART 2 nodes
+  "c-daisan": { title: "Daisan no michi as convergence endpoint", jp: "", role: "THE ARGUMENT VISUALISED", body: ["The four trajectories mapped in this chart all end at Daisan no michi's organicist-solidary anthropology. What the document does philosophically — reject the shared individualism of liberalism and communism, affirm social solidarity as ontologically prior to individual choice — is what makes it an intelligible endpoint for trajectories that start from very different places. The Council's Third Way is not opportunistic rebranding; it is the meeting point of four distinct transwar paths, made intelligible as a single destination by the document's anthropological argument."] },
+
+  "t1-start": { title: "Uesugi Shinkichi's kokutai constitutionalism", jp: "", role: "ABE'S STARTING POINT", body: ["Abe's Tokyo Imperial University legal education under Uesugi Shinkichi, whose 1921 A New Thesis on the State (Kokka shinron) articulated an emperor-as-kokutai constitutionalism opposed to Minobe's organ theory. This gives Abe the fusion of state authority and moral cultivation that would prove most durable across the 1945 divide."] },
+  "t1-mid": { title: "Tokkō chief and Planning Board", jp: "1932–45", role: "ABE'S WARTIME APEX", body: ["As Tokkō chief (1932–37) Abe administered the paternalistic-plus-coercive apparatus that managed political dissent through both tenkō and, where tenkō failed, lethal violence. As Planning Board member and finally Home Minister (April–August 1945) he represented the fully realised form of technocratic nationalism: state-directed economic management fused with moral cultivation under kokutai authority."] },
+  "t1-end": { title: "Third Way technocracy", jp: "1958–", role: "ABE'S POSTWAR CONVERGENCE", body: ["The Council as Abe's civil-society reconstruction of the technocratic-nationalist position under democratic conditions. The coercive apparatus is stripped away; the moral-cultivation-plus-state-guidance commitment is preserved and rearticulated in Daisan no michi's organicist anthropology."] },
+
+  "t2-start": { title: "Shinjinkai liberalism", jp: "Taishō", role: "RŌYAMA'S STARTING POINT", body: ["Rōyama's career began in the Shinjinkai, the left-liberal Tokyo Imperial University student group whose membership in the 1920s produced both liberal reformers and, through subsequent radicalisation, both fascist and communist trajectories. His starting point is the Taishō-era liberal intellectual formation."] },
+  "t2-mid": { title: "New Order ideologue", jp: "1940", role: "RŌYAMA'S WARTIME TURN", body: ["By 1940 Rōyama had committed to articulating the ideological case for Japan's New Order in East Asia, finding in European fascism a model for Japanese modernity. The passage from liberalism to fascism is not anomalous but follows the Shinjinkai pattern: a principled dissatisfaction with laissez-faire liberalism seeking resolution in a stronger conception of the state."] },
+  "t2-end": { title: "Democratic Socialism", jp: "postwar", role: "RŌYAMA'S POSTWAR CONVERGENCE", body: ["After the war, Rōyama's democratic socialism rejected both class-based communism and ultranationalist fascism in favour of what he called industrial democracy, a corporatist vision of labour–capital cooperation under state guidance. The rebranding is substantial at the surface but preserves the corporatist economic core and the conviction that the state must actively manage social life. This is the same organicist alternative that Daisan no michi articulates in philosophical form."] },
+
+  "t3-start": { title: "Anti-communist labour organising", jp: "1920s–30s", role: "NISHIO'S STARTING POINT", body: ["Nishio's career began in the moderate-labour wing of prewar Japanese socialism (see Large 1976), carving out space for organised labour within the existing political system and rejecting the communist and anarchist revolutionary currents. This realist-socialist tradition was anti-communist from its inception."] },
+  "t3-mid": { title: "Right-JSP leadership", jp: "1945–59", role: "NISHIO'S POSTWAR CENTRE", body: ["In the postwar Socialist Party, Nishio led the right wing and fought a sustained battle with the left-socialists that culminated in the split and the formation of the Democratic Socialist Party in January 1960. The Council's founding (January 1958) sits exactly in the middle of this trajectory."] },
+  "t3-end": { title: "Democratic Socialist Party Third Way", jp: "1960", role: "NISHIO'S POSTWAR CONVERGENCE", body: ["The DSP's Third Way rhetoric emerged from the same impulse as the Council's: rejection of communist revolutionary individualism and of laissez-faire capitalism alike, in favour of a realist social-democratic position that accepted market economics but demanded their regulation in line with social solidarity. Takasugi was explicit that Nishio's lectures influenced the Council, and the doctrinal overlap is substantial."] },
+
+  "t4-start": { title: "JCP leadership", jp: "–1929", role: "NABEYAMA'S STARTING POINT", body: ["Nabeyama was a senior figure in the Japanese Communist Party before his 1929 arrest. His starting point is Marxist-Leninist collectivism in its most theoretically developed interwar Japanese form, before tenkō transformed his relationship to collective solidarity into its national rather than class form."] },
+  "t4-mid": { title: "1933 Ichigaya declaration", jp: "", role: "NABEYAMA'S PIVOT", body: ["The June 1933 joint declaration with Sano Manabu, issued from Ichigaya Prison under Abe's Tokyo Tokkō regime, is the canonical tenkō of the prewar period. The declaration argued for a specifically Japanese socialism grounded in national particularity, rejecting the Comintern's universalism. This is structurally close to what Daisan no michi articulates philosophically twenty-six years later: the right collective commitment, directed to the right particular rather than the false universal."] },
+  "t4-end": { title: "Council directorship", jp: "1958", role: "NABEYAMA'S POSTWAR CONVERGENCE", body: ["Nabeyama's directorship is the living institutional proof of the convergence argument. The former communist whose 1933 tenkō was managed by Abe's Tokkō is a formal officer of Abe's postwar Council, helping articulate the mature philosophical form of what he had argued in prison a quarter-century earlier. The state technique of tenkō has become a shared organisational enterprise between the former converter and the most famous of the former converted."] },
+};
+
+function setupChart(svgId, panelId) {
+  const svg = document.getElementById(svgId);
+  const panel = document.getElementById(panelId);
+  const nodes = svg.querySelectorAll('.node');
+  nodes.forEach(node => {
+    node.addEventListener('click', () => {
+      nodes.forEach(n => n.classList.remove('selected'));
+      node.classList.add('selected');
+      const id = node.getAttribute('data-id');
+      const d = data[id];
+      if (!d) {
+        panel.innerHTML = '<p class="placeholder">No detail available for this node.</p>';
+        return;
+      }
+      let html = '';
+      if (d.role) html += `<div class="role">${d.role}</div>`;
+      if (d.title) html += `<h3>${d.title}</h3>`;
+      if (d.jp) html += `<div class="japanese">${d.jp}</div>`;
+      if (d.body) html += d.body.map(p => `<p>${p}</p>`).join('');
+      panel.innerHTML = html;
+    });
+  });
+}
+setupChart('chart1', 'panel1');
+setupChart('chart2', 'panel2');
+</script>
+</body>
+</html>
