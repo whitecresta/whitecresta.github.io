@@ -109,6 +109,7 @@ a.book:hover .book-cover { border-color: $ink; }
 .app-frame.app-frame-wide { height: 760px; }
 .desktop-only-note { display: none; }
 .app-frame.app-frame-auto { height: 2600px; } // fallback until the page script sizes it
+.app-frame.app-frame-app { height: 860px; }
 
 .placeholder-note { font-size: .9rem; color: #444; background: #fff; border-left: 3px solid $accent; padding: .4rem 0 .4rem 1rem; }
 
@@ -117,7 +118,7 @@ a.book:hover .book-cover { border-color: $ink; }
   .app-frame { height: 420px; }
   .app-frame.app-frame-tall { height: 1280px; }
   // The network mapper needs a desktop-width screen; link out instead of embedding
-  .app-frame.app-frame-wide { display: none; }
+  .app-frame.app-frame-wide, .app-frame.app-frame-app { display: none; }
   .desktop-only-note { display: block; }
   .hide-mobile { display: none; }
 }
