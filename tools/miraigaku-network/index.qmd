@@ -8,7 +8,7 @@ toc: true
 
 ```{=html}
 <div class="tool-meta">
-<span><strong>Status:</strong> First pass</span>
+<span><strong>Status:</strong> Working catalogue</span>
 <span><strong>Version:</strong> 0.1</span>
 <span><strong>Language:</strong> English / 日本語</span>
 <span><strong>Updated:</strong> September 2026</span>
@@ -19,7 +19,7 @@ toc: true
 
 ## What it shows
 
-Japanese futurology (*miraigaku*, 未来学) took shape between 1965 and 1970 through symposia, study groups and a wave of popular books. This map catalogues the people, organisations, events and publications named in six sources from that moment and after, from the proceedings of the first Futurology Symposium at Hakone in 1967 to Yoshizawa Gō's 2012 overview. It holds 110 people, 24 organisations, 13 events and 351 links.
+Japanese futurology (*miraigaku*, 未来学) took shape between 1965 and 1970 through symposia, study groups and a wave of popular books. This map catalogues the people, organisations, events and publications named in seven sources from that moment and after, from the proceedings of the first Futurology Symposium at Hakone in 1967 to studies by Yoshizawa Gō (2012) and Iwai Shigeru (2016). It holds 114 people, 31 organisations, 15 events and 416 links.
 
 The catalogue is set beside the Japan-related entries in Jenny Andersson's *The Future of the World* (Oxford University Press, 2018). Where both describe the same person, body or meeting they share one node, so the map shows where the international history of futures studies already includes Japan and where the Japanese sources add to it.
 
@@ -43,7 +43,7 @@ The Miraigaku Network needs a larger screen. Use the button above to open it ful
 
 ## Sources and data
 
-The map is a snapshot of a first catalogue pass, taken on 27 September 2026. Names and roles were read from front matter, contents, colophons, attendee lists and prefaces, and research-question tags are a first draft. The *Sources and method* tab lists the six sources and the checks still outstanding.
+The map is a snapshot of the catalogue taken on 27 September 2026. For the five books from 1967 to 1970, names and roles were read from front matter, contents, colophons, attendee lists and prefaces. Yoshizawa (2012) and Iwai (2016) were read in full. Research-question tags are a first draft. The *Sources and method* tab lists the seven sources and the checks still outstanding.
 
 ## How to cite
 
