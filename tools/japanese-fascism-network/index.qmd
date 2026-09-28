@@ -1,6 +1,6 @@
 ---
 title: "Japanese Fascism Network"
-description: "An interactive map of the people, organisations, events, texts and ideas in ten secondary works on fascism in Japan, 1910s to 1950s, with the historians who argue over the term shown as a separate layer."
+description: "An interactive map of the people, organisations, events, texts and ideas in eleven secondary works on fascism in Japan, 1880s to 1950s, with the historians who argue over the term shown as a separate layer."
 date: 2026-09-28
 categories: [network, fascism, historiography, 1930s]
 toc: true
@@ -9,19 +9,19 @@ toc: true
 ```{=html}
 <div class="tool-meta">
 <span><strong>Status:</strong> Working catalogue</span>
-<span><strong>Version:</strong> 0.2</span>
+<span><strong>Version:</strong> 0.3</span>
 <span><strong>Language:</strong> English / 日本語</span>
 <span><strong>Updated:</strong> September 2026</span>
 </div>
 ```
 
-[Open the Japanese Fascism Network full screen](app/index.html?v=3){.tool-launch}
+[Open the Japanese Fascism Network full screen](app/index.html?v=4){.tool-launch}
 
 ## What it shows
 
-Was interwar and wartime Japan fascist? This map gathers what ten secondary works on the question say about the people, organisations, events, texts and ideas involved, from the Taishō period to the reckoning after defeat. It holds 343 people, 145 organisations and groups, 47 events, laws and policies, 22 texts and works and 17 concepts, joined by 846 links.
+Was interwar and wartime Japan fascist? This map gathers what eleven secondary works on the question say about the people, organisations, events, texts and ideas involved, from Meiji-era nationalism to the reckoning after defeat. It holds 349 people, 150 organisations and groups, 49 events, laws and policies, 27 texts and works and 20 concepts, joined by 878 links.
 
-The historians and theorists who argue over the term form a separate layer: 68 scholars, 110 recorded positions and 114 links showing who discusses whom. Every entry and link carries the author and page it comes from.
+The historians and theorists who argue over the term form a separate layer: 69 scholars, 110 recorded positions and 117 links showing who discusses whom. Every entry and link carries the author and page it comes from.
 
 ## Explore it
 
@@ -30,7 +30,7 @@ The Japanese Fascism Network needs a larger screen. Use the button above to open
 :::
 
 ::: {.column-screen-inset}
-<iframe class="app-frame app-frame-app" src="app/index.html?v=3" title="Japanese Fascism Network"></iframe>
+<iframe class="app-frame app-frame-app" src="app/index.html?v=4" title="Japanese Fascism Network"></iframe>
 :::
 
 ## How to use it
@@ -44,8 +44,8 @@ The Japanese Fascism Network needs a larger screen. Use the button above to open
 
 ## Sources and data
 
-The map draws on ten works: articles by Miles Fletcher (1979), Herbert P. Bix (1982), Stanley G. Payne (1984), Christopher W. A. Szpilman (2013), Max Ward (2014) and Louise Young (2017); a chapter by Roy Starrs (2018); two monographs, Janis Mimura's *Planning for Empire* (2011) and Reto Hofmann's *The Fascist Effect* (2015); and the nineteen essays in Alan Tansman (ed.), *The Culture of Japanese Fascism* (2009). The main text of each was read in full; endnotes were not systematically read. No entry, link or claim comes from outside the ten works; life dates and kanji that a source does not give follow standard forms. The *Sources and method* tab gives the full bibliography and the checks still outstanding.
+The map draws on eleven works: articles by Edwin B. Lee (1975), Miles Fletcher (1979), Herbert P. Bix (1982), Stanley G. Payne (1984), Christopher W. A. Szpilman (2013), Max Ward (2014) and Louise Young (2017); a chapter by Roy Starrs (2018); two monographs, Janis Mimura's *Planning for Empire* (2011) and Reto Hofmann's *The Fascist Effect* (2015); and the nineteen essays in Alan Tansman (ed.), *The Culture of Japanese Fascism* (2009). The main text of each was read in full; endnotes were not systematically read. No entry, link or claim comes from outside the eleven works; life dates and kanji that a source does not give follow standard forms. The *Sources and method* tab gives the full bibliography and the checks still outstanding.
 
 ## How to cite
 
-> Perkins, Chris. 2026. *Japanese Fascism Network*, version 0.2. https://whitecresta.github.io/tools/japanese-fascism-network/
+> Perkins, Chris. 2026. *Japanese Fascism Network*, version 0.3. https://whitecresta.github.io/tools/japanese-fascism-network/
