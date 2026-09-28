@@ -15,7 +15,7 @@ toc: true
 </div>
 ```
 
-[Open the Miraigaku Network full screen](app/index.html){.tool-launch}
+[Open the Miraigaku Network full screen](app/index.html?v=3){.tool-launch}
 
 ## What it shows
 
@@ -30,7 +30,7 @@ The Miraigaku Network needs a larger screen. Use the button above to open it ful
 :::
 
 ::: {.column-screen-inset}
-<iframe class="app-frame app-frame-app" src="app/index.html" title="Miraigaku Network"></iframe>
+<iframe class="app-frame app-frame-app" src="app/index.html?v=3" title="Miraigaku Network"></iframe>
 :::
 
 ## How to use it
