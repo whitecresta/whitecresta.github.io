@@ -1,0 +1,51 @@
+---
+title: "Japanese Fascism Network"
+description: "An interactive map of the people, organisations, events, texts and ideas in nine secondary works on fascism in Japan, 1910s to 1950s, with the historians who argue over the term shown as a separate layer."
+date: 2026-09-28
+categories: [network, fascism, historiography, 1930s]
+toc: true
+---
+
+```{=html}
+<div class="tool-meta">
+<span><strong>Status:</strong> Working catalogue</span>
+<span><strong>Version:</strong> 0.1</span>
+<span><strong>Language:</strong> English / 日本語</span>
+<span><strong>Updated:</strong> September 2026</span>
+</div>
+```
+
+[Open the Japanese Fascism Network full screen](app/index.html?v=1){.tool-launch}
+
+## What it shows
+
+Was interwar and wartime Japan fascist? This map gathers what nine secondary works on the question say about the people, organisations, events, texts and ideas involved, from the Taishō period to the reckoning after defeat. It holds 304 people, 116 organisations and groups, 28 events, laws and policies, 18 texts and works and 11 concepts, joined by 561 links.
+
+The historians and theorists who argue over the term form a separate layer: 68 scholars, 101 recorded positions and 105 links showing who discusses whom. Every entry and link carries the author and page it comes from.
+
+## Explore it
+
+::: {.desktop-only-note .placeholder-note}
+The Japanese Fascism Network needs a larger screen. Use the button above to open it full screen.
+:::
+
+::: {.column-screen-inset}
+<iframe class="app-frame app-frame-app" src="app/index.html?v=1" title="Japanese Fascism Network"></iframe>
+:::
+
+## How to use it
+
+1. **Network**: scroll or pinch to zoom, drag to pan, and click a node to open its profile on the right. Shape shows the kind of entry, size shows the number of links, and colour shows the theme it belongs to. The profile lists what each work says about the entry, with its page reference.
+2. **Time slider**: below the network, drag through the years from 1910 to 1952, or press *Play*, to watch the network grow. Bands mark six phases, from *Taishō beginnings* to *Defeat and reckoning*.
+3. **Filters**: search for a name in English or Japanese, limit the map to one theme, kind of entry or source (down to single chapters of Tansman's edited volume), or turn on **Show the historians** to add the scholarly layer, drawn dashed.
+4. **Timeline**: dated events from the sources, arranged by theme.
+5. **Index**: every entry from A to Z, with the works that name it.
+6. **The debate** sets out the positions on whether Japan was fascist, grouped by stance; **Themes** and **Sources and method** explain how the map was built.
+
+## Sources and data
+
+The map draws on nine works: articles by Miles Fletcher (1979), Herbert P. Bix (1982), Stanley G. Payne (1984), Christopher W. A. Szpilman (2013), Max Ward (2014) and Louise Young (2017); a chapter by Roy Starrs (2018); Reto Hofmann's *The Fascist Effect* (2015); and the nineteen essays in Alan Tansman (ed.), *The Culture of Japanese Fascism* (2009). The main text of each was read in full; endnotes were not systematically read. Nothing was added from outside the nine works. The *Sources and method* tab gives the full bibliography and the checks still outstanding.
+
+## How to cite
+
+> Perkins, Chris. 2026. *Japanese Fascism Network*, version 0.1. https://whitecresta.github.io/tools/japanese-fascism-network/
