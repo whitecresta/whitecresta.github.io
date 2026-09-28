@@ -688,6 +688,15 @@ function relList(n){
     return `<div class="kind">${esc(l)} · ${groups[t].length}</div><ul class="rel">${items}</ul>`;
   }).join('');
 }
+// Wikipedia: a "go" search opens the article when the title matches, otherwise the results
+function wikiLinks(n){
+  const en = n.label.replace(/\s*\([^)]*\)\s*$/,'').replace(/['‘’"“”]/g,'').trim();
+  const head = (n.sub||'').split(',')[0].split('/')[0].trim();
+  const ja = /[\u3040-\u30ff\u3400-\u9fff]/.test(head)? head : '';
+  const url = (lang,q)=>`https://${lang}.wikipedia.org/w/index.php?search=${encodeURIComponent(q)}&go=Go`;
+  return `<a href="${url('en',en)}" target="_blank" rel="noopener" title="Open or search English Wikipedia for ${esc(en)}">Wikipedia ↗</a>`
+    + (ja? `<a href="${url('ja',ja)}" target="_blank" rel="noopener" class="jpn" title="日本語版ウィキペディアで ${esc(ja)} を開く・検索する">日本語版 ↗</a>` : '');
+}
 function renderProfile(){
   const P=$('#profile');
   if(!st.sel){
@@ -710,6 +719,7 @@ function renderProfile(){
     <div class="pname">${esc(n.label)}</div>
     <div class="pmeta jpn">${esc(n.sub||'')}</div>
     ${n.alts&&n.alts.length?`<div class="alts">Also given as: ${n.alts.map(esc).join('; ')}</div>`:''}
+    <div class="pbtns" style="margin:8px 0 12px">${wikiLinks(n)}</div>
     ${when}
     ${stm?`<ul class="stmts">${stm}</ul>`:''}
     ${cl}${au}
@@ -805,6 +815,7 @@ function renderAbout(){
   <p>The historians layer holds the scholars and theorists whose views on fascism the works state or report. Dashed links join an author to each scholar or contemporary whose analysis that author discusses, and to the main subjects of his or her case study. The layer is hidden by default and does not take part in the time slider.</p>
   <p>The time slider places each entry at the first year the sources give for its activity. Dates before ${Y0} are shown from the start. Some dates are given to the decade only (for example ‘1930s’), and these are placed at the start of the decade.</p>
   <p>Counts: ${tc.per||0} people, ${tc.org||0} organisations and groups, ${tc.evt||0} events, laws and policies, ${tc.pub||0} texts and works, ${tc.con||0} concepts, ${tc.sch||0} historians and theorists; ${edges.filter(e=>!e.hg).length} historical and ${edges.filter(e=>e.hg).length} historiographical links; ${TLI.length} timeline items; ${DATA.claims.length} recorded positions.</p>
+  <p>Each profile links to Wikipedia, in English and, where the sources give a Japanese name, in Japanese. The link opens the article whose title matches the name, or a search when there is no exact match; the articles were not checked against the sources.</p>
   <h3>Checks outstanding</h3>
   <ul class="leads">${DATA.checks.map(c=>`<li>${esc(c)}</li>`).join('')}</ul>`;
 }

@@ -15,7 +15,7 @@ toc: true
 </div>
 ```
 
-[Open the Japanese Fascism Network full screen](app/index.html?v=1){.tool-launch}
+[Open the Japanese Fascism Network full screen](app/index.html?v=2){.tool-launch}
 
 ## What it shows
 
@@ -30,12 +30,12 @@ The Japanese Fascism Network needs a larger screen. Use the button above to open
 :::
 
 ::: {.column-screen-inset}
-<iframe class="app-frame app-frame-app" src="app/index.html?v=1" title="Japanese Fascism Network"></iframe>
+<iframe class="app-frame app-frame-app" src="app/index.html?v=2" title="Japanese Fascism Network"></iframe>
 :::
 
 ## How to use it
 
-1. **Network**: scroll or pinch to zoom, drag to pan, and click a node to open its profile on the right. Shape shows the kind of entry, size shows the number of links, and colour shows the theme it belongs to. The profile lists what each work says about the entry, with its page reference.
+1. **Network**: scroll or pinch to zoom, drag to pan, and click a node to open its profile on the right. Shape shows the kind of entry, size shows the number of links, and colour shows the theme it belongs to. The profile lists what each work says about the entry, with its page reference. Buttons in the profile open the entry on English Wikipedia and, where it has a Japanese name, Japanese Wikipedia.
 2. **Time slider**: below the network, drag through the years from 1910 to 1952, or press *Play*, to watch the network grow. Bands mark six phases, from *Taishō beginnings* to *Defeat and reckoning*.
 3. **Filters**: search for a name in English or Japanese, limit the map to one theme, kind of entry or source (down to single chapters of Tansman's edited volume), or turn on **Show the historians** to add the scholarly layer, drawn dashed.
 4. **Timeline**: dated events from the sources, arranged by theme.
