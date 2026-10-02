@@ -9,19 +9,19 @@ toc: true
 ```{=html}
 <div class="tool-meta">
 <span><strong>Status:</strong> Beta</span>
-<span><strong>Version:</strong> 0.2</span>
+<span><strong>Version:</strong> 0.3</span>
 <span><strong>Language:</strong> English</span>
 <span><strong>Updated:</strong> October 2026</span>
 </div>
 ```
 
-[Open the subject map full screen](app/index.html?v=2){.tool-launch}
+[Open the subject map full screen](app/index.html?v=3){.tool-launch}
 
 ## What it shows
 
 *Japan Forum* has published research on Japan across the humanities and social sciences since 1989. This map places 890 of its research articles in 31 subjects, grouped into seven broad areas: history and thought, politics and international relations, economy and society, literature and arts, language and education, religion and belief, and the field of Japanese studies itself.
 
-It shows which subjects the journal has published most in, which subjects sit close to one another, and how the mix has changed across four periods: 1989–99, 2000–09, 2010–19 and 2020–26. A *Teaching* tab offers six sets of articles to read together in a seminar, from the aftermath of 3/11 to the politics of katakana.
+It shows which subjects the journal has published most in, which subjects sit close to one another, and how the mix has changed across four periods: 1989–99, 2000–09, 2010–19 and 2020–26. A *Teaching* tab offers 46 sets of articles to read together in a seminar, at least one for every subject, from the aftermath of 3/11 to the politics of katakana.
 
 ## Explore it
 
@@ -30,16 +30,16 @@ The subject map needs a larger screen. Use the button above to open it full scre
 :::
 
 ::: {.column-screen-inset}
-<iframe class="app-frame app-frame-app" src="app/index.html?v=2" allow="clipboard-write" title="Japan Forum, 1989–2026: a subject map"></iframe>
+<iframe class="app-frame app-frame-app" src="app/index.html?v=3" allow="clipboard-write" title="Japan Forum, 1989–2026: a subject map"></iframe>
 :::
 
 ## How to use it
 
-1. **Subjects**: each circle is a subject, sized by its number of articles. Lines join subjects whose articles overlap, read alike or cite each other. Click a subject for its articles, recurring topics, share in each period and closest neighbours.
-2. **Articles**: every article as a dot, placed by similarity of subject and wording. Click one for its reference, DOI, keywords and closest articles.
-3. **Over time**: each broad area's share of each period, and every subject's article count by period.
-4. **Teaching**: six reading sets, each with a reading order, a line on what each article argues, draft discussion questions and a seminar activity. *Copy reading list and questions* copies the whole set as text for a course handbook or VLE page. The questions were drafted from abstracts, so check them against the articles before use.
-5. **Search and periods**: search titles, authors and keywords, or limit the map to one period.
+1. **Subjects**: each circle is a subject, sized by its number of articles. Subjects sit close together when their articles overlap, read alike or cite each other. Click a subject for its articles, recurring topics, closest neighbours and teaching sets.
+2. **Articles**: every article as a dot, placed by similarity of wording, with links between similar articles and citations within the journal. Click a dot for its reference, DOI, keywords and closest articles. When zoomed in, use the minimap at the bottom right to move around.
+3. **Time slider**: drag through the years from 1989 to 2026, or press *Play*, to watch the journal's map fill in.
+4. **Teaching**: 46 reading sets, each with a reading order, a line on what each article argues, draft discussion questions and a seminar activity. *Copy reading list and questions* copies a set as text for a course handbook or VLE page. The questions were drafted from abstracts, so check them against the articles before use.
+5. **Over time**, **Index** and **Sources and method**: how the subjects have shifted year by year, every entry as text from A to Z, and how the map was built.
 
 ## Sources and data
 
@@ -47,4 +47,4 @@ Article records come from OpenAlex, not from the publisher, so the set is incomp
 
 ## How to cite
 
-> Perkins, Chris. 2026. *Japan Forum, 1989–2026: A Subject Map*, version 0.2. https://whitecresta.github.io/tools/japan-forum-subject-map/
+> Perkins, Chris. 2026. *Japan Forum, 1989–2026: A Subject Map*, version 0.3. https://whitecresta.github.io/tools/japan-forum-subject-map/
