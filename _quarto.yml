@@ -3,6 +3,7 @@ project:
   output-dir: _site
   resources:
     - "tools/*/app/**"
+    - "apps/**"
 
 website:
   title: "Chris Perkins"

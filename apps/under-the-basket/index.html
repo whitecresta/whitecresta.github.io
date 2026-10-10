@@ -1,0 +1,2238 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>Under the Basket</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@600;800&family=Hanken+Grotesk:wght@400;500;700&display=swap">
+<style>
+/* Layout: programme picker on top, then the chosen programme as drill cards on the left with a sticky scoreboard on the right, history underneath. The builder replaces all of that while open. */
+:root{
+  --bg:#EAEFF5;
+  --surface:#FFFFFF;
+  --surface-2:#F1F5FA;
+  --ink:#101B2E;
+  --ink-2:#4A5870;
+  --line:#CBD5E1;
+  --paint:#1D4E9E;
+  --on-paint:#FFFFFF;
+  --wood:#B7691B;
+  --bad:#B3261E;
+  --font-display:"Big Shoulders Display","Arial Narrow",Impact,sans-serif;
+  --font-body:"Hanken Grotesk",system-ui,-apple-system,"Segoe UI",sans-serif;
+}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){
+    --bg:#0C1424;--surface:#141E33;--surface-2:#1A2742;--ink:#E8EEF8;--ink-2:#9AABC4;--line:#2A3A58;--paint:#6FA0F0;--on-paint:#0C1424;--wood:#E8A257;--bad:#FF8A80;
+    color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#0C1424;--surface:#141E33;--surface-2:#1A2742;--ink:#E8EEF8;--ink-2:#9AABC4;--line:#2A3A58;--paint:#6FA0F0;--on-paint:#0C1424;--wood:#E8A257;--bad:#FF8A80;
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font:400 15px/1.5 var(--font-body);padding-inline:16px;padding-block:24px 56px}
+button{font:inherit;color:inherit}
+h1,h2,h3,p{margin:0}
+.wrap{max-width:1120px;margin-inline:auto;display:grid;gap:24px}
+
+header h1{font:800 clamp(40px,7vw,68px)/.92 var(--font-display);letter-spacing:.01em;text-transform:uppercase;text-wrap:balance}
+.sub{color:var(--ink-2);margin-top:8px;max-width:60ch}
+.lv-kicker{font-size:12px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--ink-2)}
+.note{color:var(--ink-2);font-size:13px}
+
+/* picker */
+.picker{display:grid;gap:16px}
+.pos-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(104px,1fr));gap:8px}
+.mine-wrap{display:grid;gap:8px}
+.pos{display:grid;gap:2px;align-content:center;justify-items:start;min-height:64px;padding:10px 14px;border-radius:8px;border:1px solid var(--line);background:var(--surface);cursor:pointer;text-align:left}
+.pos:hover{border-color:var(--ink-2)}
+.pos:focus-visible{outline:3px solid var(--wood);outline-offset:2px}
+.pos[aria-pressed="true"]{background:var(--paint);border-color:var(--paint);color:var(--on-paint)}
+.pos .num{font:800 30px/1 var(--font-display)}
+.pos .nm{font-weight:700;font-size:14px}
+.pos .sub2{font-size:12px;opacity:.8}
+#new-prog{min-height:64px}
+
+/* programme heading */
+.prog-head{display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:space-between;gap:12px 24px}
+.prog-head h2{font:800 clamp(34px,5vw,48px)/1 var(--font-display);letter-spacing:.01em;text-transform:uppercase;margin-top:4px}
+.prog-tools{display:flex;flex-wrap:wrap;align-items:center;gap:14px 20px}
+.cue{display:flex;gap:14px;font:800 22px/1 var(--font-display);letter-spacing:.1em;text-transform:uppercase;color:var(--wood)}
+.cue span{padding-bottom:4px;border-bottom:3px solid var(--wood)}
+
+.main{display:grid;gap:20px;align-items:start}
+@media (min-width:920px){
+  .main{grid-template-columns:minmax(0,1fr) 340px}
+  .score{position:sticky;top:16px}
+}
+#levels{display:grid;gap:16px;min-width:0}
+
+.level{background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:18px;display:grid;gap:14px;min-width:0}
+.level.running{border-color:var(--paint);box-shadow:0 0 0 1px var(--paint)}
+.lv-head{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:12px 20px}
+.lv-name{font:800 32px/1 var(--font-display);letter-spacing:.01em;text-transform:uppercase;margin-top:4px}
+.timer{display:flex;align-items:center;gap:10px}
+.clock{font:800 46px/1 var(--font-display);font-variant-numeric:tabular-nums;min-width:3.1ch;text-align:right}
+.clock.done{color:var(--wood)}
+.lv-how{color:var(--ink-2);max-width:64ch}
+
+.counters{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:12px}
+.counter{background:var(--surface-2);border-radius:6px;padding:12px 14px;display:grid;gap:10px;min-width:0}
+.c-top{display:flex;justify-content:space-between;align-items:baseline;gap:8px}
+.c-label{font-weight:700}
+.c-best{font-size:12px;font-weight:500;color:var(--ink-2);font-variant-numeric:tabular-nums}
+.c-best.new{color:var(--wood);font-weight:700}
+.c-mid{display:flex;align-items:center;justify-content:space-between;gap:10px}
+.c-val{font:800 44px/1 var(--font-display);font-variant-numeric:tabular-nums}
+.c-val small{font-size:22px;font-weight:600;color:var(--ink-2)}
+.c-meta{font-size:12px;color:var(--ink-2);margin-top:4px;font-variant-numeric:tabular-nums}
+.c-btns{display:flex;gap:8px}
+.pip-row{display:flex;align-items:center;gap:10px}
+.pips{display:flex;gap:4px;flex:1;min-width:0}
+.pips.dense{gap:2px}
+.pip{flex:1;height:12px;border-radius:2px;background:var(--line);transition:background .15s}
+.pip.hit{background:var(--paint)}
+.pip.miss{background:repeating-linear-gradient(135deg,var(--ink-2) 0 2px,transparent 2px 5px);box-shadow:inset 0 0 0 1px var(--ink-2)}
+
+.btn{min-height:44px;min-width:44px;padding:0 16px;border-radius:6px;border:1px solid var(--line);background:var(--surface);cursor:pointer;font-weight:700}
+.btn:hover{border-color:var(--ink-2)}
+.btn:focus-visible{outline:3px solid var(--wood);outline-offset:2px}
+.btn:disabled{opacity:.45;cursor:not-allowed}
+.btn.primary{background:var(--paint);border-color:var(--paint);color:var(--on-paint)}
+.btn.danger{color:var(--bad);border-color:var(--bad)}
+.rep{min-width:76px}
+.btn.small{min-height:36px;padding:0 12px;font-size:13px}
+
+.score{background:var(--paint);color:var(--on-paint);border-radius:8px;padding:20px;display:grid;gap:14px}
+.score-label{font-size:12px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;opacity:.85}
+.big{font:800 96px/.9 var(--font-display);font-variant-numeric:tabular-nums}
+.big .of{font-size:36px;font-weight:600;opacity:.75;margin-left:6px}
+.rows{display:grid;gap:0;margin:0;padding:0;list-style:none}
+.rows li{display:flex;justify-content:space-between;gap:12px;padding:8px 0;border-top:1px solid color-mix(in srgb,var(--on-paint) 28%,transparent);font-variant-numeric:tabular-nums}
+.rows li span:last-child{font-weight:700}
+.btn.invert{background:var(--on-paint);color:var(--paint);border-color:var(--on-paint);width:100%}
+.btn.invert:focus-visible{outline-color:var(--on-paint)}
+.msg{min-height:1.5em;font-size:13px;opacity:.9}
+
+.hist{background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:20px;display:grid;gap:16px;min-width:0}
+.hist h2{font:800 28px/1 var(--font-display);letter-spacing:.01em;text-transform:uppercase}
+.where{color:var(--ink-2);font-size:13px}
+.empty{color:var(--ink-2);max-width:60ch}
+.chart{width:100%;max-width:560px;height:auto;display:block}
+.chart .grid{stroke:var(--line);stroke-width:1}
+.chart .t{fill:var(--ink-2);font:500 10px var(--font-body)}
+.chart .v{fill:var(--ink);font:700 10px var(--font-body)}
+.chart .bar{fill:var(--paint)}
+.chart .bar.top{fill:var(--wood)}
+.tbl-wrap{overflow-x:auto}
+table{border-collapse:collapse;width:100%;min-width:680px;font-variant-numeric:tabular-nums}
+th{font-size:12px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-2);text-align:left;padding:8px 12px 8px 0;border-bottom:1px solid var(--line)}
+td{padding:8px 12px 8px 0;border-bottom:1px solid var(--line);white-space:nowrap}
+td.tot{font-weight:700}
+
+/* builder */
+.builder{background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:20px;display:grid;gap:18px;min-width:0}
+.builder h2{font:800 34px/1 var(--font-display);letter-spacing:.01em;text-transform:uppercase}
+.field{display:grid;gap:6px;min-width:0}
+.field label{font-size:13px;font-weight:700}
+.field.narrow{width:110px;flex:none}
+.field.grow{flex:1;min-width:200px}
+input,select,textarea{font:inherit;color:var(--ink);background:var(--surface-2);border:1px solid var(--line);border-radius:6px;padding:10px 12px;min-height:44px;width:100%}
+textarea{resize:vertical}
+input:focus-visible,select:focus-visible,textarea:focus-visible{outline:3px solid var(--wood);outline-offset:1px}
+.bd{background:var(--surface-2);border-radius:8px;padding:14px;display:grid;gap:12px}
+.bd input,.bd textarea{background:var(--surface)}
+.bd-head{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:8px}
+.bd-title{font:800 22px/1 var(--font-display);letter-spacing:.01em;text-transform:uppercase}
+.bd-tools{display:flex;flex-wrap:wrap;gap:8px}
+.b-row,.b-score{display:flex;flex-wrap:wrap;gap:12px;align-items:flex-end}
+.b-actions{display:flex;flex-wrap:wrap;gap:10px}
+.err{color:var(--bad);font-weight:700;min-height:1.5em}
+.b-cols{display:grid;gap:18px;align-items:start}
+.b-left{display:grid;gap:12px;min-width:0;align-content:start}
+.lib{background:var(--surface-2);border-radius:8px;padding:14px;display:grid;gap:10px;min-width:0}
+@media (min-width:920px){
+  .b-cols{grid-template-columns:minmax(0,1fr) 320px}
+  .lib{position:sticky;top:16px;max-height:calc(100vh - 32px);overflow-y:auto}
+}
+.msg2{min-height:1.5em;font-size:13px;color:var(--ink-2)}
+.lib-group{border:1px solid var(--line);border-radius:6px;background:var(--surface);padding:0 12px}
+.lib-group summary{min-height:44px;display:flex;align-items:center;justify-content:space-between;gap:8px;cursor:pointer;font-weight:700}
+.lib-group summary:focus-visible{outline:3px solid var(--wood);outline-offset:2px}
+.lib-list{list-style:none;margin:0;padding:0;display:grid}
+.lib-row{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:8px 0;border-top:1px solid var(--line)}
+.lib-info{min-width:0}
+.lib-name{font-weight:700}
+.lib-all{padding:8px 0 12px}
+.players{display:grid;gap:10px}
+.players .err,.players .msg2{min-height:0}
+.chips{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.chip{min-height:44px;padding:0 18px;border-radius:999px;border:1px solid var(--line);background:var(--surface);cursor:pointer;font-weight:700}
+.chip:hover{border-color:var(--ink-2)}
+.chip:focus-visible{outline:3px solid var(--wood);outline-offset:2px}
+.chip[aria-pressed="true"]{background:var(--paint);border-color:var(--paint);color:var(--on-paint)}
+.manage{display:flex;flex-wrap:wrap;align-items:center;gap:10px}
+.pform{display:flex;flex-wrap:wrap;gap:12px;align-items:flex-end}
+.pform .field{max-width:320px}
+.pform-note{flex-basis:100%}
+.hint{font-size:13px;opacity:.9}
+[hidden]{display:none!important}
+h4{margin:0}
+
+/* drill pool, filters and animated diagrams */
+.lib h4{font:700 12px var(--font-body);letter-spacing:.14em;text-transform:uppercase;color:var(--ink-2);margin-top:6px}
+.filters{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.filters .field label{font-size:12px}
+.filters select{padding-inline:8px}
+.pool-list{list-style:none;margin:0;padding:0 12px;border:1px solid var(--line);border-radius:6px;background:var(--surface)}
+.pool-item{border-top:1px solid var(--line);padding:8px 0;display:grid;gap:10px}
+.pool-item:first-child{border-top:0}
+.pool-row{display:flex;align-items:center;justify-content:space-between;gap:10px}
+.pool-btns{display:flex;gap:6px;flex:none}
+.show-row{display:flex;flex-wrap:wrap;gap:10px;align-items:center}
+.demo{border:1px solid var(--line);border-radius:8px;background:var(--surface-2);padding:14px}
+.demo-in{display:grid;gap:14px;min-width:0}
+.level .demo-in{align-items:start}
+@media (min-width:660px){.level .demo-in{grid-template-columns:minmax(0,1.1fr) minmax(0,1fr)}}
+.stage{display:grid;gap:8px;min-width:0}
+.court{width:100%;height:auto;display:block;background:var(--surface);border:1px solid var(--line);border-radius:6px}
+.court .ln{fill:none;stroke:var(--ink-2);stroke-width:.5;opacity:.75}
+.court .paint{fill:color-mix(in srgb,var(--paint) 13%,transparent)}
+.court .bb{stroke:var(--ink);stroke-width:1.3}
+.court .rim{fill:none;stroke:var(--wood);stroke-width:.9}
+.court .wall{stroke:var(--ink);stroke-width:1.6}
+.court .cone{fill:var(--wood);stroke:var(--ink);stroke-width:.3}
+.court .trail{fill:none;stroke:var(--paint);stroke-width:.6;stroke-dasharray:1.6 1.6;opacity:.6}
+.court .lab{fill:var(--ink-2);font:700 3.4px var(--font-body)}
+.court .sh{fill:var(--ink);opacity:.16}
+.court .a-o .bd{fill:var(--paint);stroke:var(--surface);stroke-width:.8}
+.court .a-d .bd{fill:var(--surface);stroke:var(--ink-2);stroke-width:1.2}
+.court .a-p .bd{fill:var(--ink-2);stroke:var(--surface);stroke-width:.8}
+.court .ball{fill:var(--wood);stroke:var(--ink);stroke-width:.5}
+.legend{display:flex;flex-wrap:wrap;gap:4px 14px;font-size:12px;color:var(--ink-2)}
+.dot{display:inline-block;width:10px;height:10px;border-radius:50%;margin-right:5px;vertical-align:-1px;box-sizing:border-box}
+.dot-o{background:var(--paint)}
+.dot-d{border:2px solid var(--ink-2);background:var(--surface)}
+.dot-p{background:var(--ink-2)}
+.dot-b{background:var(--wood);border:1px solid var(--ink)}
+.demo-body{display:grid;gap:10px;min-width:0;align-content:start}
+.demo h4{font:700 12px var(--font-body);letter-spacing:.14em;text-transform:uppercase;color:var(--ink-2)}
+.cap{font-weight:700;font-size:16px;min-height:3em}
+.vctl{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.vtabs{display:flex;gap:8px;margin-bottom:12px}
+.vtabs .btn[aria-pressed="true"]{background:var(--paint);border-color:var(--paint);color:var(--on-paint)}
+.gl{position:relative;aspect-ratio:4/3;width:100%;border:1px solid var(--line);border-radius:6px;overflow:hidden;background:var(--surface)}
+.gl canvas{width:100%;height:100%;display:block;cursor:grab;touch-action:pan-y}
+.gl canvas:active{cursor:grabbing}
+.gl canvas:focus-visible{outline:3px solid var(--wood);outline-offset:-3px}
+.gl-msg{position:absolute;inset:0;display:grid;place-items:center;padding:16px;text-align:center;color:var(--ink-2);font-size:14px;pointer-events:none}
+.gl-msg:empty{display:none}
+.tags3{position:absolute;inset:0;pointer-events:none}
+.tag3{position:absolute;transform:translate(-50%,-100%);background:var(--ink);color:var(--surface);font:700 12px/1.2 var(--font-body);padding:4px 9px;border-radius:999px;white-space:nowrap;opacity:0;transition:opacity .25s}
+.tag3.on{opacity:1}
+.tag3::after{content:"";position:absolute;left:50%;top:100%;margin-left:-4px;border:4px solid transparent;border-top-color:var(--ink)}
+.steps,.watch{margin:0;padding-left:20px;display:grid;gap:5px}
+.steps{color:var(--ink-2);font-size:14px}
+.steps li.now{color:var(--ink);font-weight:700}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+
+<div class="wrap">
+  <header>
+    <h1>Under the Basket</h1>
+    <p class="sub">Timed drills for all five positions. Pick a programme, work through the levels, tap Hit or Miss on every rep and save the score. Tap Show me on a drill to see it on a court with what to watch for. Build your own from the drill pool when none of the programmes fit.</p>
+  </header>
+
+  <section class="players" id="players" aria-label="Player">
+    <div class="lv-kicker">Player</div>
+    <div class="chips">
+      <div class="chips" id="plist" role="group" aria-label="Choose a player"></div>
+      <button class="btn" type="button" id="add-player" disabled>Add player</button>
+    </div>
+    <div class="manage" id="manage" hidden>
+      <button class="btn small" type="button" id="ren-player">Rename</button>
+      <button class="btn small danger" type="button" id="rm-player">Remove player</button>
+      <span class="note">Removing a player deletes their saved sessions.</span>
+    </div>
+    <form class="pform" id="pform" hidden novalidate>
+      <div class="field grow"><label for="p-name">First name or nickname</label><input id="p-name" maxlength="20" autocomplete="off"></div>
+      <button class="btn primary" type="submit" id="p-save">Add player</button>
+      <button class="btn" type="button" id="p-cancel">Cancel</button>
+      <p class="note pform-note">There are no passwords. Anyone using this device can open any player, so stick to first names or nicknames.</p>
+    </form>
+    <div class="err" id="p-err" role="alert"></div>
+    <div class="msg2" id="p-msg" role="status" aria-live="polite"></div>
+  </section>
+
+  <nav class="picker" id="picker" aria-label="Programmes">
+    <div class="pos-row" id="pos" role="group" aria-label="Position programmes"></div>
+    <div class="mine-wrap">
+      <div class="lv-kicker">Your programmes</div>
+      <div class="pos-row" id="mine" role="group" aria-label="Your own programmes"></div>
+      <p class="note" id="mine-hint"></p>
+    </div>
+  </nav>
+
+  <div class="prog-head" id="proghead">
+    <div>
+      <div class="lv-kicker" id="ph-kicker"></div>
+      <h2 id="ph-name"></h2>
+      <p class="sub" id="ph-sub"></p>
+    </div>
+    <div class="prog-tools">
+      <div class="cue" id="cue"></div>
+      <button class="btn" type="button" id="ph-act"></button>
+    </div>
+  </div>
+
+  <div class="main" id="main">
+    <section id="levels" aria-label="Drill levels"></section>
+
+    <aside class="score" aria-label="Session scoreboard">
+      <div class="score-label">Session total</div>
+      <div class="big"><span id="total">0</span><span class="of" id="max"></span></div>
+      <ul class="rows" id="rows"></ul>
+      <button class="btn invert" id="save" type="button" disabled>Save session</button>
+      <p class="hint" id="p-hint" hidden></p>
+      <div class="msg" id="msg" role="status" aria-live="polite"></div>
+    </aside>
+  </div>
+
+  <section class="hist" id="hist" aria-label="Session history">
+    <h2 id="hist-title">History</h2>
+    <p class="where" id="where"></p>
+    <div id="history"></div>
+  </section>
+
+  <section class="builder" id="builder" aria-label="Programme builder" hidden>
+    <h2 id="b-title">New programme</h2>
+    <div class="b-row">
+      <div class="field grow">
+        <label for="b-name">Programme name</label>
+        <input id="b-name" maxlength="40" autocomplete="off">
+      </div>
+    </div>
+    <div class="field">
+      <label for="b-cue">Cue words (optional, up to three, separated by commas)</label>
+      <input id="b-cue" maxlength="60" autocomplete="off" placeholder="For example: Land, Hold, Up">
+    </div>
+    <p class="note">Build the programme from drills in the library, from drills you write yourself, or both. Each score counts hits out of the reps you set, and in a session you tap Hit or Miss for every rep. A programme can have up to 12 drills, each with up to 3 scores of up to 20 reps.</p>
+    <div class="b-cols">
+      <div class="b-left">
+        <div id="b-drills"></div>
+        <div><button class="btn" type="button" id="b-add">Add your own drill</button></div>
+      </div>
+      <aside class="lib" aria-label="Drill library">
+        <h3 class="bd-title">Drill library</h3>
+        <p class="note">Add drills to your programme. Each one is copied, so you can change it without touching the original. Show me plays the drill on a court.</p>
+        <div class="msg2" id="lib-msg" role="status" aria-live="polite"></div>
+        <h4>Drill pool</h4>
+        <div class="filters">
+          <div class="field"><label for="f-skill">Skill</label><select id="f-skill"></select></div>
+          <div class="field"><label for="f-pos">Position</label><select id="f-pos"></select></div>
+          <div class="field"><label for="f-who">Who</label><select id="f-who"></select></div>
+          <div class="field"><label for="f-level">Level</label><select id="f-level"></select></div>
+        </div>
+        <p class="note" id="pool-n"></p>
+        <ul class="pool-list" id="pool"></ul>
+        <h4>Whole programmes</h4>
+        <div id="lib"></div>
+      </aside>
+    </div>
+    <div class="err" id="b-err" role="alert"></div>
+    <div class="b-actions">
+      <button class="btn primary" type="button" id="b-save">Save programme</button>
+      <button class="btn" type="button" id="b-cancel">Cancel</button>
+      <button class="btn danger" type="button" id="b-del" hidden>Delete programme</button>
+    </div>
+    <p class="note" id="b-delnote" hidden>Deleting a programme removes it and hides its saved history.</p>
+  </section>
+</div>
+
+<script>
+(function () {
+  'use strict';
+
+  function K(id, label, max) { return { id: id, label: label, max: max }; }
+  function D(id, name, min, how, counters) { return { id: id, name: name, min: min, how: how, counters: counters }; }
+
+  var POSITIONS = [
+    { id: 'pg', num: 1, name: 'Point guard', cue: ['Eyes up', 'Stay low', 'Pace'],
+      blurb: 'Ball handling, passing on target and controlled finishes.',
+      drills: [
+        D('1', 'Ball control', 2, 'Low stance, eyes up. One rep is a right pound, left pound, crossover, then between the legs. A hit is a rep with no lost ball. 10 reps.', [K('a', 'Clean combos', 10)]),
+        D('2', 'Passing to a target', 2, 'Mark a spot on a wall about 3 metres away and step into every pass. A hit is a pass that lands on the mark. 10 chest passes, then 10 bounce passes.', [K('a', 'Chest passes', 10), K('b', 'Bounce passes', 10)]),
+        D('3', 'Change of pace finish', 3, 'Dribble hard from half court, slow down two steps out, then drive to the rim. Under control means the ball stayed secure and your feet stayed balanced. 10 reps, alternating sides.', [K('a', 'Under control', 10), K('b', 'Makes', 10)]),
+        D('4', 'Pull-up jumper', 2, 'Two dribbles, stop on two feet, shoot. 5 from each elbow.', [K('a', 'Makes', 10)])
+      ] },
+    { id: 'sg', num: 2, name: 'Shooting guard', cue: ['Set', 'Square', 'Follow through'],
+      blurb: 'Shot form, catch and shoot, and free throws.',
+      drills: [
+        D('1', 'Form shooting', 2, 'Stand about 1.5 metres from the basket with one hand on the ball and the elbow under it. Flick the wrist and hold your follow through. 10 shots.', [K('a', 'Makes', 10)]),
+        D('2', 'Catch and shoot', 3, 'Pass to yourself off the floor, or have a parent pass. Feet ready before the ball arrives, then hop into the shot. 5 from the right wing, 5 from the left.', [K('a', 'Feet ready', 10), K('b', 'Makes', 10)]),
+        D('3', 'Pull-up off the dribble', 2, 'From each elbow, one or two dribbles, stop on balance, shoot. 5 from each side.', [K('a', 'Makes', 10)]),
+        D('4', 'Free throws', 2, 'Use the same routine every time: breathe, bounce twice, shoot. 10 shots.', [K('a', 'Makes', 10)])
+      ] },
+    { id: 'sf', num: 3, name: 'Small forward', cue: ['Read', 'Attack', 'Finish'],
+      blurb: 'Triple threat, attacking off the catch and the corner shot.',
+      drills: [
+        D('1', 'Triple threat', 2, 'Catch on the wing, land on two feet with the ball on your hip and your eyes on the rim. Hold for one second. A hit is a balanced stance. 10 reps.', [K('a', 'Balanced stances', 10)]),
+        D('2', 'Attack from the wing', 3, 'From the wing, one or two dribbles to the rim, then finish. 5 from the right, 5 from the left.', [K('a', 'Under control', 10), K('b', 'Makes', 10)]),
+        D('3', 'Corner shot', 2, 'Catch in the corner with your feet ready and shoot. 5 from each corner.', [K('a', 'Makes', 10)]),
+        D('4', 'Rebound and push', 2, 'Toss the ball off the backboard, catch it at the top of your jump, land on two feet, then dribble out hard to half court. A hit is a clean landing and first dribble.', [K('a', 'Clean rebounds', 10)])
+      ] },
+    { id: 'pf', num: 4, name: 'Power forward', cue: ['Seal', 'Catch', 'Finish'],
+      blurb: 'Rebounding, the elbow shot and finishing close to the rim.',
+      drills: [
+        D('1', 'Box out and rebound', 2, 'Toss the ball off the backboard. Find a chair or a parent to box out, hold your position, then take the ball with two hands at the top. A hit is a clean rebound after boxing out. 10 reps.', [K('a', 'Clean rebounds', 10)]),
+        D('2', 'Elbow jumper', 2, 'Catch at the elbow, square your feet to the rim and shoot. 5 from each elbow.', [K('a', 'Makes', 10)]),
+        D('3', 'Short corner finish', 3, 'Catch near the baseline, one power dribble, jump stop, finish. 5 from each side. Feet count even when the shot misses.', [K('a', 'Feet set', 10), K('b', 'Makes', 10)]),
+        D('4', 'Pick and pop', 2, 'Set a screen on a chair, step out to the elbow, catch and shoot. 8 reps.', [K('a', 'Makes', 8)])
+      ] },
+    { id: 'center', num: 5, name: 'Centre', cue: ['Land', 'Hold', 'Up'],
+      blurb: 'Footwork and finishing around the rim.',
+      drills: [
+        D('1', 'Feet only', 2, 'Stand a step or two from the basket. Pick up the ball and land in a two-foot jump stop, feet shoulder-width, knees bent, ball high. Hold for one second. Then do 5 pivots on one planted foot.', [K('feet', 'Clean stops', 10)]),
+        D('2', 'Rebound and put-back', 2, 'Toss the ball off the backboard. Jump, catch it with both hands at the top, land on two feet and go straight back up. 10 attempts.', [K('feet', 'Clean landings', 10), K('fin', 'Makes', 10)]),
+        D('3', 'Gather and finish', 3, 'Start 6 to 8 feet out. One strong power dribble, jump stop on two feet, ball high, finish. 5 from the right side, 5 from the left. Feet count even when the shot misses.', [K('feet', 'Feet set', 10), K('fin', 'Makes', 10)]),
+        D('4', 'Contact finish', 2, 'A parent holds a cushion lightly against him as he goes up. Finish through the bump. 8 attempts.', [K('fin', 'Makes', 8)])
+      ] }
+  ];
+
+  /* ---------- drill pool ----------
+     Each entry is written in our own words. "from" reuses a drill that already sits in a position programme (and links it back with ref),
+     everything else carries its own text and scores. The court is 100 wide and 70 tall with the baseline at the top and the rim at 50,10.5,
+     so up the page is toward the basket and right is the player's right. Steps: s caption, o you, d defender, p partner, b ball ('o', 'd', 'p'
+     for held, or [x,y]), j and dj for a jump. m marks cones, w draws a wall. */
+  var SKILLS = { finish: 'Finishing', feet: 'Footwork', rebound: 'Rebounding', pass: 'Passing', handle: 'Ball handling', shoot: 'Shooting', defend: 'Defence' };
+  var LEVELS = { 1: 'Start', 2: 'Build', 3: 'Stretch' };
+  var WHO = { solo: 'Solo', partner: 'With a partner' };
+  var RIM = [50, 10.5];
+
+  var POOL = [
+    /* footwork */
+    { id: 'jumpstop', from: ['center', '1'], skills: ['feet'], pos: ['center', 'pf', 'sf'], who: 'solo', level: 1,
+      watch: ['Both feet hit the floor at the same moment.', 'Knees bent and chest over your toes, so you could jump again straight away.', 'Ball high and strong near your chin, not dropped to your waist.', 'Stay still for a full second before you move.'],
+      steps: [
+        { s: 'Start a step or two from the basket with the ball in two hands', o: [50, 34] },
+        { s: 'Take a step and hop forward', o: [50, 28], j: 1 },
+        { s: 'Land on both feet together, knees bent, ball high. Hold for a second', o: [50, 26] }
+      ] },
+    { id: 'pivot', name: 'Pivot and protect', min: 2, who: 'partner', level: 1, skills: ['feet'], pos: ['all'],
+      how: 'Stand with the ball and choose one foot to plant. A parent or teammate stands close as a defender. Turn on the planted foot, front and back, keeping the ball high and away from them. A hit is a pivot where the planted foot never moved. 10 reps.',
+      counters: [K('a', 'Clean pivots', 10)],
+      watch: ['The planted foot stays in the same spot. Do not shuffle it.', 'Keep the ball high and tight as it crosses your body.', 'Stay low with your weight on the balls of your feet.', 'Finish with your body between the ball and the defender.'],
+      steps: [
+        { s: 'A defender is close on your right and the ball is on that side', o: [50, 32], d: [58, 31], b: [54.5, 29] },
+        { s: 'Plant one foot and swing the ball up and across, keeping it high', b: [50, 25.5] },
+        { s: 'End with your body between the ball and the defender', b: [45.5, 29] }
+      ] },
+    { id: 'layupfeet', name: 'Lay-up footwork', min: 3, who: 'solo', level: 1, skills: ['feet', 'finish'], pos: ['all'],
+      how: 'Start about 45 degrees out on the right, four or five metres from the basket. Walk it first: long step with the right foot, short step with the left, then jump off the left foot and lift the right knee. Shoot with the right hand off the backboard. Then mirror it on the left, starting with the left foot. 5 from each side. A hit for the first score is a rep with the steps in the right order.',
+      counters: [K('feet', 'Steps in order', 10), K('fin', 'Makes', 10)],
+      watch: ['Long step, then short step. You jump from the short one.', 'Jump up, not out. Land close to where you took off.', 'Lift the knee on your shooting-hand side.', 'Keep the ball high in both hands until the last moment.', 'Eyes on the small square on the backboard.'],
+      steps: [
+        { s: 'Start about 45 degrees out on the right with the ball in two hands', o: [68, 40] },
+        { s: 'Long first step with the right foot', o: [63, 31] },
+        { s: 'Short second step with the left foot', o: [58, 22] },
+        { s: 'Jump off the left foot, right knee up, ball high and soft off the backboard', o: [54, 14.5], j: 1, b: [51, 10.5] }
+      ] },
+    { id: 'dropstep', name: 'Drop step to the rim', min: 3, who: 'partner', level: 3, skills: ['feet', 'finish'], pos: ['center', 'pf'],
+      how: 'Start on the block with your back to the basket and a chair or a parent on your high side. Seal them with your back and show a target hand. Take the pass, land on two feet, then swing one foot around and step to the rim. Finish up off the backboard. 4 from each block.',
+      counters: [K('feet', 'Feet set', 8), K('fin', 'Makes', 8)],
+      watch: ['Seal first: get your back and hip against the defender before you ask for the ball.', 'Catch, then land on two feet with the ball at your chin.', 'Your first step goes toward the rim and past the defender.', 'Keep the ball high while you turn.', 'Finish soft, using the backboard.'],
+      steps: [
+        { s: 'Seal your defender with your back and show a target hand', o: [38, 15], d: [39.5, 21], p: [52, 46], b: 'p' },
+        { s: 'Catch the pass with two hands and land on two feet', b: 'o' },
+        { s: 'Swing one foot around the defender and step to the rim', o: [44, 14.5] },
+        { s: 'Go up strong and finish off the backboard', o: [47.5, 14.5], j: 1, b: [51, 10.5] }
+      ] },
+    { id: 'triple', from: ['sf', '1'], skills: ['feet'], pos: ['sf', 'sg', 'pg'], who: 'solo', level: 1,
+      watch: ['Ball on your hip, protected, so you can still see the rim.', 'Knees bent, weight slightly forward, balanced.', 'Eyes on the rim first, then look around for a pass.', 'Hold for one second before you decide.'],
+      steps: [
+        { s: 'Catch on the wing with your feet ready', o: [24, 36], b: [22, 28] },
+        { s: 'Land on two feet, ball on your hip, eyes on the rim', o: [26, 34], b: 'o' },
+        { s: 'Hold it for a second. Now you can shoot, drive or pass', o: [26, 34], b: 'o' }
+      ] },
+    { id: 'rimrun', name: 'Run the floor to the block', min: 2, who: 'solo', level: 1, skills: ['feet'], pos: ['center', 'pf'],
+      how: 'Start at half court. Sprint to the block under the basket as if your team has just won the ball, finish with a two-foot jump stop and put your target hand up. A hit is a run where you arrived under control with your hand up. 6 reps.',
+      counters: [K('a', 'Good arrivals', 6)],
+      watch: ['Sprint the whole way. A big player who runs hard gets easy baskets.', 'Keep your head up so you can see where the ball is.', 'Stop under control with a two-foot jump stop.', 'Hand up as a target the moment you arrive.'],
+      steps: [
+        { s: 'Start at half court as the ball is won', o: [42, 66], b: 'o' },
+        { s: 'Sprint up the floor with your head up', o: [40, 46] },
+        { s: 'Jump stop at the block with your hand up as a target', o: [35, 17] }
+      ] },
+
+    /* finishing */
+    { id: 'closefin', name: 'Power up close', min: 2, who: 'solo', level: 1, skills: ['finish'], pos: ['all'],
+      how: 'Stand close to the basket, about an arm and a half away. Hold the ball in two hands at chin height, bend your knees, jump straight up and finish off the backboard with a soft touch. Catch it, reset and go again. 10 attempts.',
+      counters: [K('fin', 'Makes', 10)],
+      watch: ['Jump straight up. If you drift sideways you are not strong.', 'Both hands on the ball until the last moment.', 'Soft touch. A hard throw bounces out.', 'Land on two feet, balanced, ready to go again.'],
+      steps: [
+        { s: 'Stand close with your knees bent and the ball at your chin', o: [50, 16] },
+        { s: 'Jump straight up with the ball high over your head', o: [50, 15], j: 1, b: [50, 12.5] },
+        { s: 'Soft touch off the backboard and in', o: [50, 15], j: 1, b: RIM },
+        { s: 'Land on two feet and catch it', o: [50, 16], b: 'o' }
+      ] },
+    { id: 'gather', from: ['center', '3'], skills: ['finish', 'feet'], pos: ['center', 'pf'], who: 'solo', level: 2,
+      watch: ['One dribble only, hard and low. Save your energy for the jump.', 'Jump stop: both feet land together, knees bent.', 'Ball high before you go up. Do not bring it up from your waist.', 'Eyes on the target on the backboard.', 'Count the feet even when the shot misses.'],
+      steps: [
+        { s: 'Start about two metres out with the ball', o: [66, 31] },
+        { s: 'One strong power dribble toward the rim', o: [61, 25] },
+        { s: 'Jump stop on two feet with the ball high', o: [57, 20] },
+        { s: 'Go up strong and finish', o: [55, 15], j: 1, b: [51, 10.5] }
+      ] },
+    { id: 'backboard', name: 'Backboard angles', min: 2, who: 'solo', level: 2, skills: ['finish'], pos: ['all'],
+      how: 'Take lay-ups from three spots: 45 degrees on the right, straight in front and 45 degrees on the left. From the angles, aim at the top corner of the small square on the backboard and let the ball drop in. From straight in front, use a soft touch off the top of the square. 10 attempts.',
+      counters: [K('fin', 'Makes', 10)],
+      watch: ['Pick a spot on the backboard before you jump and look at it.', 'The wider the angle, the more the board does the work.', 'Soft touch. Think of placing the ball on the board, not throwing it.', 'Follow through with your hand pointing at the spot.'],
+      steps: [
+        { s: 'Start on the angle with the ball in two hands', o: [66, 30] },
+        { s: 'Step through to the rim', o: [57, 18] },
+        { s: 'Go up and aim for the top corner of the small square', o: [55, 14.5], j: 1, b: [53.5, 8.5] },
+        { s: 'Let the board bring it down into the basket', o: [55, 14.5], j: 1, b: RIM }
+      ] },
+    { id: 'reboundput', from: ['center', '2'], skills: ['rebound', 'finish'], pos: ['center', 'pf'], who: 'solo', level: 2,
+      watch: ['Catch the ball at the top of your jump, not on the way down.', 'Two hands, fingers spread, then bring it to your chin.', 'Land on both feet at the same time.', 'Go straight back up with no extra dribble.'],
+      steps: [
+        { s: 'Start under the basket with the ball', o: [50, 19], b: 'o' },
+        { s: 'Toss it high off the backboard', b: [50, 8.5] },
+        { s: 'Jump and catch it with two hands at the top', o: [53, 17], j: 1, b: 'o' },
+        { s: 'Land on both feet with the ball at your chin', o: [53, 18], b: 'o' },
+        { s: 'Go straight back up and finish', o: [52, 15], j: 1, b: RIM }
+      ] },
+    { id: 'contactfin', from: ['center', '4'], skills: ['finish'], pos: ['center', 'pf'], who: 'partner', level: 3,
+      watch: ['Keep the ball high and away from the cushion.', 'Brace your core so a bump does not knock you off balance.', 'Go up anyway. Do not stop or give up the shot when you feel contact.', 'Finish with the hand furthest from the defender.', 'Parents: a light bump only, never a shove.'],
+      steps: [
+        { s: 'A parent stands near the rim holding a cushion', o: [65, 30], d: [52, 19] },
+        { s: 'Drive at the rim and take the first contact on your shoulder', o: [57, 20.5] },
+        { s: 'Stay strong and go up through the bump', o: [55, 16], j: 1, b: [51, 10.5] }
+      ] },
+    { id: 'weakhand', name: 'Weak-hand lay-ups', min: 3, who: 'solo', level: 2, skills: ['finish', 'feet'], pos: ['all'],
+      how: 'If you shoot with your right hand, take lay-ups from the left side with the left hand. Start 45 degrees out on the left. Long step with the left foot, short step with the right, jump off the right foot and lift the left knee. 10 attempts.',
+      counters: [K('fin', 'Makes', 10)],
+      watch: ['Practise this more than your strong side. Lopsided players are easy to defend.', 'Same steps in a mirror image: long step, short step, jump.', 'Use the backboard and let the ball do the work.', 'Slow down if it feels clumsy and build the speed back up as it gets clean.'],
+      steps: [
+        { s: 'Start 45 degrees out on the left with the ball in two hands', o: [32, 40] },
+        { s: 'Long first step with the left foot', o: [37, 31] },
+        { s: 'Short second step with the right foot', o: [42, 22] },
+        { s: 'Jump off the right foot, left knee up, ball in your left hand off the board', o: [46, 14.5], j: 1, b: [49, 10.5] }
+      ] },
+    { id: 'pumpfake', name: 'Pump fake and finish', min: 3, who: 'partner', level: 3, skills: ['finish', 'feet'], pos: ['center', 'pf'],
+      how: 'Catch near the rim with a parent or a chair as the defender. Show the ball up quickly with your eyes on the rim, but keep both feet on the floor. When the defender jumps or leans, step round them and finish. 8 reps. A hit for the first score is a fake where your feet stayed down.',
+      counters: [K('feet', 'Feet stayed down', 8), K('fin', 'Makes', 8)],
+      watch: ['Sell the fake with your eyes and shoulders, not just the ball.', 'Do not travel. Keep your pivot foot planted.', 'Bring the ball back to your chin before you step.', 'Only go if the defender reacts. If they stay down, shoot.'],
+      steps: [
+        { s: 'Catch near the rim with a defender close', o: [44, 17], d: [44, 23], b: 'o' },
+        { s: 'Pump fake: ball up, feet stay down', b: [44, 12.5] },
+        { s: 'The defender leaves the floor', d: [44, 22], dj: 1, b: 'o' },
+        { s: 'Step past and finish', o: [49, 14.5], j: 1, dj: 0, d: [44, 22], b: RIM }
+      ] },
+    { id: 'wingdrive', from: ['sf', '2'], skills: ['finish', 'handle'], pos: ['sf', 'sg', 'pg'], who: 'solo', level: 2,
+      watch: ['Catch facing the rim, ready to go.', 'Attack with your first step, low and quick.', 'Under control means you could stop at any point.', 'Look at the rim, not at the ball.'],
+      steps: [
+        { s: 'Catch on the wing and face the rim', o: [20, 36] },
+        { s: 'Attack with one or two hard dribbles', o: [33, 28] },
+        { s: 'Stop under control near the rim', o: [43, 20] },
+        { s: 'Go up and finish', o: [47, 15], j: 1, b: [50, 10.5] }
+      ] },
+    { id: 'shortcorner', from: ['pf', '3'], skills: ['finish', 'feet'], pos: ['pf', 'center'], who: 'solo', level: 2,
+      watch: ['Stay low on the dribble and use just one hard bounce.', 'Jump stop before you go up. Count the feet even on a miss.', 'Keep the ball high and in two hands when you stop.', 'Finish off the backboard or soft over the front of the rim.'],
+      steps: [
+        { s: 'Catch near the baseline outside the lane', o: [22, 17] },
+        { s: 'One power dribble toward the middle', o: [29, 20] },
+        { s: 'Jump stop with the ball high', o: [37, 17] },
+        { s: 'Go up and finish', o: [43, 14.5], j: 1, b: [50, 10.5] }
+      ] },
+
+    /* rebounding */
+    { id: 'chinit', name: 'Rebound and chin it', min: 2, who: 'solo', level: 1, skills: ['rebound'], pos: ['center', 'pf', 'sf'],
+      how: 'Toss the ball high off the backboard, jump and catch it with both hands at the top. Land on two feet and tuck it under your chin with your elbows out. Hold for a count of two, then go again. 10 reps. A hit is a catch at the top with a balanced landing.',
+      counters: [K('a', 'Clean catches', 10)],
+      watch: ['Elbows wide so nobody can knock the ball away.', 'Catch it with two hands at the highest point.', 'Land balanced. Do not walk with the ball.', 'Chin it: ball under your chin, not on your chest.'],
+      steps: [
+        { s: 'Start under the basket with the ball', o: [50, 19], b: 'o' },
+        { s: 'Toss it high off the backboard', b: [50, 8.5] },
+        { s: 'Jump and catch it with two hands at the top', o: [52, 17], j: 1, b: 'o' },
+        { s: 'Land on two feet and chin the ball, elbows out', o: [52, 18], b: 'o' }
+      ] },
+    { id: 'boxout', from: ['pf', '1'], skills: ['rebound', 'defend'], pos: ['pf', 'center'], who: 'partner', level: 2,
+      watch: ['Contact first, then go. Feel them with your back and forearm.', 'Wide base, bent knees, arms out. Make yourself big.', 'Do not watch the ball. The other player is who you are blocking.', 'Once the ball hits the rim, go to it hard with two hands.'],
+      steps: [
+        { s: 'Your player is about to shoot. Stay between them and the basket', o: [50, 25], d: [50, 33], b: 'd' },
+        { s: 'The shot goes up. Find your player and make contact', o: [50, 25.5], d: [50, 32], b: [50, 11] },
+        { s: 'Hold the seal with a wide base and your arms out', b: [50, 16] },
+        { s: 'The ball comes off the rim. Go and get it with two hands', o: [50, 21], d: [50, 30], j: 1, b: 'o' }
+      ] },
+    { id: 'tip', name: 'Keep it alive', min: 2, who: 'solo', level: 3, skills: ['rebound', 'finish'], pos: ['center', 'pf'],
+      how: 'Stand under the basket. Throw the ball up on the backboard, jump and tap it back up with your fingertips, three times in a row without it touching the floor. Catch it on the third and finish. A hit is a round with three clean taps. 8 rounds.',
+      counters: [K('a', 'Clean rounds', 8)],
+      watch: ['Reach with straight arm and fingertips. Slapping makes the ball squirt away.', 'Land balanced between taps and jump again at once.', 'Eyes on the ball the whole time.', 'Use two hands for the catch at the end.'],
+      steps: [
+        { s: 'Start under the basket with the ball', o: [50, 17], b: 'o' },
+        { s: 'Throw it up on the backboard', b: [50, 8.5] },
+        { s: 'Jump and tap it back up with your fingertips', o: [50, 15.5], j: 1, b: [51, 8.5] },
+        { s: 'Land, jump and tap again. After three taps catch it and finish', o: [50, 15.5], j: 1, b: RIM }
+      ] },
+    { id: 'outlet', name: 'Rebound and outlet', min: 2, who: 'partner', level: 2, skills: ['rebound', 'pass'], pos: ['center', 'pf', 'sf'],
+      how: 'Toss the ball off the backboard, rebound it and land with the ball high. A teammate or parent waits on the wing as the target, and another stands close as a defender if you have one. Pivot away from the pressure, then throw a firm chest or bounce pass to the target. A hit is a clean landing and a pass that arrives on target. 10 reps.',
+      counters: [K('a', 'Clean outlets', 10)],
+      watch: ['Pivot away from the pressure first, then pass.', 'Throw to the hand away from the defender so they can catch and go.', 'Step into the pass and snap your wrists.', 'Then run. The pass starts the break, it is not the end of the job.'],
+      steps: [
+        { s: 'Rebound the ball and land with it high', o: [50, 21], d: [55, 25], p: [14, 40], b: 'o' },
+        { s: 'Pivot away from the pressure and find your partner', b: [45.5, 20] },
+        { s: 'Throw a firm pass to the sideline', b: 'p' },
+        { s: 'Sprint up the floor to help', o: [40, 48], b: 'p' }
+      ] },
+    { id: 'reboundpush', from: ['sf', '4'], skills: ['rebound', 'handle'], pos: ['sf', 'pf', 'center'], who: 'solo', level: 2,
+      watch: ['Catch at the top with two hands.', 'Land and turn away from pressure, toward the sideline.', 'First dribble hard and out ahead of you.', 'Head up as you go so you can see your teammates.'],
+      steps: [
+        { s: 'Toss the ball off the backboard', o: [50, 20], b: [50, 8.5] },
+        { s: 'Jump and catch it at the top', o: [52, 18], j: 1, b: 'o' },
+        { s: 'Land on two feet and turn toward the sideline', o: [44, 22], b: 'o' },
+        { s: 'Dribble out hard to half court', o: [36, 56], b: 'o' }
+      ] },
+
+    /* passing */
+    { id: 'wallpass', from: ['pg', '2'], skills: ['pass'], pos: ['pg', 'sg', 'sf'], who: 'solo', level: 1, w: [[10, 30, 10, 56]],
+      watch: ['Step toward the target as you pass.', 'Snap your thumbs down on the follow through.', 'Hit the mark, not just the wall.', 'Catch with fingers spread and soft hands, then pass again quickly.'],
+      steps: [
+        { s: 'Stand about three metres from the wall with the ball at your chest', o: [30, 43] },
+        { s: 'Step in and snap the pass onto the mark', o: [28, 43], b: [11, 43] },
+        { s: 'Catch it with soft hands and go again', o: [30, 43], b: 'o' }
+      ] },
+    { id: 'highlow', name: 'High-low feed', min: 2, who: 'partner', level: 2, skills: ['pass', 'finish'], pos: ['center', 'pf'],
+      how: 'Start on the block with your back to the basket. A parent or teammate stands at the top of the key with the ball. Show a big target hand and call for it. Catch the pass, land on two feet, chin the ball, then finish. 8 reps.',
+      counters: [K('a', 'Clean catches', 8), K('b', 'Makes', 8)],
+      watch: ['Make a big target: hand up and fingers spread.', 'Stay low and wide, and do not drift out of the lane.', 'Catch with two hands, then land on two feet before you move.', 'Call for it with your voice. Loud is good here.'],
+      steps: [
+        { s: 'Wait on the block with your hand up as a target', o: [38, 15], p: [50, 42], b: 'p' },
+        { s: 'Your partner passes over the top into your high hand', b: 'o' },
+        { s: 'Catch, land on two feet and chin the ball', o: [38, 15], b: 'o' },
+        { s: 'Step to the middle and finish', o: [45, 14.5], j: 1, b: RIM }
+      ] },
+
+    /* ball handling */
+    { id: 'pounds', from: ['pg', '1'], skills: ['handle'], pos: ['pg', 'sg', 'sf'], who: 'solo', level: 1,
+      watch: ['Ball low enough to control, below the waist.', 'Fingertips, not the palm.', 'Eyes up. Look at a mark on the wall, not the ball.', 'Stay low with your knees bent and your back straight.'],
+      steps: [
+        { s: 'Low stance, eyes up. Right-hand pound', o: [50, 36], b: [56, 38] },
+        { s: 'Left-hand pound', b: [44, 38] },
+        { s: 'Crossover in front of you', b: [50, 33] },
+        { s: 'Between the legs', b: [50, 39] }
+      ] },
+    { id: 'cones', name: 'Cone weave', min: 2, who: 'solo', level: 2, skills: ['handle'], pos: ['pg', 'sg', 'sf'], m: [[24, 50], [40, 50], [56, 50], [72, 50]],
+      how: 'Set up four cones, or four shoes, in a line about two metres apart. Dribble through them, changing hands at each one, with your head up. A hit is a run with no lost ball. 8 runs, switching the hand you start with each time.',
+      counters: [K('a', 'Clean runs', 8)],
+      watch: ['Change hands at the cone, not before it.', 'Keep your head up and look at the far cone.', 'Stay low with your knees bent.', 'Speed up only when you have not lost the ball for a few runs.'],
+      steps: [
+        { s: 'Start low at the first cone, ball in your right hand', o: [12, 50] },
+        { s: 'Go round the first cone and change hands', o: [24, 56] },
+        { s: 'Change again round the next cone', o: [40, 44] },
+        { s: 'Keep the rhythm to the end with your head up', o: [74, 56] }
+      ] },
+    { id: 'changepace', from: ['pg', '3'], skills: ['handle', 'finish'], pos: ['pg', 'sg', 'sf'], who: 'solo', level: 3,
+      watch: ['Slow down for just two steps, then explode.', 'Keep the ball low and tight when you slow.', 'Finish with control: balanced feet and the ball protected.', 'Alternate sides. The change of pace works on both.'],
+      steps: [
+        { s: 'Dribble hard from half court', o: [26, 66] },
+        { s: 'Slow down two steps out and keep the ball low', o: [34, 48] },
+        { s: 'Explode past into the lane', o: [43, 28] },
+        { s: 'Finish at the rim under control', o: [49, 15], j: 1, b: [50, 10.5] }
+      ] },
+
+    /* shooting */
+    { id: 'form', from: ['sg', '1'], skills: ['shoot'], pos: ['sg', 'pg', 'sf'], who: 'solo', level: 1,
+      watch: ['Shooting elbow under the ball and pointing at the rim.', 'Your other hand rests on the side and does not push.', 'Snap the wrist and finish with your fingers pointing down, as if reaching into a basket.', 'Hold the follow through until the ball lands.'],
+      steps: [
+        { s: 'Stand close with your elbow under the ball and the other hand on the side', o: [50, 23], b: [53, 19] },
+        { s: 'Push up and flick the wrist', b: [51.5, 15] },
+        { s: 'Hold your follow through until it lands', b: RIM }
+      ] },
+    { id: 'closefive', name: 'Five spots close', min: 3, who: 'solo', level: 1, skills: ['shoot'], pos: ['all'],
+      how: 'Pick five spots in an arc about two metres from the basket. Take two shots from each spot with the same form every time: elbow under the ball and your follow through held. Rebound your own shots. 10 shots.',
+      counters: [K('a', 'Makes', 10)],
+      watch: ['Same form from every spot. Do not rush it because you moved.', 'Square your feet and shoulders to the rim.', 'Aim over the front of the rim and let it drop in.', 'Hold the follow through every time.'],
+      steps: [
+        { s: 'Start at the left spot, two metres out', o: [30, 20], b: 'o' },
+        { s: 'Shoot twice with the same form, then move on', o: [30, 20], b: RIM, j: 1 },
+        { s: 'Walk round the arc to the middle spot', o: [50, 29], b: 'o', j: 0 },
+        { s: 'Keep going round: five spots, two shots from each', o: [70, 20], b: 'o' }
+      ] },
+    { id: 'catchshoot', from: ['sg', '2'], skills: ['shoot'], pos: ['sg', 'sf', 'pg'], who: 'partner', level: 2,
+      watch: ['Feet ready before the ball arrives, not after.', 'Show a target hand so the passer can see you.', 'Hop into the shot so your feet land balanced.', 'Catch it in your shooting pocket and go. No dip and no waiting.'],
+      steps: [
+        { s: 'Hands up and feet moving as the pass comes', o: [30, 28], p: [52, 46], b: 'p' },
+        { s: 'Catch the pass and hop into the shot', b: 'o' },
+        { s: 'Land on two feet, square to the rim', o: [30, 27], b: 'o' },
+        { s: 'Shoot and hold your follow through', o: [30, 27], j: 1, b: RIM }
+      ] },
+    { id: 'pullup', from: ['pg', '4'], skills: ['shoot', 'handle'], pos: ['pg', 'sg'], who: 'solo', level: 3,
+      watch: ['Stop on two feet, balanced, before you shoot. Your feet decide the shot.', 'Square your shoulders to the rim.', 'Same shot as always. Do not rush it because you were moving.', 'Hold your follow through until the ball goes in.'],
+      steps: [
+        { s: 'Start at the top of the key, ball in your hand', o: [42, 54] },
+        { s: 'One or two dribbles toward the elbow', o: [37, 44] },
+        { s: 'Stop on two feet, balanced', o: [35, 39] },
+        { s: 'Rise up and shoot', o: [35, 39], j: 1, b: RIM }
+      ] },
+    { id: 'ft', from: ['sg', '4'], skills: ['shoot'], pos: ['sg', 'pg', 'sf', 'pf', 'center'], who: 'solo', level: 1,
+      watch: ['Pick a routine and copy it exactly every time.', 'Breathe out slowly before you shoot.', 'Eyes on the front of the rim, not on the ball.', 'Bend your knees. The power comes from your legs.'],
+      steps: [
+        { s: 'Line up on the free throw line and breathe', o: [50, 38], b: 'o' },
+        { s: 'Bounce twice, eyes on the front of the rim', b: [50, 41] },
+        { s: 'Bend your knees, shoot and hold the follow through', j: 1, b: RIM }
+      ] },
+    { id: 'corner', from: ['sf', '3'], skills: ['shoot'], pos: ['sf', 'sg'], who: 'partner', level: 2,
+      watch: ['Feet ready and shoulders square to the rim.', 'Use your legs. From distance the power comes from the floor.', 'Aim over the front of the rim.', 'If you miss short, bend your knees more.'],
+      steps: [
+        { s: 'Wait in the corner with your hands ready', o: [14, 14], p: [50, 46], b: 'p' },
+        { s: 'Catch the pass with your feet ready', b: 'o' },
+        { s: 'Shoot and hold your follow through', o: [14, 14], j: 1, b: RIM }
+      ] },
+    { id: 'elbowj', from: ['pf', '2'], skills: ['shoot'], pos: ['pf', 'center'], who: 'partner', level: 2,
+      watch: ['Catch with two hands and land on two feet.', 'Square your feet and shoulders to the rim.', 'Aim over the front of the rim.', 'Go and get your own rebound.'],
+      steps: [
+        { s: 'Show your hands at the elbow', o: [35, 39], p: [50, 54], b: 'p' },
+        { s: 'Catch with two hands and land on two feet', b: 'o' },
+        { s: 'Square up and shoot', j: 1, b: RIM }
+      ] },
+    { id: 'pickpop', from: ['pf', '4'], skills: ['shoot', 'defend'], pos: ['pf', 'center'], who: 'partner', level: 3, m: [[34, 47]],
+      watch: ['Be still when you screen. A moving screen is a foul.', 'Wide base, arms crossed in front of your chest.', 'Open your chest to the passer as you step out.', 'Catch on balance and shoot without hesitating.'],
+      steps: [
+        { s: 'Set the screen next to the chair with a wide base and arms crossed', o: [38, 49], p: [64, 58], b: 'p' },
+        { s: 'Hold still until the ball handler has used you', o: [38, 49] },
+        { s: 'Open to the ball and step out', o: [46, 46] },
+        { s: 'Catch on balance', b: 'o' },
+        { s: 'Square up and shoot', j: 1, b: RIM }
+      ] },
+
+    /* defence */
+    { id: 'slide', name: 'Defensive slides', min: 2, who: 'solo', level: 1, skills: ['defend', 'feet'], pos: ['all'], m: [[30, 50], [70, 50]],
+      how: 'Set two cones, or two shoes, about four metres apart. Get into a wide stance and slide from one to the other without crossing your feet, then back. One length is one rep. A hit is a rep with your feet never crossing and your hips staying low. 10 reps.',
+      counters: [K('a', 'Clean slides', 10)],
+      watch: ['Stay low, with hips down, back straight and chest up.', 'Never cross your feet or click your heels together.', 'Push with the back foot and step with the lead foot.', 'Hands up and active, eyes on the middle of an imaginary player.'],
+      steps: [
+        { s: 'Get into a wide stance with your knees bent and hands up', o: [34, 50] },
+        { s: 'Slide right without crossing your feet', o: [66, 50] },
+        { s: 'Push off the back foot and slide back', o: [34, 50] }
+      ] },
+    { id: 'closeout', name: 'Closeouts', min: 2, who: 'partner', level: 2, skills: ['defend'], pos: ['all'],
+      how: 'A parent or teammate holds the ball at the top of the key. Start about four metres away, nearer the basket. Sprint at them, take short chopping steps as you arrive, one hand high and one wide. Stop under control. 10 reps. A hit is a closeout that finished balanced without jumping in.',
+      counters: [K('a', 'Balanced closeouts', 10)],
+      watch: ['Sprint, then chop. Take two or three short steps as you arrive.', 'One hand high on the ball and one hand wide for the pass.', 'Eyes on the shooter\'s chest, not the ball.', 'Stay on your feet. Jumping at a fake leaves you out of position.'],
+      steps: [
+        { s: 'Start in the lane while your player holds the ball', o: [50, 28], p: [50, 46], b: 'p' },
+        { s: 'Sprint at them with your hand high', o: [50, 38] },
+        { s: 'Chop your feet, hands up, and finish under control', o: [50, 41.5] }
+      ] }
+  ];
+  var POOLBY = {};
+  POOL.forEach(function (e) {
+    if (e.from) {
+      var pr = POSITIONS.filter(function (p) { return p.id === e.from[0]; })[0];
+      var dr = pr.drills.filter(function (d) { return d.id === e.from[1]; })[0];
+      dr.ref = e.id;
+      e.name = dr.name; e.min = dr.min; e.how = dr.how;
+      e.counters = dr.counters.map(function (c) { return K(c.id, c.label, c.max); });
+    }
+    POOLBY[e.id] = e;
+  });
+  /* 3D versions, written by hand because they need a pose for every step rather than just a position.
+     L and R are the feet as [x, y, lift in metres] on the same court as the diagrams. at is the point the player faces, k is how far the knees are
+     bent (0 to 1), l leans the body forward (radians), a names the arm pose, b is 'two' or 'right' for a held ball or {c, h} for a loose one,
+     h adds a little extra height, arc bends the ball's flight, ms is how long the move into the step takes, q keeps a quick step short,
+     and t lists the labels to show, each as [anchor, text, optional sideways pixels]. Anything left out carries on from the step before. */
+  var V3 = {
+    jumpstop: { cam: { az: 105, el: 10, dist: 3.6, c: [50, 30], y: 1.0 }, steps: [
+      { s: 'Stand a step or two from the basket with the ball in two hands', L: [49, 34], R: [51, 34], at: RIM, k: 0.1, l: 0.08, a: 'carry', b: 'two', t: [['ball', 'Ball in two hands']] },
+      { s: 'Take a step with your right foot', R: [51, 31.5], k: 0.25, l: 0.14, ms: 800 },
+      { s: 'Hop forward off that foot', L: [49, 29.5, 0.2], R: [51, 29, 0.24], k: 0.15, l: 0.12, h: 0.05, a: 'chin', ms: 420, q: true, t: [['feet', 'Both feet leave the floor']] },
+      { s: 'Land on both feet at the same moment, knees bent, ball high', L: [49, 27.5], R: [51, 27.5], k: 0.65, l: 0.3, ms: 320, t: [['feet', 'Both feet land together', 0, 34], ['knees', 'Knees bent', -80], ['ball', 'Ball high, near your chin', 70, -10]] },
+      { s: 'Hold still for a full second', k: 0.6, l: 0.28, ms: 400, t: [['head', 'Eyes up and still']] }
+    ] },
+    gather: { cam: { az: 100, el: 10, dist: 5.2, c: [55, 19], y: 1.5 }, steps: [
+      { s: 'Start about two and a half metres out with the ball in two hands', L: [57, 25.5], R: [59, 25.5], at: RIM, k: 0.1, l: 0.08, a: 'carry', b: 'two', t: [['ball', 'Ball in two hands']] },
+      { s: 'Push one hard dribble out in front of you', L: [56, 23.5], R: [58.5, 25.5], k: 0.3, l: 0.22, a: 'dribble', b: { c: [55.3, 21.2], h: 0.12 }, ms: 500, t: [['ball', 'One hard, low dribble']] },
+      { s: 'Step to the ball and take it back into two hands', R: [55, 20.5], k: 0.35, l: 0.2, a: 'carry', b: 'two', ms: 800 },
+      { s: 'Hop into the jump stop', L: [54.2, 17.8, 0.18], R: [56.2, 17.6, 0.2], k: 0.2, l: 0.12, h: 0.04, a: 'chin', ms: 420, q: true },
+      { s: 'Land on both feet together, knees bent, ball high', L: [54, 17], R: [56, 17], k: 0.65, l: 0.3, ms: 320, t: [['feet', 'Both feet land together', 0, 34], ['knees', 'Knees bent', -80], ['ball', 'Ball high', 70, -10]] },
+      { s: 'Explode up with the ball high', L: [54, 17, 0.32], R: [56, 17, 0.3], k: 0.1, l: 0.05, a: 'high', ms: 480, q: true },
+      { s: 'Soft touch up and over the front of the rim', L: [54, 17, 0.5], R: [56, 17, 0.48], h: 0.12, a: 'reach', b: { c: RIM, h: 3.05 }, arc: 0.4, ms: 450, t: [['hands', 'Soft touch']] },
+      { s: 'Land balanced on two feet', L: [54, 17], R: [56, 17], k: 0.5, l: 0.15, a: 'down', b: { c: RIM, h: 2.7 }, ms: 520, t: [['feet', 'Land balanced']] }
+    ] },
+    layupfeet: { cam: { az: 100, el: 10, dist: 5.8, c: [57, 22], y: 1.4 }, steps: [
+      { s: 'Start about 45 degrees out on the right, a couple of strides from the basket, ball in two hands', L: [59.75, 25.5], R: [62.5, 30.2], at: RIM, k: 0.45, l: 0.12, a: 'carry', b: 'two', t: [['ball', 'Ball in two hands']] },
+      { s: 'Long first step with your right foot', R: [57, 20.8], k: 0.5, l: 0.16, ms: 800, t: [['feet', 'Long step: right foot']] },
+      { s: 'Short second step with your left foot. Sink into it, this is your launch', L: [54.5, 16.5], k: 0.6, l: 0.22, a: 'chin', ms: 700, t: [['feet', 'Short step: left foot', 0, 34], ['knees', 'Sink', -95, -24]] },
+      { s: 'Jump off the left foot and drive your right knee up', L: [54.4, 16.2, 0.32], R: [53.6, 15, 0.8], k: 0.12, l: 0.08, h: 0.06, a: 'high', ms: 480, q: true, t: [['kneeR', 'Right knee drives up', 70]] },
+      { s: 'Reach up and lay the ball softly off the backboard', L: [54.4, 16.2, 0.5], R: [53.6, 15, 0.85], h: 0.1, a: 'reach', b: { c: [52.4, 8.4], h: 3.3 }, arc: 0.2, ms: 380, t: [['hands', 'Soft touch off the board']] },
+      { s: 'Land balanced on two feet', L: [54, 16.8], R: [52.2, 16], k: 0.5, l: 0.15, a: 'down', b: { c: RIM, h: 2.7 }, ms: 520, t: [['feet', 'Land balanced']] }
+    ] }
+  };
+  Object.keys(V3).forEach(function (id) { if (POOLBY[id]) POOLBY[id].v3 = V3[id]; });
+
+  /* the position programmes use these drills too, so give each of their copies the same link */
+  [['pg', '1', 'pounds'], ['pg', '2', 'wallpass'], ['pg', '3', 'changepace'], ['pg', '4', 'pullup'],
+   ['sg', '1', 'form'], ['sg', '2', 'catchshoot'], ['sg', '3', 'pullup'], ['sg', '4', 'ft'],
+   ['sf', '1', 'triple'], ['sf', '2', 'wingdrive'], ['sf', '3', 'corner'], ['sf', '4', 'reboundpush'],
+   ['pf', '1', 'boxout'], ['pf', '2', 'elbowj'], ['pf', '3', 'shortcorner'], ['pf', '4', 'pickpop'],
+   ['center', '1', 'jumpstop'], ['center', '2', 'reboundput'], ['center', '3', 'gather'], ['center', '4', 'contactfin']
+  ].forEach(function (r) {
+    POSITIONS.forEach(function (p) { if (p.id === r[0]) p.drills.forEach(function (d) { if (d.id === r[1]) d.ref = r[2]; }); });
+  });
+
+  function $(s) { return document.querySelector(s); }
+  function esc(s) { return String(s).replace(/[&<>"']/g, function (ch) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[ch]; }); }
+  function fmt(ms) { var s = Math.ceil(ms / 1000); return Math.floor(s / 60) + ':' + String(s % 60).padStart(2, '0'); }
+  function uid(p) { return p + Math.random().toString(36).slice(2, 7); }
+  function lsGet(k) { try { return localStorage.getItem(k); } catch (e) { return null; } }
+  function lsSet(k, v) { try { localStorage.setItem(k, v); } catch (e) {} }
+
+  /* ---------- programmes ---------- */
+  var MAX_DRILLS = 12;
+  var customs = [];       /* the user's own programmes */
+  var prog = null;        /* the programme on screen */
+  var COUNTERS = [];
+  var MAX_TOTAL = 0;
+  var wanted = lsGet('utb-prog') || 'center';
+
+  function cleanId(s) { return String(s || '').replace(/[^A-Za-z0-9]/g, '').slice(0, 16); }
+  function normaliseProg(o) {
+    if (!o || typeof o !== 'object') return null;
+    var id = cleanId(o.id);
+    if (!id) return null;
+    var drills = (Array.isArray(o.drills) ? o.drills : []).slice(0, MAX_DRILLS).map(function (d) {
+      if (!d) return null;
+      var did = cleanId(d.id);
+      if (!did) return null;
+      var cs = (Array.isArray(d.counters) ? d.counters : []).slice(0, 3).map(function (c) {
+        if (!c) return null;
+        var cid = cleanId(c.id);
+        if (!cid) return null;
+        return { id: cid, label: String(c.label || '').slice(0, 30), max: Math.min(20, Math.max(1, Math.round(Number(c.max)) || 1)) };
+      }).filter(Boolean);
+      if (!cs.length) return null;
+      var out = { id: did, name: String(d.name || '').slice(0, 40), min: Math.min(30, Math.max(1, Math.round(Number(d.min)) || 1)), how: String(d.how || '').slice(0, 400), counters: cs };
+      var ref = cleanId(d.ref);
+      if (ref) out.ref = ref;
+      return out;
+    }).filter(Boolean);
+    if (!drills.length) return null;
+    return { id: id, name: String(o.name || '').slice(0, 40), cue: (Array.isArray(o.cue) ? o.cue : []).slice(0, 3).map(function (w) { return String(w).slice(0, 14); }), drills: drills, created: Number(o.created) || 0, custom: true };
+  }
+  function findProg(id) {
+    var all = POSITIONS.concat(customs);
+    for (var i = 0; i < all.length; i++) if (all[i].id === id) return all[i];
+    return null;
+  }
+  function countersOf(p) {
+    var out = [];
+    p.drills.forEach(function (d) {
+      d.counters.forEach(function (c) { out.push({ key: d.id + c.id, drill: d.id, label: c.label, max: c.max }); });
+    });
+    return out;
+  }
+
+  /* ---------- current session (a draft kept in this browser) ---------- */
+  var cur = {};   /* each counter holds its reps in order: 1 for a hit, 0 for a miss */
+  function hitsOf(key) { return (cur[key] || []).reduce(function (a, b) { return a + b; }, 0); }
+  function loadDraft() {
+    cur = {};
+    COUNTERS.forEach(function (c) { cur[c.key] = []; });
+    try {
+      var raw = lsGet(draftKey());
+      var d = JSON.parse(raw || 'null');
+      if (d) COUNTERS.forEach(function (c) {
+        var v = d[c.key];
+        if (Array.isArray(v)) cur[c.key] = v.slice(0, c.max).map(function (x) { return x ? 1 : 0; });
+        else if (isFinite(Number(v))) cur[c.key] = new Array(Math.min(c.max, Math.max(0, Math.round(Number(v))))).fill(1);
+      });
+    } catch (e) {}
+  }
+  function draftKey() { return 'utb-draft-' + (player ? player.id : 'none') + '-' + prog.id; }
+  function saveDraft() { lsSet(draftKey(), JSON.stringify(cur)); }
+
+  /* ---------- history and personal bests ---------- */
+  var sessions = [];        /* all programmes, newest first */
+  var progSessions = [];    /* the current programme only */
+  var bests = {};
+  var kind = 'pending';     /* 'pending' | 'db' | 'local' */
+  var loaded = false;
+  var dbCol = null, dbProgCol = null;
+  var saving = false;
+
+  /* players: names only, no passwords */
+  var players = [];       /* {id, name, created} */
+  var player = null;      /* the active player */
+  var loadedPlayers = false;
+  var dbPlayersCol = null;
+  var pOpen = false, pMode = 'add', pAutoShown = false, rmArm = false, rmTimer = 0;
+
+  function g(s, k) { return Number(s && s.scores && s.scores[k]) || 0; }
+  function cell(s, k) {
+    if (!s || !s.scores || s.scores[k] === undefined) return '-';
+    var t = Number(s.tries && s.tries[k]);
+    return g(s, k) + (t > 0 ? '/' + t : '');
+  }
+  function computeBests() {
+    bests = {};
+    COUNTERS.forEach(function (c) {
+      bests[c.key] = progSessions.reduce(function (m, s) { return Math.max(m, g(s, c.key)); }, 0);
+    });
+  }
+  function recompute() {
+    progSessions = sessions.filter(function (s) { return player && s.player === player.id && (s.prog || 'center') === prog.id; });
+    computeBests(); renderHistory(); refresh();
+  }
+  function setSessions(list) {
+    sessions = list.sort(function (a, b) { return (Number(b.at) || 0) - (Number(a.at) || 0); });
+    recompute();
+  }
+
+  /* ---------- picker ---------- */
+  function renderPicker() {
+    $('#pos').innerHTML = POSITIONS.map(function (p) {
+      return '<button class="pos" type="button" data-prog="' + p.id + '" aria-pressed="' + (prog && prog.id === p.id) + '"><span class="num">' + p.num + '</span><span class="nm">' + p.name + '</span></button>';
+    }).join('');
+    $('#mine').innerHTML = customs.map(function (p) {
+      return '<button class="pos" type="button" data-prog="' + esc(p.id) + '" aria-pressed="' + (prog && prog.id === p.id) + '"><span class="nm">' + esc(p.name) + '</span><span class="sub2">' + p.drills.length + (p.drills.length === 1 ? ' drill' : ' drills') + '</span></button>';
+    }).join('') + '<button class="btn" type="button" id="new-prog">New programme</button>';
+    $('#mine-hint').textContent = customs.length ? '' : 'Build your own with New programme and pick from the drill pool, or copy a position programme and change it.';
+  }
+
+  /* ---------- build the screen for the chosen programme ---------- */
+  function counterHTML(d, c) {
+    var key = d.id + c.id, pips = '';
+    for (var i = 0; i < c.max; i++) pips += '<span class="pip"></span>';
+    var nm = esc(c.label.toLowerCase());
+    return '<div class="counter" id="ctr-' + key + '">' +
+      '<div class="c-top"><span class="c-label">' + esc(c.label) + '</span><span class="c-best" id="best-' + key + '"></span></div>' +
+      '<div class="c-mid"><div><div class="c-val"><span id="val-' + key + '">0</span><small>/' + c.max + '</small></div><div class="c-meta" id="meta-' + key + '"></div></div>' +
+      '<div class="c-btns">' +
+      '<button class="btn rep" type="button" data-rep="0" data-key="' + key + '" aria-label="Record a miss for ' + nm + '">Miss</button>' +
+      '<button class="btn rep primary" type="button" data-rep="1" data-key="' + key + '" aria-label="Record a hit for ' + nm + '">Hit</button>' +
+      '</div></div>' +
+      '<div class="pip-row"><div class="pips' + (c.max > 12 ? ' dense' : '') + '" id="pips-' + key + '" aria-hidden="true">' + pips + '</div>' +
+      '<button class="btn small" type="button" data-undo="' + key + '" aria-label="Undo the last rep for ' + nm + '">Undo</button></div></div>';
+  }
+
+  function buildProgramme() {
+    var mins = prog.drills.reduce(function (a, d) { return a + d.min; }, 0);
+    $('#ph-kicker').textContent = prog.custom ? 'Your programme' : 'Position ' + prog.num;
+    $('#ph-name').textContent = prog.name;
+    $('#ph-sub').textContent = (prog.blurb ? prog.blurb + ' ' : '') + prog.drills.length + (prog.drills.length === 1 ? ' level' : ' levels') + ', about ' + mins + ' minutes.';
+    var cue = $('#cue');
+    cue.innerHTML = prog.cue.map(function (w) { return '<span>' + esc(w) + '</span>'; }).join('');
+    cue.hidden = !prog.cue.length;
+    cue.setAttribute('aria-label', 'Cue words: ' + prog.cue.join(', '));
+    $('#ph-act').textContent = prog.custom ? 'Edit programme' : 'Copy and edit';
+
+    timers = {};
+    prog.drills.forEach(function (d) { timers[d.id] = { total: d.min * 60000, left: d.min * 60000, running: false, end: 0 }; });
+
+    $('#levels').innerHTML = prog.drills.map(function (d, i) {
+      var pd = poolOf(d);
+      var show = pd ? '<div class="show-row"><button class="btn small" type="button" data-show="' + pd.id + '" aria-expanded="false">Show me</button>' +
+        '<span class="note">See it on a court and what to watch for.</span></div><div class="demo" hidden></div>' : '';
+      return '<article class="level" data-demohost id="lv' + d.id + '">' +
+        '<div class="lv-head"><div><div class="lv-kicker">Level ' + (i + 1) + ' · ' + d.min + ' min</div>' +
+        '<h3 class="lv-name">' + esc(d.name) + '</h3></div>' +
+        '<div class="timer"><span class="clock" id="clock' + d.id + '">' + fmt(d.min * 60000) + '</span>' +
+        '<button class="btn primary" type="button" id="tbtn' + d.id + '" data-timer="toggle" data-drill="' + d.id + '">Start</button>' +
+        '<button class="btn" type="button" data-timer="reset" data-drill="' + d.id + '">Reset</button></div></div>' +
+        '<p class="lv-how">' + esc(d.how) + '</p>' + show +
+        '<div class="counters">' + d.counters.map(function (c) { return counterHTML(d, c); }).join('') + '</div></article>';
+    }).join('');
+
+    $('#max').textContent = '/' + MAX_TOTAL;
+    $('#rows').innerHTML = prog.drills.map(function (d, i) {
+      var mx = d.counters.reduce(function (a, c) { return a + c.max; }, 0);
+      return '<li><span>Level ' + (i + 1) + ' · ' + esc(d.name) + '</span><span id="sub' + d.id + '" data-max="' + mx + '">0/' + mx + '</span></li>';
+    }).join('');
+  }
+
+  function setProgramme(id, auto) {
+    var p = findProg(id) || POSITIONS[4];
+    if (!auto) wanted = null;
+    stopAllTimers();
+    prog = p;
+    COUNTERS = countersOf(p);
+    MAX_TOTAL = COUNTERS.reduce(function (a, c) { return a + c.max; }, 0);
+    lsSet('utb-prog', p.id);
+    loadDraft();
+    buildProgramme();
+    renderPicker();
+    recompute();
+  }
+
+  function setCustoms(list) {
+    customs = list.sort(function (a, b) { return (a.created || 0) - (b.created || 0); });
+    var w = wanted;
+    wanted = null;
+    if (w && w !== prog.id && findProg(w)) { setProgramme(w, true); return; }
+    if (prog.custom) {
+      var np = findProg(prog.id);
+      if (!np) { setProgramme('center', true); return; }
+      if (JSON.stringify(np) !== JSON.stringify(prog)) { setProgramme(prog.id, true); return; }
+    }
+    renderPicker();
+  }
+
+  /* ---------- scoreboard and counters ---------- */
+  function refresh() {
+    var total = 0;
+    COUNTERS.forEach(function (c) {
+      var reps = cur[c.key], v = hitsOf(c.key), b = bests[c.key] || 0, box = $('#ctr-' + c.key);
+      total += v;
+      $('#val-' + c.key).textContent = v;
+      $('#meta-' + c.key).textContent = reps.length + ' of ' + c.max + ' reps' + (reps.length > v ? ', ' + (reps.length - v) + ' missed' : '');
+      Array.prototype.forEach.call(box.querySelectorAll('[data-rep]'), function (btn) { btn.disabled = reps.length >= c.max; });
+      box.querySelector('[data-undo]').disabled = reps.length === 0;
+      var be = $('#best-' + c.key);
+      if (progSessions.length && v > b && v > 0) { be.textContent = 'New best'; be.className = 'c-best new'; }
+      else if (progSessions.length) { be.textContent = 'Best ' + b; be.className = 'c-best'; }
+      else { be.textContent = ''; be.className = 'c-best'; }
+      Array.prototype.forEach.call($('#pips-' + c.key).children, function (p, i) {
+        p.classList.toggle('hit', reps[i] === 1);
+        p.classList.toggle('miss', reps[i] === 0);
+      });
+    });
+    prog.drills.forEach(function (d) {
+      var sum = d.counters.reduce(function (a, c) { return a + hitsOf(d.id + c.id); }, 0);
+      var el = $('#sub' + d.id);
+      el.textContent = sum + '/' + el.dataset.max;
+    });
+    $('#total').textContent = total;
+    $('#save').disabled = total === 0 || kind === 'pending' || !loaded || saving || !player;
+    var hint = $('#p-hint');
+    hint.hidden = !!player || !loadedPlayers;
+    hint.textContent = players.length ? 'Choose a player above to save scores.' : 'Add a player above to save scores.';
+  }
+
+  /* ---------- history ---------- */
+  var delId = null, delTimer = 0;
+  function fmtDate(ms) {
+    try { return new Date(ms).toLocaleString('en-GB', { weekday: 'short', day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' }); }
+    catch (e) { return ''; }
+  }
+  function shortDate(ms) {
+    try { return new Date(ms).toLocaleDateString('en-GB', { day: 'numeric', month: 'numeric' }); } catch (e) { return ''; }
+  }
+
+  function chartSVG(list, scaleMax) {
+    var W = 380, H = 160, L = 30, R = 8, T = 16, B = 22;
+    var iw = W - L - R, ih = H - T - B, n = list.length, step = iw / n, bw = Math.min(30, step * 0.62);
+    function y(v) { return T + ih - (v / scaleMax) * ih; }
+    var topIdx = 0;
+    list.forEach(function (s, i) { if (Number(s.total) > Number(list[topIdx].total)) topIdx = i; });
+    var ticks = [0, Math.round(scaleMax / 3), Math.round(scaleMax * 2 / 3), scaleMax].filter(function (t, i, a) { return a.indexOf(t) === i; });
+    var out = '<svg class="chart" viewBox="0 0 ' + W + ' ' + H + '" role="img" aria-label="Bar chart of session totals out of ' + scaleMax + '">';
+    ticks.forEach(function (t) {
+      out += '<line class="grid" x1="' + L + '" x2="' + (W - R) + '" y1="' + y(t) + '" y2="' + y(t) + '"/>';
+      out += '<text class="t" x="' + (L - 6) + '" y="' + (y(t) + 3) + '" text-anchor="end">' + t + '</text>';
+    });
+    list.forEach(function (s, i) {
+      var v = Number(s.total) || 0, cx = L + step * i + step / 2, yy = y(v);
+      out += '<rect class="bar' + (i === topIdx ? ' top' : '') + '" x="' + (cx - bw / 2) + '" y="' + yy + '" width="' + bw + '" height="' + Math.max(0, T + ih - yy) + '" rx="2"/>';
+      out += '<text class="v" x="' + cx + '" y="' + (yy - 4) + '" text-anchor="middle">' + v + '</text>';
+      if (n <= 8 || i % 2 === (n - 1) % 2) out += '<text class="t" x="' + cx + '" y="' + (H - 6) + '" text-anchor="middle">' + shortDate(s.at) + '</text>';
+    });
+    return out + '</svg>';
+  }
+
+  function renderHistory() {
+    $('#hist-title').textContent = 'History · ' + prog.name + (player ? ' · ' + player.name : '');
+    var el = $('#history');
+    if (kind === 'pending' || !loaded || !loadedPlayers) { el.innerHTML = '<p class="empty">Loading history.</p>'; return; }
+    if (!player) {
+      el.innerHTML = '<p class="empty">' + (players.length ? 'Choose a player above to see their saved sessions.' : 'Add a player above to start saving sessions.') + '</p>';
+      return;
+    }
+    if (!progSessions.length) {
+      el.innerHTML = '<p class="empty">No sessions saved for this programme yet. Score the levels, then press Save session. Each saved session adds a bar here and sets the personal bests.</p>';
+      return;
+    }
+    var head = prog.drills.map(function (d, i) { return '<th title="' + esc(d.name) + '">Level ' + (i + 1) + '</th>'; }).join('');
+    var rows = progSessions.map(function (s) {
+      var cells = prog.drills.map(function (d) {
+        return '<td>' + d.counters.map(function (c) { return cell(s, d.id + c.id); }).join(' · ') + '</td>';
+      }).join('');
+      return '<tr><td>' + esc(fmtDate(Number(s.at))) + '</td>' + cells + '<td class="tot">' + (Number(s.total) || 0) + '</td>' +
+        '<td><button class="btn small" type="button" data-del="' + esc(s.id) + '">' + (delId === s.id ? 'Sure?' : 'Delete') + '</button></td></tr>';
+    }).join('');
+    var scaleMax = Math.max(MAX_TOTAL, progSessions.reduce(function (m, s) { return Math.max(m, Number(s.total) || 0); }, 0));
+    el.innerHTML =
+      '<div><h3 class="lv-kicker" style="margin-bottom:8px">Session totals, out of ' + MAX_TOTAL + '</h3>' + chartSVG(progSessions.slice(0, 12).reverse(), scaleMax) + '</div>' +
+      '<div class="tbl-wrap"><table><thead><tr><th>Date</th>' + head + '<th>Total</th><th></th></tr></thead><tbody>' + rows + '</tbody></table></div>' +
+      '<p class="note">Each score is hits out of reps taken. Levels with two scores show them in order. The tallest bar is the best session so far.</p>';
+  }
+
+  function setMsg(t) {
+    var m = $('#msg'); m.textContent = t;
+    clearTimeout(setMsg.t);
+    if (t) setMsg.t = setTimeout(function () { m.textContent = ''; }, 4500);
+  }
+
+  /* ---------- storage: db when the page is served by claude.ai, this browser otherwise ---------- */
+  function loadLocal() {
+    var list = [], progs = [], plist = [];
+    try { list = JSON.parse(lsGet('utb-sessions') || '[]'); } catch (e) {}
+    try { progs = JSON.parse(lsGet('utb-programmes') || '[]'); } catch (e) {}
+    try { plist = JSON.parse(lsGet('utb-players') || '[]'); } catch (e) {}
+    kind = 'local'; loaded = true;
+    $('#where').textContent = 'Players, history and your programmes are kept in this browser only.';
+    sessions = Array.isArray(list) ? list : [];
+    setCustoms((Array.isArray(progs) ? progs : []).map(normaliseProg).filter(Boolean));
+    setPlayers((Array.isArray(plist) ? plist : []).map(normalisePlayer).filter(Boolean));
+    setSessions(sessions);
+  }
+  function persistLocal() { lsSet('utb-sessions', JSON.stringify(sessions)); }
+  function persistLocalProgs() { lsSet('utb-programmes', JSON.stringify(customs)); }
+
+  async function init() {
+    var db = null;
+    try { db = window.claude && window.claude.use ? await window.claude.use('db') : null; } catch (e) { db = null; }
+    if (!db) { loadLocal(); return; }
+    kind = 'db';
+    dbCol = db.collection('sessions');
+    dbProgCol = db.collection('programmes');
+    dbPlayersCol = db.collection('players');
+    $('#where').textContent = 'Players, history and your programmes are saved with this page, so they stay across visits and devices.';
+    dbPlayersCol.orderBy('created', 'asc').limit(60).onSnapshot(
+      function (snap) {
+        setPlayers(snap.docs.map(function (d) { var o = d.data() || {}; o.id = d.id; return normalisePlayer(o); }).filter(Boolean));
+      },
+      function () { loadLocal(); }
+    );
+    dbProgCol.orderBy('created', 'asc').limit(50).onSnapshot(
+      function (snap) {
+        setCustoms(snap.docs.map(function (d) { var o = d.data() || {}; o.id = d.id; return normaliseProg(o); }).filter(Boolean));
+      },
+      function () { loadLocal(); }
+    );
+    dbCol.orderBy('at', 'desc').limit(400).onSnapshot(
+      function (snap) {
+        loaded = true;
+        setSessions(snap.docs.map(function (d) { var o = d.data() || {}; o.id = d.id; return o; }));
+      },
+      function () { loadLocal(); }
+    );
+  }
+
+  async function save() {
+    var total = COUNTERS.reduce(function (a, c) { return a + hitsOf(c.key); }, 0);
+    if (!total || saving || !player) return;
+    var at = Date.now(), scores = {}, tries = {};
+    COUNTERS.forEach(function (c) { scores[c.key] = hitsOf(c.key); tries[c.key] = cur[c.key].length; });
+    var rec = { at: at, player: player.id, prog: prog.id, progName: prog.name, total: total, max: MAX_TOTAL, scores: scores, tries: tries };
+    saving = true; refresh();
+    try {
+      if (kind === 'db') { await dbCol.doc('s' + at).set(rec); }
+      else { sessions.unshift(Object.assign({ id: 's' + at }, rec)); persistLocal(); setSessions(sessions); }
+      COUNTERS.forEach(function (c) { cur[c.key] = []; });
+      saveDraft(); resetTimers();
+      setMsg('Session saved. Total ' + total + ' of ' + MAX_TOTAL + '.');
+    } catch (e) {
+      setMsg('Could not save the session. Try again in a moment.');
+    }
+    saving = false; refresh();
+  }
+
+  async function removeSession(id) {
+    try {
+      if (kind === 'db') { await dbCol.doc(id).delete(); }
+      else { setSessions(sessions.filter(function (s) { return s.id !== id; })); persistLocal(); }
+    } catch (e) { setMsg('Could not delete that session.'); }
+  }
+
+  /* ---------- timers ---------- */
+  var timers = {};
+  var actx = null, lock = null;
+
+  function beep() {
+    try {
+      var Ctx = window.AudioContext || window.webkitAudioContext;
+      actx = actx || new Ctx();
+      var o = actx.createOscillator(), gn = actx.createGain();
+      o.frequency.value = 880; gn.gain.value = 0.15;
+      o.connect(gn); gn.connect(actx.destination);
+      o.start(); o.stop(actx.currentTime + 0.4);
+    } catch (e) {}
+  }
+  async function syncWake() {
+    var any = Object.keys(timers).some(function (k) { return timers[k].running; });
+    try {
+      if (any && !lock && navigator.wakeLock) {
+        lock = await navigator.wakeLock.request('screen');
+        lock.addEventListener('release', function () { lock = null; });
+      } else if (!any && lock) { await lock.release(); lock = null; }
+    } catch (e) { lock = null; }
+  }
+  function paintTimer(id) {
+    var t = timers[id], clock = $('#clock' + id), btn = $('#tbtn' + id);
+    if (!t || !clock || !btn) return;
+    clock.textContent = fmt(t.left);
+    clock.classList.toggle('done', t.left <= 0);
+    $('#lv' + id).classList.toggle('running', t.running);
+    btn.textContent = t.running ? 'Pause' : (t.left > 0 && t.left < t.total ? 'Resume' : 'Start');
+  }
+  function toggleTimer(id) {
+    var t = timers[id];
+    if (!t) return;
+    if (t.running) { t.left = Math.max(0, t.end - Date.now()); t.running = false; }
+    else {
+      Object.keys(timers).forEach(function (k) {
+        var o = timers[k];
+        if (o.running) { o.left = Math.max(0, o.end - Date.now()); o.running = false; paintTimer(k); }
+      });
+      if (t.left <= 0) t.left = t.total;
+      t.end = Date.now() + t.left; t.running = true;
+      try { var Ctx = window.AudioContext || window.webkitAudioContext; actx = actx || new Ctx(); if (actx.resume) actx.resume(); } catch (e) {}
+    }
+    paintTimer(id); syncWake();
+  }
+  function resetTimer(id) { var t = timers[id]; if (!t) return; t.running = false; t.left = t.total; paintTimer(id); }
+  function resetTimers() { Object.keys(timers).forEach(resetTimer); syncWake(); }
+  function stopAllTimers() { Object.keys(timers).forEach(function (k) { timers[k].running = false; }); syncWake(); }
+
+  setInterval(function () {
+    Object.keys(timers).forEach(function (k) {
+      var t = timers[k];
+      if (!t.running) return;
+      t.left = Math.max(0, t.end - Date.now());
+      if (t.left <= 0) { t.running = false; beep(); syncWake(); }
+      paintTimer(k);
+    });
+  }, 250);
+
+  /* ---------- drill pool: finding drills and showing them on a court ---------- */
+  var pf = { skill: '', pos: '', who: '', level: '' };
+  var MOVE_MS = 1100;
+  var COURT =
+    '<rect class="paint" x="34" y="0" width="32" height="38"/>' +
+    '<path class="ln" d="M34 0V38H66V0"/>' +
+    '<circle class="ln" cx="50" cy="38" r="12"/>' +
+    '<path class="ln" d="M42 10.5A8 8 0 0 0 58 10.5"/>' +
+    '<path class="ln" d="M6 0V15.6A44.3 44.3 0 1 0 94 15.6V0"/>' +
+    '<line class="bb" x1="44" y1="8" x2="56" y2="8"/>' +
+    '<circle class="rim" cx="50" cy="10.5" r="2.4"/>';
+
+  function poolOf(d) {
+    if (d && d.ref && POOLBY[d.ref]) return POOLBY[d.ref];
+    var n = String((d && d.name) || '').trim().toLowerCase();
+    if (!n) return null;
+    for (var i = 0; i < POOL.length; i++) if (POOL[i].name.toLowerCase() === n) return POOL[i];
+    return null;
+  }
+  function poolMeta(p) { return p.min + ' min · ' + SKILLS[p.skills[0]] + ' · ' + WHO[p.who] + ' · ' + LEVELS[p.level]; }
+
+  function fillFilters() {
+    function opts(sel, first, pairs) {
+      $(sel).innerHTML = '<option value="">' + first + '</option>' + pairs.map(function (q) { return '<option value="' + q[0] + '">' + esc(q[1]) + '</option>'; }).join('');
+    }
+    opts('#f-skill', 'Any skill', Object.keys(SKILLS).map(function (k) { return [k, SKILLS[k]]; }));
+    opts('#f-pos', 'Any position', POSITIONS.map(function (p) { return [p.id, p.name]; }));
+    opts('#f-who', 'Any', Object.keys(WHO).map(function (k) { return [k, WHO[k]]; }));
+    opts('#f-level', 'Any level', Object.keys(LEVELS).map(function (k) { return [k, k + ' ' + LEVELS[k]]; }));
+  }
+  function poolFiltered() {
+    return POOL.filter(function (p) {
+      return (!pf.skill || p.skills.indexOf(pf.skill) > -1) &&
+        (!pf.pos || p.pos.indexOf('all') > -1 || p.pos.indexOf(pf.pos) > -1) &&
+        (!pf.who || p.who === pf.who) &&
+        (!pf.level || p.level === Number(pf.level));
+    });
+  }
+  function renderPool() {
+    var list = poolFiltered();
+    $('#pool-n').textContent = 'Showing ' + list.length + ' of ' + POOL.length + ' drills.';
+    $('#pool').innerHTML = list.length ? list.map(function (p) {
+      return '<li class="pool-item" data-demohost><div class="pool-row"><div class="lib-info"><div class="lib-name">' + esc(p.name) + '</div>' +
+        '<div class="note">' + esc(poolMeta(p)) + '</div></div>' +
+        '<div class="pool-btns"><button class="btn small" type="button" data-show="' + p.id + '" data-how="1" aria-expanded="false">Show me</button>' +
+        '<button class="btn small" type="button" data-pool="' + p.id + '" aria-label="Add ' + esc(p.name) + ' to the programme">Add</button></div></div>' +
+        '<div class="demo" hidden></div></li>';
+    }).join('') : '<li class="pool-item empty">No drills match those filters. Try clearing one.</li>';
+    updateLibButtons();
+  }
+
+  /* turn the written steps into full positions for every step */
+  function compileAnim(p) {
+    var cur = {}, curB = 'o', steps = [];
+    p.steps.forEach(function (st) {
+      ['o', 'd', 'p'].forEach(function (k) { if (st[k]) cur[k] = st[k]; });
+      if (st.b !== undefined) curB = st.b;
+      var r = { s: st.s, j: st.j ? 1 : 0, dj: st.dj ? 1 : 0 };
+      ['o', 'd', 'p'].forEach(function (k) { if (cur[k]) r[k] = cur[k].slice(); });
+      var b = curB;
+      if (typeof b === 'string') { var h = r[b] || r.o; b = [h[0] + 3.2, h[1] - 2.4]; }
+      r.b = b.slice();
+      steps.push(r);
+    });
+    var pts = [], lab = {}, order = [];
+    steps.forEach(function (s, i) {
+      var key = s.o[0] + ',' + s.o[1], last = pts[pts.length - 1];
+      if (!lab[key]) { lab[key] = { x: s.o[0], y: s.o[1], n: [] }; order.push(key); }
+      lab[key].n.push(i + 1);
+      if (!last || last[0] !== s.o[0] || last[1] !== s.o[1]) pts.push(s.o);
+    });
+    return { steps: steps, has: { d: !!steps[0].d, p: !!steps[0].p }, m: p.m || [], w: p.w || [], trail: pts, labels: order.map(function (k) { return lab[k]; }) };
+  }
+
+  function demoHTML(p, A, withHow) {
+    var svg = '<svg class="court" viewBox="0 0 100 70" role="img" aria-label="' + esc('Diagram of the drill ' + p.name + ' on a half court') + '">' + COURT;
+    A.w.forEach(function (w) { svg += '<line class="wall" x1="' + w[0] + '" y1="' + w[1] + '" x2="' + w[2] + '" y2="' + w[3] + '"/>'; });
+    A.m.forEach(function (c) { svg += '<polygon class="cone" points="' + c[0] + ',' + (c[1] - 2.2) + ' ' + (c[0] - 2) + ',' + (c[1] + 1.6) + ' ' + (c[0] + 2) + ',' + (c[1] + 1.6) + '"/>'; });
+    if (A.trail.length > 1) {
+      svg += '<polyline class="trail" points="' + A.trail.map(function (q) { return q[0] + ',' + q[1]; }).join(' ') + '"/>';
+      A.labels.forEach(function (l) { svg += '<text class="lab" x="' + (l.x + 4.6) + '" y="' + (l.y + 1.2) + '">' + l.n.join(',') + '</text>'; });
+    }
+    function actor(k) { return '<g class="a a-' + k + '"><circle class="sh" r="3.4"/><circle class="bd" r="3.4"/></g>'; }
+    svg += (A.has.d ? actor('d') : '') + (A.has.p ? actor('p') : '') + actor('o') + '<circle class="ball" r="1.9"/></svg>';
+    var legend = '<span><i class="dot dot-o"></i>You</span>' + (A.has.d ? '<span><i class="dot dot-d"></i>Defender</span>' : '') +
+      (A.has.p ? '<span><i class="dot dot-p"></i>Partner</span>' : '') + '<span><i class="dot dot-b"></i>Ball</span>' + (A.w.length ? '<span>Thick line: wall</span>' : '') + (A.m.length ? '<span>Cone or chair</span>' : '');
+    var tabs = p.v3 ? '<div class="vtabs" role="group" aria-label="Choose a view"><button class="btn small" type="button" data-vt="2d" aria-pressed="true">Diagram</button>' +
+      '<button class="btn small" type="button" data-vt="3d" aria-pressed="false">3D view</button></div>' : '';
+    return tabs + '<div class="demo-in"><div class="stage">' + svg + '<div class="legend">' + legend + '</div></div><div class="demo-body">' +
+      (withHow ? '<h4>How it works</h4><p>' + esc(p.how) + '</p>' : '') +
+      '<h4>On the court</h4><p class="cap" aria-live="off"></p>' +
+      '<div class="vctl"><button class="btn small" type="button" data-v="back">Back</button><button class="btn small" type="button" data-v="play">Pause</button>' +
+      '<button class="btn small" type="button" data-v="next">Next</button><span class="note step-n"></span></div>' +
+      '<ol class="steps">' + A.steps.map(function (s) { return '<li>' + esc(s.s) + '</li>'; }).join('') + '</ol>' +
+      '<h4>Watch out for</h4><ul class="watch">' + p.watch.map(function (w) { return '<li>' + esc(w) + '</li>'; }).join('') + '</ul></div></div>' +
+      (p.v3 ? demo3HTML(p, compile3Text(p.v3)) : '');
+  }
+  /* the step captions are all the 3D list needs before three.js has loaded */
+  function compile3Text(spec) { return spec.steps.map(function (s) { return { s: s.s }; }); }
+
+  function ease(k) { return k < 0.5 ? 2 * k * k : 1 - Math.pow(-2 * k + 2, 2) / 2; }
+  function mix(a, b, k) { return [a[0] + (b[0] - a[0]) * k, a[1] + (b[1] - a[1]) * k]; }
+  function mixState(a, b, k) {
+    var r = { j: a.j + (b.j - a.j) * k, dj: a.dj + (b.dj - a.dj) * k, b: mix(a.b, b.b, k) };
+    ['o', 'd', 'p'].forEach(function (n) { if (a[n] && b[n]) r[n] = mix(a[n], b[n], k); });
+    return r;
+  }
+  function setActor(el, pt, j) {
+    el.setAttribute('transform', 'translate(' + pt[0].toFixed(2) + ' ' + pt[1].toFixed(2) + ')');
+    var c = el.lastChild;
+    c.setAttribute('r', (3.4 * (1 + 0.3 * j)).toFixed(2));
+    c.setAttribute('cy', (-2.2 * j).toFixed(2));
+  }
+  function paintV(v, st) {
+    v.cur = st;
+    setActor(v.o, st.o, st.j);
+    if (v.d && st.d) setActor(v.d, st.d, st.dj);
+    if (v.p && st.p) setActor(v.p, st.p, 0);
+    v.ball.setAttribute('cx', st.b[0].toFixed(2));
+    v.ball.setAttribute('cy', st.b[1].toFixed(2));
+  }
+  function capV(v, i) {
+    v.cap.textContent = v.A.steps[i].s;
+    v.num.textContent = 'Step ' + (i + 1) + ' of ' + v.A.steps.length;
+    Array.prototype.forEach.call(v.items, function (li, n) { li.classList.toggle('now', n === i); });
+  }
+  function showStep(v, i) { v.i = i; paintV(v, v.A.steps[i]); capV(v, i); }
+  function playLabel(v) {
+    v.playBtn.textContent = v.playing ? 'Pause' : 'Play';
+    v.cap.setAttribute('aria-live', v.playing ? 'off' : 'polite');
+  }
+  function holdMs(v) { return Math.min(3800, 1200 + 30 * v.A.steps[v.i].s.length); }
+  function tick(v) {
+    if (v.raf) return;
+    v.raf = requestAnimationFrame(function (now) { v.raf = 0; frame(v, now); });
+  }
+  function frame(v, now) {
+    if (!v.playing) return;
+    if (!v.panel.isConnected || v.panel.hidden || v.panel.closest('[hidden]')) { v.playing = false; playLabel(v); return; }
+    var steps = v.A.steps, n = steps.length;
+    if (v.phase === 'move') {
+      var k = Math.min(1, (now - v.t0) / MOVE_MS);
+      paintV(v, mixState(v.from, v.to, ease(k)));
+      if (k >= 1) { v.cur = v.to; v.phase = 'hold'; v.t0 = now; }
+    } else if (now - v.t0 >= holdMs(v)) {
+      var nx = (v.i + 1) % n;
+      v.i = nx; capV(v, nx);
+      if (nx === 0) { paintV(v, steps[0]); v.phase = 'hold'; v.t0 = now; }
+      else { v.from = v.cur; v.to = steps[nx]; v.phase = 'move'; v.t0 = now; }
+    }
+    tick(v);
+  }
+  function mountDemo(panel, p, withHow) {
+    var A = compileAnim(p);
+    panel.innerHTML = demoHTML(p, A, withHow);
+    var q = function (s) { return panel.querySelector(s); };
+    var v = { panel: panel, A: A, i: 0, playing: false, phase: 'hold', t0: 0, from: null, to: null, cur: A.steps[0], raf: 0,
+      o: q('.a-o'), d: q('.a-d'), p: q('.a-p'), ball: q('.ball'), cap: q('.cap'), num: q('.step-n'), playBtn: q('[data-v="play"]'),
+      items: panel.querySelectorAll('.demo-in:not(.demo3) .steps li') };
+    panel._v = v;
+    showStep(v, 0);
+    var calm = false;
+    try { calm = !!(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches); } catch (e) {}
+    if (!calm) { v.playing = true; v.t0 = performance.now(); tick(v); }
+    playLabel(v);
+  }
+  function unmountDemo(panel) {
+    if (panel._v) { panel._v.playing = false; panel._v = null; }
+    if (panel._v3) { dispose3(panel._v3); panel._v3 = null; }
+    panel.innerHTML = '';
+    panel.hidden = true;
+  }
+  function toggleDemo(b) {
+    var host = b.closest('[data-demohost]'), panel = host && host.querySelector('.demo');
+    if (!panel) return;
+    if (panel.hidden) {
+      var p = POOLBY[b.dataset.show];
+      if (!p) return;
+      panel.hidden = false;
+      panel.dataset.pool = p.id;
+      mountDemo(panel, p, b.dataset.how === '1');
+      b.textContent = 'Hide'; b.setAttribute('aria-expanded', 'true');
+    } else {
+      unmountDemo(panel);
+      b.textContent = 'Show me'; b.setAttribute('aria-expanded', 'false');
+    }
+  }
+  function demoCtl(b) {
+    var panel = b.closest('.demo'), v = panel && panel._v;
+    if (!v) return;
+    var n = v.A.steps.length;
+    if (b.dataset.v === 'play') {
+      if (v.playing) v.playing = false;
+      else { v.playing = true; v.phase = 'hold'; v.t0 = performance.now(); tick(v); }
+    } else {
+      v.playing = false;
+      showStep(v, (v.i + (b.dataset.v === 'next' ? 1 : n - 1)) % n);
+    }
+    playLabel(v);
+  }
+
+  /* ---------- 3D view ----------
+     three.js loads from a CDN the first time someone opens a 3D view. The figure is a jointed mannequin: feet are placed first, legs and arms
+     are solved from them (two-bone IK), and the knees, lean and arm pose come from each step. */
+  var THREE_URL = 'https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js';
+  var threeP = null, active3 = null;
+  var S3 = 0.1524;    /* metres per court unit */
+  var ARMS = {
+    carry: [-0.12, -0.22, 0.30, 0.12, -0.22, 0.30],
+    chin: [-0.12, 0.10, 0.30, 0.12, 0.10, 0.30],
+    high: [-0.12, 0.52, 0.20, 0.12, 0.52, 0.20],
+    reach: [-0.45, 0.10, 0.10, 0.12, 0.62, 0.28],
+    dribble: [-0.30, -0.15, 0.25, 0.30, -0.62, 0.30],
+    down: [-0.25, -0.55, 0, 0.25, -0.55, 0]
+  };
+  function loadThree() {
+    if (window.THREE) return Promise.resolve();
+    if (!threeP) threeP = new Promise(function (res, rej) {
+      var s = document.createElement('script');
+      s.src = THREE_URL;
+      s.onload = function () { if (window.THREE) res(); else { threeP = null; rej(new Error('three missing')); } };
+      s.onerror = function () { threeP = null; rej(new Error('three failed')); };
+      document.head.appendChild(s);
+    });
+    return threeP;
+  }
+
+  /* tiny vector helpers, so the pose maths runs without three.js */
+  function vadd(a, b) { return [a[0] + b[0], a[1] + b[1], a[2] + b[2]]; }
+  function vsub(a, b) { return [a[0] - b[0], a[1] - b[1], a[2] - b[2]]; }
+  function vmul(a, s) { return [a[0] * s, a[1] * s, a[2] * s]; }
+  function vdot(a, b) { return a[0] * b[0] + a[1] * b[1] + a[2] * b[2]; }
+  function vlen(a) { return Math.sqrt(vdot(a, a)); }
+  function ik(a, t, l1, l2, pole) {
+    var d = vsub(t, a), dist = vlen(d) || 1e-4, dir = vmul(d, 1 / dist);
+    var dd = Math.min((l1 + l2) * 0.995, Math.max(Math.abs(l1 - l2) + 0.01, dist));
+    var x = (l1 * l1 - l2 * l2 + dd * dd) / (2 * dd), hgt = Math.sqrt(Math.max(0, l1 * l1 - x * x));
+    var pp = vsub(pole, vmul(dir, vdot(pole, dir))), pl = vlen(pp);
+    pp = pl < 1e-4 ? [0, 0, -1] : vmul(pp, 1 / pl);
+    return { mid: vadd(vadd(a, vmul(dir, x)), vmul(pp, hgt)), end: vadd(a, vmul(dir, dd)) };
+  }
+
+  /* work out every joint for one pose. Local axes: x is the player's right, y up, z backwards. */
+  function solve(P) {
+    var fl = [(P.L[0] - 50) * S3, P.L[1] * S3], fr = [(P.R[0] - 50) * S3, P.R[1] * S3];
+    var rx = (fl[0] + fr[0]) / 2, rz = (fl[1] + fr[1]) / 2, c = Math.cos(P.th), s = Math.sin(P.th);
+    function toLocal(w) { var dx = w[0] - rx, dz = w[1] - rz; return [c * dx - s * dz, s * dx + c * dz]; }
+    function lw(p) { return [rx + c * p[0] + s * p[2], p[1], rz - s * p[0] + c * p[2]]; }
+    var lL = toLocal(fl), lR = toLocal(fr), ankle = 0.08;
+    var ph = 0.96 - 0.30 * P.k + Math.min(P.L[2], P.R[2]) + P.h, lean = P.l;
+    var pel = [0, ph, 0.25 * lean];
+    var hipL = [-0.09, ph, pel[2]], hipR = [0.09, ph, pel[2]];
+    var ankL = [lL[0], ankle + P.L[2], lL[1]], ankR = [lR[0], ankle + P.R[2], lR[1]];
+    var legL = ik(hipL, ankL, 0.44, 0.44, [0, 0, -1]), legR = ik(hipR, ankR, 0.44, 0.44, [0, 0, -1]);
+    var ex = [1, 0, 0], ey = [0, Math.cos(lean), -Math.sin(lean)], ez = [0, Math.sin(lean), Math.cos(lean)];
+    var sc = vadd(pel, vmul(ey, 0.5)), shL = vadd(sc, [-0.19, 0, 0]), shR = vadd(sc, [0.19, 0, 0]);
+    function hand(i) { return vadd(sc, vadd(vadd(vmul(ex, P.a[i]), vmul(ey, P.a[i + 1])), vmul(ez, -P.a[i + 2]))); }
+    var armL = ik(shL, hand(0), 0.30, 0.28, [-0.5, -1, 0.3]), armR = ik(shR, hand(3), 0.30, 0.28, [0.5, -1, 0.3]);
+    var ball = P.hold === 'right' ? vadd(armR.end, vmul(ey, 0.11)) : vmul(vadd(armL.end, armR.end), 0.5);
+    return { rx: rx, rz: rz, th: P.th, lw: lw, pel: pel, hipL: hipL, hipR: hipR, kneeL: legL.mid, kneeR: legR.mid, ankL: legL.end, ankR: legR.end,
+      sc: sc, shL: shL, shR: shR, elL: armL.mid, elR: armR.mid, hdL: armL.end, hdR: armR.end, head: vadd(sc, [0, 0.2, -0.03]), ball: lw(ball), liftL: P.L[2], liftR: P.R[2], h: P.h };
+  }
+
+  function compile3(spec) {
+    var cur = { L: [57, 30, 0], R: [59, 30, 0], k: 0.1, l: 0.08, a: 'carry', b: 'two', at: null, th: 0 }, out = [];
+    spec.steps.forEach(function (st) {
+      ['L', 'R'].forEach(function (k) { if (st[k]) cur[k] = [st[k][0], st[k][1], st[k][2] || 0]; });
+      ['k', 'l', 'a', 'b'].forEach(function (k) { if (st[k] !== undefined) cur[k] = st[k]; });
+      if (st.at) cur.at = st.at;
+      var mx = (cur.L[0] + cur.R[0]) / 2, my = (cur.L[1] + cur.R[1]) / 2;
+      if (cur.at) cur.th = Math.atan2(-(cur.at[0] - mx), -(cur.at[1] - my));
+      var held = typeof cur.b === 'string';
+      var r = { s: st.s, L: cur.L.slice(), R: cur.R.slice(), k: cur.k, l: cur.l, h: st.h || 0, th: cur.th, a: ARMS[cur.a].slice(),
+        held: held, hold: held ? cur.b : '', arc: st.arc || 0, ms: st.ms || MOVE_MS, q: !!st.q, t: st.t || [] };
+      r.bp = held ? solve(r).ball : [(cur.b.c[0] - 50) * S3, cur.b.h, cur.b.c[1] * S3];
+      out.push(r);
+    });
+    return out;
+  }
+  function mix3(A, B, k) {
+    function lerpv(a, b) { return a.map(function (x, i) { return x + (b[i] - x) * k; }); }
+    var dth = Math.atan2(Math.sin(B.th - A.th), Math.cos(B.th - A.th));
+    var r = { L: lerpv(A.L, B.L), R: lerpv(A.R, B.R), k: A.k + (B.k - A.k) * k, l: A.l + (B.l - A.l) * k, h: A.h + (B.h - A.h) * k,
+      th: A.th + dth * k, a: lerpv(A.a, B.a), hold: B.hold };
+    var sw = Math.sin(Math.PI * k);
+    [['L'], ['R']].forEach(function (n) {
+      var key = n[0], dist = Math.hypot(B[key][0] - A[key][0], B[key][1] - A[key][1]) * S3;
+      r[key][2] += Math.min(0.2, dist * 0.14) * sw;
+    });
+    return r;
+  }
+
+  function makeFigure(T, col) {
+    var g = new T.Group();
+    function mat(c) { return new T.MeshLambertMaterial({ color: c }); }
+    var shirt = mat(col.shirt), shorts = mat(col.shorts), skin = mat(col.skin);
+    function limb(r, m) { var me = new T.Mesh(new T.CylinderGeometry(r, r, 1, 10), m); g.add(me); return me; }
+    function ball(r, m) { var me = new T.Mesh(new T.SphereGeometry(r, 12, 10), m); g.add(me); return me; }
+    var f = {
+      g: g,
+      thighL: limb(0.075, shorts), thighR: limb(0.075, shorts), shinL: limb(0.058, skin), shinR: limb(0.058, skin),
+      upL: limb(0.052, shirt), upR: limb(0.052, shirt), foreL: limb(0.046, skin), foreR: limb(0.046, skin),
+      torso: new T.Mesh(new T.CylinderGeometry(0.15, 0.13, 1, 16), shirt), neck: limb(0.045, skin),
+      hips: new T.Mesh(new T.BoxGeometry(0.3, 0.16, 0.18), shorts),
+      head: ball(0.105, skin), nose: new T.Mesh(new T.BoxGeometry(0.05, 0.05, 0.06), shirt),
+      joints: [ball(0.07, shorts), ball(0.07, shorts), ball(0.063, shorts), ball(0.063, shorts), ball(0.06, shirt), ball(0.06, shirt), ball(0.052, skin), ball(0.052, skin), ball(0.05, skin), ball(0.05, skin)],
+      footL: new T.Mesh(new T.BoxGeometry(0.1, 0.07, 0.27), shirt), footR: new T.Mesh(new T.BoxGeometry(0.1, 0.07, 0.27), shirt),
+      shadow: new T.Mesh(new T.CircleGeometry(0.34, 20), new T.MeshBasicMaterial({ color: 0x000000, transparent: true, opacity: 0.2 })),
+      discL: new T.Mesh(new T.RingGeometry(0.1, 0.17, 24), new T.MeshBasicMaterial({ color: col.mark, transparent: true, side: T.DoubleSide })),
+      discR: new T.Mesh(new T.RingGeometry(0.1, 0.17, 24), new T.MeshBasicMaterial({ color: col.mark, transparent: true, side: T.DoubleSide }))
+    };
+    [f.torso, f.hips, f.nose, f.footL, f.footR, f.shadow, f.discL, f.discR].forEach(function (m) { g.add(m); });
+    [f.shadow, f.discL, f.discR].forEach(function (m) { m.rotation.x = -Math.PI / 2; });
+    return f;
+  }
+  function placeFigure(T, f, S) {
+    var up = new T.Vector3(0, 1, 0), va = new T.Vector3(), vb = new T.Vector3();
+    function seg(m, a, b, sx, sz) {
+      va.set(a[0], a[1], a[2]); vb.set(b[0], b[1], b[2]);
+      var d = vb.clone().sub(va), len = d.length() || 1e-4;
+      m.position.copy(va).addScaledVector(d, 0.5);
+      m.scale.set(sx || 1, len, sz || 1);
+      m.quaternion.setFromUnitVectors(up, d.normalize());
+    }
+    function at(m, p) { m.position.set(p[0], p[1], p[2]); }
+    f.g.position.set(S.rx, 0, S.rz);
+    f.g.rotation.y = S.th;
+    seg(f.thighL, S.hipL, S.kneeL); seg(f.thighR, S.hipR, S.kneeR);
+    seg(f.shinL, S.kneeL, S.ankL); seg(f.shinR, S.kneeR, S.ankR);
+    seg(f.upL, S.shL, S.elL); seg(f.upR, S.shR, S.elR);
+    seg(f.foreL, S.elL, S.hdL); seg(f.foreR, S.elR, S.hdR);
+    seg(f.torso, S.pel, S.sc, 1.25, 0.8);
+    seg(f.neck, S.sc, S.head);
+    at(f.hips, [0, S.pel[1], S.pel[2]]);
+    at(f.head, S.head); at(f.nose, vadd(S.head, [0, -0.01, -0.105]));
+    [S.hipL, S.hipR, S.kneeL, S.kneeR, S.shL, S.shR, S.elL, S.elR, S.hdL, S.hdR].forEach(function (p, i) { at(f.joints[i], p); });
+    at(f.footL, [S.ankL[0], S.ankL[1] - 0.035, S.ankL[2] - 0.06]); at(f.footR, [S.ankR[0], S.ankR[1] - 0.035, S.ankR[2] - 0.06]);
+    at(f.shadow, [0, 0.004, S.pel[2]]);
+    var sh = Math.max(0.55, 1 - (S.pel[1] - 0.96) * 0.35);
+    f.shadow.scale.set(sh, sh, sh);
+    at(f.discL, [S.ankL[0], 0.006, S.ankL[2] - 0.04]); at(f.discR, [S.ankR[0], 0.006, S.ankR[2] - 0.04]);
+    f.discL.material.opacity = 0.95 * Math.max(0, 1 - S.liftL / 0.05);
+    f.discR.material.opacity = 0.95 * Math.max(0, 1 - S.liftR / 0.05);
+  }
+
+  function courtTexture(T, col) {
+    var cv = document.createElement('canvas');
+    cv.width = 1000; cv.height = 700;
+    var x = cv.getContext('2d');
+    x.fillStyle = col.floor; x.fillRect(0, 0, 1000, 700);
+    x.globalAlpha = 0.16; x.fillStyle = col.paint; x.fillRect(340, 0, 320, 380); x.globalAlpha = 1;
+    x.save(); x.scale(10, 10);
+    x.strokeStyle = col.line; x.lineWidth = 0.6;
+    ['M34 0V38H66V0', 'M38 38a12 12 0 1 0 24 0a12 12 0 1 0 -24 0', 'M42 10.5A8 8 0 0 0 58 10.5', 'M6 0V15.6A44.3 44.3 0 1 0 94 15.6V0', 'M0.3 0.3H99.7V69.7H0.3Z'].forEach(function (d) { x.stroke(new Path2D(d)); });
+    x.restore();
+    return new T.CanvasTexture(cv);
+  }
+
+  function anchor3(sol, name) {
+    var m = function (a, b) { return vmul(vadd(a, b), 0.5); };
+    var p;
+    if (name === 'ball') return sol.ball;
+    if (name === 'head') p = vadd(sol.head, [0, 0.12, 0]);
+    else if (name === 'knees') p = m(sol.kneeL, sol.kneeR);
+    else if (name === 'kneeR') p = sol.kneeR;
+    else if (name === 'hands') p = sol.hdR;
+    else if (name === 'feet') { p = m(sol.ankL, sol.ankR); p = [p[0], 0.02, p[2]]; }
+    else p = sol.pel;
+    return sol.lw(p);
+  }
+
+  function demo3HTML(p, steps) {
+    return '<div class="demo-in demo3" hidden><div class="stage"><div class="gl"><canvas tabindex="0" aria-label="3D view of the drill ' + esc(p.name) + '. Drag to turn the view."></canvas><div class="tags3"></div><div class="gl-msg" role="status"></div></div>' +
+      '<div class="vctl"><button class="btn small" type="button" data-view="behind">Behind</button><button class="btn small" type="button" data-view="side">Side</button>' +
+      '<button class="btn small" type="button" data-view="front">Front</button><button class="btn small" type="button" data-view="above">Above</button></div>' +
+      '<p class="note">Drag to turn the view. Scroll or pinch to zoom. Orange rings show which foot is on the floor.</p></div>' +
+      '<div class="demo-body"><h4>On the court</h4><p class="cap" aria-live="off"></p>' +
+      '<div class="vctl"><button class="btn small" type="button" data-w="back">Back</button><button class="btn small" type="button" data-w="play">Pause</button>' +
+      '<button class="btn small" type="button" data-w="next">Next</button><span class="note step-n"></span></div>' +
+      '<ol class="steps">' + steps.map(function (s) { return '<li>' + esc(s.s) + '</li>'; }).join('') + '</ol>' +
+      '<h4>Watch out for</h4><ul class="watch">' + p.watch.map(function (w) { return '<li>' + esc(w) + '</li>'; }).join('') + '</ul></div></div>';
+  }
+
+  function render3(v) {
+    if (v.dead) return;
+    var cam = v.camera, ce = Math.cos(v.el);
+    cam.position.set(v.target.x + v.dist * Math.sin(v.az) * ce, v.target.y + v.dist * Math.sin(v.el), v.target.z + v.dist * Math.cos(v.az) * ce);
+    cam.lookAt(v.target);
+    v.renderer.render(v.scene, cam);
+    placeTags(v);
+  }
+  function placeTags(v) {
+    if (!v.sol) return;
+    var w = v.canvas.clientWidth, h = v.canvas.clientHeight, T = window.THREE;
+    Array.prototype.forEach.call(v.tagEls, function (el) {
+      var p = anchor3(v.sol, el.dataset.anchor), q = new T.Vector3(p[0], p[1], p[2]).project(v.camera);
+      var x = (q.x * 0.5 + 0.5) * w + Number(el.dataset.dx || 0), y = (-q.y * 0.5 + 0.5) * h - 8 + Number(el.dataset.dy || 0), half = (el.offsetWidth || 120) / 2 + 4;
+      el.style.left = Math.max(half, Math.min(w - half, x)) + 'px';
+      el.style.top = Math.max(28, Math.min(h - 6, y)) + 'px';
+    });
+  }
+  function setTags(v, on) {
+    var st = v.steps[v.i];
+    if (v.tagFor !== v.i) {
+      v.tagFor = v.i;
+      v.tagBox.innerHTML = st.t.map(function (t) { return '<span class="tag3" data-anchor="' + t[0] + '" data-dx="' + (t[2] || 0) + '" data-dy="' + (t[3] || 0) + '">' + esc(t[1]) + '</span>'; }).join('');
+      v.tagEls = v.tagBox.children;
+    }
+    Array.prototype.forEach.call(v.tagEls, function (el) { el.classList.toggle('on', !!on); });
+  }
+  function paint3(v, A, B, k) {
+    var P = k >= 1 || A === B ? B : mix3(A, B, k);
+    if (k >= 1 || A === B) P = { L: B.L, R: B.R, k: B.k, l: B.l, h: B.h, th: B.th, a: B.a, hold: B.hold };
+    var sol = solve(P);
+    placeFigure(window.THREE, v.fig, sol);
+    var bp;
+    if (k >= 1 || A === B) bp = B.held ? sol.ball : B.bp;
+    else if (A.held && B.held && A.hold === B.hold) bp = sol.ball;
+    else { bp = A.bp.map(function (x, i) { return x + (B.bp[i] - x) * k; }); bp[1] += B.arc * Math.sin(Math.PI * k); }
+    v.ball.position.set(bp[0], bp[1], bp[2]);
+    v.sol = sol;
+    render3(v);
+  }
+  function cap3(v, i) {
+    v.cap.textContent = v.steps[i].s;
+    v.num.textContent = 'Step ' + (i + 1) + ' of ' + v.steps.length;
+    Array.prototype.forEach.call(v.items, function (li, n) { li.classList.toggle('now', n === i); });
+  }
+  function show3(v, i) {
+    v.i = i; v.prev = i; v.phase = 'hold';
+    cap3(v, i); setTags(v, true);
+    paint3(v, v.steps[i], v.steps[i], 1);
+  }
+  function label3(v) {
+    v.playBtn.textContent = v.playing ? 'Pause' : 'Play';
+    v.cap.setAttribute('aria-live', v.playing ? 'off' : 'polite');
+  }
+  function tick3(v) {
+    if (v.raf || v.dead) return;
+    v.raf = requestAnimationFrame(function (now) { v.raf = 0; frame3(v, now); });
+  }
+  function hold3(v) { var st = v.steps[v.i]; return st.q ? 650 : Math.min(3800, 1200 + 30 * st.s.length); }
+  function frame3(v, now) {
+    if (v.dead || !v.playing) return;
+    if (!v.panel.isConnected || v.panel.hidden || v.panel.closest('[hidden]')) { v.playing = false; label3(v); return; }
+    var st = v.steps, n = st.length;
+    if (v.phase === 'move') {
+      var B = st[v.i], k = Math.min(1, (now - v.t0) / B.ms);
+      paint3(v, st[v.prev], B, ease(k));
+      if (k >= 1) { v.phase = 'hold'; v.t0 = now; setTags(v, true); }
+    } else if (now - v.t0 >= hold3(v)) {
+      var nx = (v.i + 1) % n;
+      v.prev = v.i; v.i = nx; cap3(v, nx); setTags(v, false);
+      if (nx === 0) { v.prev = 0; paint3(v, st[0], st[0], 1); v.phase = 'hold'; v.t0 = now; setTags(v, true); }
+      else { v.phase = 'move'; v.t0 = now; }
+    }
+    tick3(v);
+  }
+
+  function dispose3(v) {
+    if (!v || v.dead) return;
+    v.dead = true; v.playing = false;
+    try { if (v.ro) v.ro.disconnect(); window.removeEventListener('resize', v.onResize); v.renderer.dispose(); if (v.renderer.forceContextLoss) v.renderer.forceContextLoss(); } catch (e) {}
+    if (active3 === v) active3 = null;
+    /* a canvas whose context was released cannot be reused, so leave a fresh one in its place */
+    try { if (v.canvas.parentNode) v.canvas.parentNode.replaceChild(v.canvas.cloneNode(false), v.canvas); } catch (e) {}
+  }
+  function size3(v) {
+    var w = v.canvas.clientWidth || 300, h = v.canvas.clientHeight || 225;
+    v.renderer.setSize(w, h, false);
+    v.camera.aspect = w / h; v.camera.updateProjectionMatrix();
+    render3(v);
+  }
+  function setView(v, az, el) { v.az = az; v.el = el; render3(v); }
+
+  function mount3(panel, p) {
+    var T = window.THREE, box = panel.querySelector('.demo3'), canvas = box.querySelector('canvas'), msg = box.querySelector('.gl-msg');
+    var cs = getComputedStyle(document.documentElement);
+    function css(n, d) { var s = cs.getPropertyValue(n).trim(); return s || d; }
+    var col = { floor: '#' + new T.Color(css('--wood', '#B7691B')).lerp(new T.Color(css('--surface', '#FFFFFF')), 0.8).getHexString(), paint: css('--paint', '#1D4E9E'), line: css('--ink-2', '#4A5870'), bg: css('--surface', '#FFFFFF'), wood: css('--wood', '#B7691B'), ink: css('--ink', '#101B2E') };
+    var renderer;
+    try { renderer = new T.WebGLRenderer({ canvas: canvas, antialias: true }); }
+    catch (e) { msg.textContent = 'This device could not start the 3D view. The diagram still works.'; return null; }
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+    renderer.setClearColor(new T.Color(col.bg));
+    var scene = new T.Scene();
+    scene.add(new T.AmbientLight(0xffffff, 0.7));
+    var sun = new T.DirectionalLight(0xffffff, 0.7); sun.position.set(3, 6, 4); scene.add(sun);
+
+    var tex = courtTexture(T, col);
+    tex.anisotropy = renderer.capabilities.getMaxAnisotropy();
+    var floor = new T.Mesh(new T.PlaneGeometry(100 * S3, 70 * S3), new T.MeshLambertMaterial({ map: tex }));
+    floor.rotation.x = -Math.PI / 2; floor.position.set(0, 0, 35 * S3); scene.add(floor);
+    /* hoop */
+    var grey = new T.MeshLambertMaterial({ color: new T.Color(col.line) });
+    var board = new T.Mesh(new T.BoxGeometry(1.8, 1.05, 0.04), new T.MeshLambertMaterial({ color: 0xffffff, transparent: true, opacity: 0.6 }));
+    board.position.set(0, 3.425, 8 * S3); scene.add(board);
+    var rim = new T.Mesh(new T.TorusGeometry(0.225, 0.014, 8, 28), new T.MeshLambertMaterial({ color: new T.Color(col.wood) }));
+    rim.rotation.x = Math.PI / 2; rim.position.set(0, 3.05, 10.5 * S3); scene.add(rim);
+    var net = new T.Mesh(new T.CylinderGeometry(0.225, 0.14, 0.38, 16, 1, true), new T.MeshBasicMaterial({ color: 0xcccccc, wireframe: true }));
+    net.position.set(0, 2.86, 10.5 * S3); scene.add(net);
+    var pole = new T.Mesh(new T.CylinderGeometry(0.06, 0.06, 3.4, 10), grey); pole.position.set(0, 1.7, -0.5); scene.add(pole);
+    var arm = new T.Mesh(new T.BoxGeometry(0.1, 0.1, 1.75), grey); arm.position.set(0, 3.425, 0.36); scene.add(arm);
+
+    var fig = makeFigure(T, { shirt: new T.Color(col.paint), shorts: new T.Color(col.paint).multiplyScalar(0.6), skin: 0x93A4BE, mark: new T.Color(col.wood) });
+    scene.add(fig.g);
+    var ball = new T.Mesh(new T.SphereGeometry(0.12, 16, 12), new T.MeshLambertMaterial({ color: 0xE07A1F }));
+    scene.add(ball);
+
+    var steps = compile3(p.v3), cam = p.v3.cam || { az: 35, el: 12, dist: 5, c: [55, 25] };
+    var v = { panel: panel, steps: steps, renderer: renderer, scene: scene, canvas: canvas, camera: new T.PerspectiveCamera(40, 4 / 3, 0.1, 80),
+      fig: fig, ball: ball, az: cam.az * Math.PI / 180, el: cam.el * Math.PI / 180, dist: cam.dist, target: new T.Vector3((cam.c[0] - 50) * S3, cam.y || 1.0, cam.c[1] * S3),
+      i: 0, prev: 0, phase: 'hold', t0: 0, playing: false, raf: 0, dead: false, sol: null, tagFor: -1, tagEls: [],
+      tagBox: box.querySelector('.tags3'), cap: box.querySelector('.cap'), num: box.querySelector('.step-n'), playBtn: box.querySelector('[data-w="play"]'),
+      items: box.querySelectorAll('.steps li') };
+    panel._v3 = v;
+    v.onResize = function () { size3(v); };
+    if (window.ResizeObserver) { v.ro = new ResizeObserver(v.onResize); v.ro.observe(canvas); } else window.addEventListener('resize', v.onResize);
+
+    /* dragging turns the view, wheel and pinch zoom. On touch screens only sideways drags turn it, so the page can still scroll. */
+    var ptrs = {}, lastPinch = 0;
+    canvas.style.touchAction = 'pan-y';
+    canvas.addEventListener('pointerdown', function (e) { try { canvas.setPointerCapture(e.pointerId); } catch (x) {} ptrs[e.pointerId] = { x: e.clientX, y: e.clientY, touch: e.pointerType === 'touch' }; lastPinch = 0; });
+    canvas.addEventListener('pointermove', function (e) {
+      var q = ptrs[e.pointerId];
+      if (!q) return;
+      var dx = e.clientX - q.x, dy = e.clientY - q.y;
+      q.x = e.clientX; q.y = e.clientY;
+      var ids = Object.keys(ptrs);
+      if (ids.length === 2) {
+        var a = ptrs[ids[0]], b = ptrs[ids[1]], d = Math.hypot(a.x - b.x, a.y - b.y);
+        if (lastPinch) v.dist = Math.max(1.8, Math.min(12, v.dist * lastPinch / d));
+        lastPinch = d;
+      } else {
+        v.az -= dx * 0.008;
+        if (!q.touch) v.el = Math.max(0.02, Math.min(1.45, v.el + dy * 0.006));
+      }
+      render3(v);
+    });
+    function up(e) { delete ptrs[e.pointerId]; lastPinch = 0; }
+    canvas.addEventListener('pointerup', up); canvas.addEventListener('pointercancel', up);
+    canvas.addEventListener('wheel', function (e) { e.preventDefault(); v.dist = Math.max(1.8, Math.min(12, v.dist * Math.exp(e.deltaY * 0.0012))); render3(v); }, { passive: false });
+    canvas.addEventListener('keydown', function (e) {
+      var k = e.key;
+      if (k === 'ArrowLeft') v.az -= 0.15; else if (k === 'ArrowRight') v.az += 0.15;
+      else if (k === 'ArrowUp') v.el = Math.min(1.45, v.el + 0.1); else if (k === 'ArrowDown') v.el = Math.max(0.02, v.el - 0.1);
+      else if (k === '+' || k === '=') v.dist = Math.max(1.8, v.dist * 0.9); else if (k === '-') v.dist = Math.min(12, v.dist / 0.9);
+      else return;
+      e.preventDefault(); render3(v);
+    });
+    return v;
+  }
+
+  function start3(panel, p) {
+    var box = panel.querySelector('.demo3'), msg = box.querySelector('.gl-msg');
+    msg.textContent = 'Loading the 3D view.';
+    loadThree().then(function () {
+      if (panel.hidden || box.hidden || panel._v3) return;
+      if (active3) { var old = active3; dispose3(old); if (old.panel._v3 === old) old.panel._v3 = null; }
+      var v = mount3(panel, p);
+      if (!v) return;
+      active3 = v;
+      msg.textContent = '';
+      size3(v);
+      show3(v, 0);
+      var calm = false;
+      try { calm = !!(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches); } catch (e) {}
+      if (!calm) { v.playing = true; v.t0 = performance.now(); tick3(v); }
+      label3(v);
+    }).catch(function () { msg.textContent = 'The 3D view could not load. Check your connection. The diagram still works.'; });
+  }
+  function setTab(panel, which) {
+    var d2 = panel.querySelector('.demo-in:not(.demo3)'), d3 = panel.querySelector('.demo3');
+    if (!d2 || !d3) return;
+    var p = POOLBY[panel.dataset.pool];
+    Array.prototype.forEach.call(panel.querySelectorAll('[data-vt]'), function (b) { b.setAttribute('aria-pressed', String(b.dataset.vt === which)); });
+    if (which === '3d') {
+      if (panel._v) { panel._v.playing = false; playLabel(panel._v); }
+      d2.hidden = true; d3.hidden = false;
+      if (!panel._v3 && p) start3(panel, p);
+    } else {
+      if (panel._v3) { dispose3(panel._v3); panel._v3 = null; }
+      d3.hidden = true; d2.hidden = false;
+      if (panel._v) { var v = panel._v; v.playing = true; v.phase = 'hold'; v.t0 = performance.now(); tick(v); playLabel(v); }
+    }
+  }
+  function ctl3(b) {
+    var panel = b.closest('.demo'), v = panel && panel._v3;
+    if (!v || v.dead) return;
+    var n = v.steps.length;
+    if (b.dataset.w === 'play') {
+      if (v.playing) v.playing = false;
+      else { show3(v, v.i); v.playing = true; v.t0 = performance.now(); tick3(v); }
+    } else {
+      v.playing = false;
+      show3(v, (v.i + (b.dataset.w === 'next' ? 1 : n - 1)) % n);
+    }
+    label3(v);
+  }
+  function viewBtn(b) {
+    var panel = b.closest('.demo'), v = panel && panel._v3;
+    if (!v || v.dead) return;
+    var w = b.dataset.view;
+    if (w === 'behind') setView(v, 0, 0.22); else if (w === 'side') setView(v, Math.PI / 2, 0.12);
+    else if (w === 'front') setView(v, Math.PI, 0.2); else setView(v, 0, 1.35);
+  }
+
+  /* ---------- programme builder ---------- */
+  var edit = null; /* {id, created, name, cue, drills} while the builder is open */
+  var builderSaving = false, delProgArm = false, delProgTimer = 0;
+
+  function blankDrill() { return { id: uid('d'), name: '', min: 2, how: '', counters: [{ id: uid('c'), label: 'Makes', max: 10 }] }; }
+  function cloneDrills(drills, fresh) {
+    return drills.map(function (d) {
+      var out = { id: fresh ? uid('d') : d.id, name: d.name, min: d.min, how: d.how,
+        counters: d.counters.map(function (c) { return { id: fresh ? uid('c') : c.id, label: c.label, max: c.max }; }) };
+      if (d.ref) out.ref = d.ref;
+      return out;
+    });
+  }
+  function showBuilder(on) {
+    $('#builder').hidden = !on;
+    ['#players', '#picker', '#proghead', '#main', '#hist'].forEach(function (s) { $(s).hidden = on; });
+  }
+
+  function openBuilder(mode, src) {
+    if (mode === 'edit') {
+      edit = { id: src.id, created: src.created, name: src.name, cue: src.cue.join(', '), drills: cloneDrills(src.drills, false) };
+    } else if (src) {
+      edit = { id: null, created: 0, name: 'My ' + src.name.toLowerCase(), cue: src.cue.join(', '), drills: cloneDrills(src.drills, true) };
+    } else {
+      edit = { id: null, created: 0, name: '', cue: '', drills: [] };
+    }
+    delProgArm = false;
+    renderBuilder();
+    showBuilder(true);
+    $('#b-name').focus();
+  }
+  function closeBuilder() { edit = null; showBuilder(false); }
+
+  function renderBuilder() {
+    $('#b-title').textContent = edit.id ? 'Edit programme' : 'New programme';
+    $('#b-name').value = edit.name;
+    $('#b-cue').value = edit.cue;
+    $('#b-err').textContent = '';
+    $('#b-del').hidden = !edit.id;
+    $('#b-del').textContent = 'Delete programme';
+    $('#b-delnote').hidden = !edit.id;
+    $('#lib-msg').textContent = '';
+    renderLibrary();
+    renderBDrills();
+    renderPool();
+  }
+
+  function renderBDrills() {
+    var last = edit.drills.length - 1;
+    $('#b-drills').innerHTML = edit.drills.map(function (d, i) {
+      var cs = d.counters.map(function (c, j) {
+        return '<div class="b-score">' +
+          '<div class="field grow"><label for="b' + i + '-c' + j + '-l">Score ' + (j + 1) + ' label</label>' +
+          '<input id="b' + i + '-c' + j + '-l" data-f="clabel" data-d="' + i + '" data-c="' + j + '" maxlength="30" value="' + esc(c.label) + '" autocomplete="off"></div>' +
+          '<div class="field narrow"><label for="b' + i + '-c' + j + '-m">Reps</label>' +
+          '<input id="b' + i + '-c' + j + '-m" type="number" min="1" max="20" inputmode="numeric" data-f="cmax" data-d="' + i + '" data-c="' + j + '" value="' + esc(c.max) + '"></div>' +
+          '<button class="btn small" type="button" data-act="rmc" data-d="' + i + '" data-c="' + j + '"' + (d.counters.length < 2 ? ' disabled' : '') + '>Remove score</button></div>';
+      }).join('');
+      return '<div class="bd"><div class="bd-head"><h3 class="bd-title">Drill ' + (i + 1) + '</h3><div class="bd-tools">' +
+        '<button class="btn small" type="button" data-act="up" data-d="' + i + '"' + (i === 0 ? ' disabled' : '') + '>Move up</button>' +
+        '<button class="btn small" type="button" data-act="down" data-d="' + i + '"' + (i === last ? ' disabled' : '') + '>Move down</button>' +
+        '<button class="btn small" type="button" data-act="rmd" data-d="' + i + '">Remove drill</button></div></div>' +
+        '<div class="b-row"><div class="field grow"><label for="b' + i + '-n">Drill name</label>' +
+        '<input id="b' + i + '-n" data-f="name" data-d="' + i + '" maxlength="40" value="' + esc(d.name) + '" autocomplete="off"></div>' +
+        '<div class="field narrow"><label for="b' + i + '-t">Minutes</label>' +
+        '<input id="b' + i + '-t" type="number" min="1" max="30" inputmode="numeric" data-f="min" data-d="' + i + '" value="' + esc(d.min) + '"></div></div>' +
+        '<div class="field"><label for="b' + i + '-h">How it works</label>' +
+        '<textarea id="b' + i + '-h" rows="3" maxlength="400" data-f="how" data-d="' + i + '">' + esc(d.how) + '</textarea></div>' +
+        cs +
+        '<div><button class="btn small" type="button" data-act="addc" data-d="' + i + '"' + (d.counters.length >= 3 ? ' disabled' : '') + '>Add a score</button></div></div>';
+    }).join('');
+    if (!edit.drills.length) $('#b-drills').innerHTML = '<p class="empty">No drills yet. Add some from the library, or write your own.</p>';
+    $('#b-add').disabled = edit.drills.length >= MAX_DRILLS;
+    updateLibButtons();
+  }
+
+  function builderAct(b) {
+    var i = Number(b.dataset.d), j = Number(b.dataset.c), a = b.dataset.act, ds = edit.drills, t;
+    if (a === 'up' && i > 0) { t = ds[i]; ds[i] = ds[i - 1]; ds[i - 1] = t; }
+    else if (a === 'down' && i < ds.length - 1) { t = ds[i]; ds[i] = ds[i + 1]; ds[i + 1] = t; }
+    else if (a === 'rmd' && ds.length > 0) { ds.splice(i, 1); }
+    else if (a === 'addc' && ds[i].counters.length < 3) { ds[i].counters.push({ id: uid('c'), label: '', max: 10 }); }
+    else if (a === 'rmc' && ds[i].counters.length > 1) { ds[i].counters.splice(j, 1); }
+    renderBDrills();
+  }
+
+  function renderLibrary() {
+    $('#lib').innerHTML = POSITIONS.concat(customs).filter(function (p) { return !edit || p.id !== edit.id; }).map(function (p) {
+      var rows = p.drills.map(function (d) {
+        var scores = d.counters.map(function (c) { return esc(c.label) + ' ' + c.max; }).join(', ');
+        return '<li class="lib-row"><div class="lib-info"><div class="lib-name">' + esc(d.name) + '</div><div class="note">' + d.min + ' min · ' + scores + '</div></div>' +
+          '<button class="btn small" type="button" data-lib="' + esc(p.id) + '" data-ld="' + esc(d.id) + '" aria-label="Add ' + esc(d.name) + ' to the programme">Add</button></li>';
+      }).join('');
+      var title = p.custom ? esc(p.name) : p.num + ' · ' + esc(p.name);
+      return '<details class="lib-group"' + (prog && p.id === prog.id ? ' open' : '') + '><summary><span>' + title + '</span><span class="note">' + p.drills.length + (p.drills.length === 1 ? ' drill' : ' drills') + '</span></summary>' +
+        '<ul class="lib-list">' + rows + '</ul>' +
+        '<div class="lib-all"><button class="btn small" type="button" data-libgroup="' + esc(p.id) + '">Add all ' + p.drills.length + '</button></div></details>';
+    }).join('');
+  }
+  function updateLibButtons() {
+    if (!edit) return;
+    var left = MAX_DRILLS - edit.drills.length;
+    Array.prototype.forEach.call(document.querySelectorAll('#lib [data-lib], #pool [data-pool]'), function (b) { b.disabled = left < 1; });
+    Array.prototype.forEach.call(document.querySelectorAll('#lib [data-libgroup]'), function (b) {
+      var p = findProg(b.dataset.libgroup);
+      b.disabled = !p || left < p.drills.length;
+    });
+  }
+  function addFromLibrary(pid, did) {
+    var p = findProg(pid);
+    if (!p || !edit) return;
+    var src = did ? p.drills.filter(function (d) { return d.id === did; }) : p.drills;
+    if (!src.length || edit.drills.length + src.length > MAX_DRILLS) return;
+    cloneDrills(src, true).forEach(function (d) { edit.drills.push(d); });
+    renderBDrills();
+    $('#lib-msg').textContent = (did ? 'Added ' + src[0].name : 'Added ' + src.length + ' drills from ' + p.name) + '. ' + edit.drills.length + ' of ' + MAX_DRILLS + ' drills.';
+  }
+
+  function addFromPool(id) {
+    var p = POOLBY[id];
+    if (!p || !edit || edit.drills.length >= MAX_DRILLS) return;
+    edit.drills.push({ id: uid('d'), name: p.name, min: p.min, how: p.how, ref: p.id,
+      counters: p.counters.map(function (c) { return { id: uid('c'), label: c.label, max: c.max }; }) });
+    renderBDrills();
+    $('#lib-msg').textContent = 'Added ' + p.name + '. ' + edit.drills.length + ' of ' + MAX_DRILLS + ' drills.';
+  }
+
+  function validateBuilder() {
+    if (!edit.name.trim()) return 'Give the programme a name.';
+    if (!edit.drills.length) return 'Add at least one drill from the library, or write your own.';
+    for (var i = 0; i < edit.drills.length; i++) {
+      var d = edit.drills[i], t = 'Drill ' + (i + 1);
+      if (!d.name.trim()) return t + ' needs a name.';
+      var m = Number(d.min);
+      if (!(m >= 1 && m <= 30)) return t + ' needs a time between 1 and 30 minutes.';
+      if (!d.counters.length) return t + ' needs at least one score.';
+      for (var j = 0; j < d.counters.length; j++) {
+        var c = d.counters[j];
+        if (!c.label.trim()) return t + ', score ' + (j + 1) + ' needs a label.';
+        var r = Number(c.max);
+        if (!(r >= 1 && r <= 20)) return t + ', score ' + (j + 1) + ' needs between 1 and 20 reps.';
+      }
+    }
+    return '';
+  }
+
+  function upsertCustom(p) {
+    var found = false;
+    customs = customs.map(function (x) { if (x.id === p.id) { found = true; return p; } return x; });
+    if (!found) customs.push(p);
+    customs.sort(function (a, b) { return (a.created || 0) - (b.created || 0); });
+  }
+
+  async function saveBuilder() {
+    if (builderSaving) return;
+    var err = validateBuilder();
+    $('#b-err').textContent = err;
+    if (err) return;
+    if (kind === 'pending') { $('#b-err').textContent = 'Still loading. Try again in a moment.'; return; }
+    var p = normaliseProg({
+      id: edit.id || 'p' + Date.now(), created: edit.created || Date.now(), name: edit.name.trim(),
+      cue: edit.cue.split(',').map(function (w) { return w.trim(); }).filter(Boolean),
+      drills: edit.drills.map(function (d) {
+        return { id: d.id, name: d.name.trim(), min: Number(d.min), how: d.how.trim(), ref: d.ref,
+          counters: d.counters.map(function (c) { return { id: c.id, label: c.label.trim(), max: Number(c.max) }; }) };
+      })
+    });
+    if (!p) { $('#b-err').textContent = 'Something in the programme is not valid. Check each drill.'; return; }
+    builderSaving = true; $('#b-save').disabled = true;
+    try {
+      if (kind === 'db') { await dbProgCol.doc(p.id).set({ name: p.name, cue: p.cue, drills: p.drills, created: p.created }); }
+      upsertCustom(p);
+      if (kind !== 'db') persistLocalProgs();
+      closeBuilder();
+      setProgramme(p.id, true);
+      setMsg('Programme saved.');
+    } catch (e) {
+      $('#b-err').textContent = 'Could not save the programme. Try again in a moment.';
+    }
+    builderSaving = false; $('#b-save').disabled = false;
+  }
+
+  async function deleteProgramme() {
+    var btn = $('#b-del');
+    if (!delProgArm) {
+      delProgArm = true; btn.textContent = 'Sure?';
+      clearTimeout(delProgTimer);
+      delProgTimer = setTimeout(function () { delProgArm = false; btn.textContent = 'Delete programme'; }, 3000);
+      return;
+    }
+    clearTimeout(delProgTimer); delProgArm = false;
+    var id = edit.id;
+    try {
+      if (kind === 'db') { await dbProgCol.doc(id).delete(); }
+      customs = customs.filter(function (x) { return x.id !== id; });
+      if (kind !== 'db') persistLocalProgs();
+      closeBuilder();
+      setProgramme('center', true);
+      setMsg('Programme deleted.');
+    } catch (e) {
+      $('#b-err').textContent = 'Could not delete the programme. Try again in a moment.';
+      btn.textContent = 'Delete programme';
+    }
+  }
+
+  /* ---------- players ---------- */
+  function normalisePlayer(o) {
+    if (!o || typeof o !== 'object') return null;
+    var id = cleanId(o.id), name = String(o.name || '').trim().slice(0, 20);
+    if (!id || !name) return null;
+    return { id: id, name: name, created: Number(o.created) || 0 };
+  }
+  function persistLocalPlayers() { lsSet('utb-players', JSON.stringify(players)); }
+  function pmsg(t) {
+    var m = $('#p-msg'); m.textContent = t;
+    clearTimeout(pmsg.t);
+    if (t) pmsg.t = setTimeout(function () { m.textContent = ''; }, 4500);
+  }
+  function nameError(name, ownId) {
+    if (!name) return 'Type a name first.';
+    var dupe = players.some(function (p) { return p.id !== ownId && p.name.toLowerCase() === name.toLowerCase(); });
+    return dupe ? 'That name is already on the list.' : '';
+  }
+  function renderPlayers() {
+    $('#plist').innerHTML = players.map(function (p) {
+      return '<button class="chip" type="button" data-player="' + esc(p.id) + '" aria-pressed="' + !!(player && player.id === p.id) + '">' + esc(p.name) + '</button>';
+    }).join('');
+    $('#manage').hidden = !player;
+    $('#pform').hidden = !pOpen;
+    $('#p-save').textContent = pMode === 'rename' ? 'Save name' : 'Add player';
+    $('#add-player').disabled = !loadedPlayers;
+    if (!rmArm) $('#rm-player').textContent = 'Remove player';
+  }
+  function showPForm(mode) {
+    pOpen = true; pMode = mode;
+    $('#p-name').value = mode === 'rename' && player ? player.name : '';
+    $('#p-err').textContent = '';
+    renderPlayers();
+    $('#p-name').focus();
+  }
+  function resolvePlayer() {
+    var want = player ? player.id : (lsGet('utb-player') || '');
+    var p = players.filter(function (x) { return x.id === want; })[0] || (players.length === 1 ? players[0] : null);
+    var changed = (p ? p.id : null) !== (player ? player.id : null);
+    player = p;
+    lsSet('utb-player', p ? p.id : '');
+    if (changed) loadDraft();
+    renderPlayers(); recompute();
+  }
+  function setPlayers(list) {
+    players = list.sort(function (a, b) { return (a.created || 0) - (b.created || 0); });
+    loadedPlayers = true;
+    if (!pAutoShown) { pAutoShown = true; if (!players.length) { pOpen = true; pMode = 'add'; } }
+    resolvePlayer();
+  }
+  function selectPlayer(id, keepDraft) {
+    player = players.filter(function (x) { return x.id === id; })[0] || null;
+    lsSet('utb-player', player ? player.id : '');
+    pOpen = false; $('#p-err').textContent = '';
+    if (keepDraft) saveDraft(); else loadDraft();
+    renderPlayers(); recompute();
+  }
+  async function claimLegacy(id) {
+    var legacy = sessions.filter(function (s) { return !s.player; }), n = 0;
+    for (var i = 0; i < legacy.length; i++) {
+      if (kind === 'db') await dbCol.doc(legacy[i].id).update({ player: id });
+      else legacy[i].player = id;
+      n++;
+    }
+    if (kind !== 'db' && n) persistLocal();
+    return n;
+  }
+  async function addPlayer(name) {
+    name = name.trim();
+    var err = nameError(name, null);
+    if (err) return err;
+    if (kind === 'pending' || !loaded || !loadedPlayers) return 'Still loading. Try again in a moment.';
+    var p = { id: uid('u'), name: name, created: Date.now() }, first = players.length === 0, had = !!player, claimed = 0;
+    try {
+      if (kind === 'db') await dbPlayersCol.doc(p.id).set({ name: p.name, created: p.created });
+      if (!players.some(function (x) { return x.id === p.id; })) players.push(p);
+      if (kind !== 'db') persistLocalPlayers();
+      if (first) claimed = await claimLegacy(p.id);
+      selectPlayer(p.id, !had);
+      pmsg('Added ' + p.name + '.' + (claimed ? ' Earlier saved sessions now belong to this player.' : ''));
+      return '';
+    } catch (e) { return 'Could not add the player. Try again in a moment.'; }
+  }
+  async function renamePlayer(name) {
+    name = name.trim();
+    var err = nameError(name, player.id);
+    if (err) return err;
+    var id = player.id;
+    try {
+      if (kind === 'db') await dbPlayersCol.doc(id).update({ name: name });
+      players = players.map(function (x) { return x.id === id ? { id: id, name: name, created: x.created } : x; });
+      if (kind !== 'db') persistLocalPlayers();
+      player = players.filter(function (x) { return x.id === id; })[0];
+      pOpen = false; renderPlayers(); recompute();
+      pmsg('Renamed to ' + name + '.');
+      return '';
+    } catch (e) { return 'Could not save the new name. Try again in a moment.'; }
+  }
+  function removePlayerClick() {
+    var btn = $('#rm-player');
+    if (!rmArm) {
+      rmArm = true; btn.textContent = 'Sure?';
+      clearTimeout(rmTimer);
+      rmTimer = setTimeout(function () { rmArm = false; btn.textContent = 'Remove player'; }, 3000);
+      return;
+    }
+    clearTimeout(rmTimer); rmArm = false; btn.textContent = 'Remove player';
+    removePlayer();
+  }
+  async function removePlayer() {
+    var pl = player;
+    if (!pl) return;
+    var mine = sessions.filter(function (s) { return s.player === pl.id; });
+    try {
+      if (kind === 'db') {
+        for (var i = 0; i < mine.length; i++) await dbCol.doc(mine[i].id).delete();
+        await dbPlayersCol.doc(pl.id).delete();
+      } else {
+        sessions = sessions.filter(function (s) { return s.player !== pl.id; });
+        persistLocal();
+      }
+      players = players.filter(function (x) { return x.id !== pl.id; });
+      if (kind !== 'db') persistLocalPlayers();
+      POSITIONS.concat(customs).forEach(function (p) { try { localStorage.removeItem('utb-draft-' + pl.id + '-' + p.id); } catch (e) {} });
+      player = null; lsSet('utb-player', '');
+      loadDraft();
+      if (!players.length) { pOpen = true; pMode = 'add'; }
+      resolvePlayer();
+      if (kind !== 'db') setSessions(sessions);
+      pmsg('Removed ' + pl.name + ' and their saved sessions.');
+    } catch (e) { pmsg('Could not remove that player. Try again in a moment.'); }
+  }
+
+  document.addEventListener('submit', async function (e) {
+    if (e.target.id !== 'pform') return;
+    e.preventDefault();
+    var name = $('#p-name').value;
+    var err = pMode === 'rename' && player ? await renamePlayer(name) : await addPlayer(name);
+    $('#p-err').textContent = err;
+  });
+
+  /* ---------- events ---------- */
+  document.addEventListener('click', function (e) {
+    var b = e.target.closest('button');
+    if (!b) return;
+    if (b.dataset.prog) { setProgramme(b.dataset.prog); }
+    else if (b.dataset.player) { if (!player || player.id !== b.dataset.player) selectPlayer(b.dataset.player, false); }
+    else if (b.id === 'add-player') { showPForm('add'); }
+    else if (b.id === 'ren-player' && player) { showPForm('rename'); }
+    else if (b.id === 'p-cancel') { pOpen = false; $('#p-err').textContent = ''; renderPlayers(); }
+    else if (b.id === 'rm-player' && player) { removePlayerClick(); }
+    else if (b.id === 'new-prog') { openBuilder('new', null); }
+    else if (b.id === 'ph-act') { openBuilder(prog.custom ? 'edit' : 'new', prog); }
+    else if (b.dataset.rep !== undefined) {
+      var c = COUNTERS.filter(function (x) { return x.key === b.dataset.key; })[0];
+      if (c && cur[c.key].length < c.max) { cur[c.key].push(Number(b.dataset.rep)); saveDraft(); refresh(); }
+    } else if (b.dataset.undo) {
+      cur[b.dataset.undo].pop(); saveDraft(); refresh();
+    } else if (b.dataset.timer === 'toggle') { toggleTimer(b.dataset.drill); }
+    else if (b.dataset.timer === 'reset') { resetTimer(b.dataset.drill); syncWake(); }
+    else if (b.dataset.del) {
+      var id = b.dataset.del;
+      if (delId === id) { clearTimeout(delTimer); delId = null; removeSession(id); }
+      else {
+        delId = id; clearTimeout(delTimer);
+        delTimer = setTimeout(function () { delId = null; renderHistory(); }, 3000);
+        renderHistory();
+      }
+    } else if (b.dataset.act && edit) { builderAct(b); }
+    else if (b.id === 'b-add' && edit) {
+      if (edit.drills.length < MAX_DRILLS) {
+        edit.drills.push(blankDrill()); renderBDrills();
+        var nd = $('#b' + (edit.drills.length - 1) + '-n');
+        if (nd) nd.focus();
+      }
+    }
+    else if (b.dataset.show) { toggleDemo(b); }
+    else if (b.dataset.v) { demoCtl(b); }
+    else if (b.dataset.w) { ctl3(b); }
+    else if (b.dataset.vt) { setTab(b.closest('.demo'), b.dataset.vt); }
+    else if (b.dataset.view) { viewBtn(b); }
+    else if (b.dataset.pool && edit) { addFromPool(b.dataset.pool); }
+    else if (b.dataset.lib && edit) { addFromLibrary(b.dataset.lib, b.dataset.ld); }
+    else if (b.dataset.libgroup && edit) { addFromLibrary(b.dataset.libgroup, null); }
+    else if (b.id === 'b-save' && edit) { saveBuilder(); }
+    else if (b.id === 'b-cancel') { closeBuilder(); }
+    else if (b.id === 'b-del' && edit) { deleteProgramme(); }
+    else if (b.id === 'save') { save(); }
+  });
+
+  document.addEventListener('change', function (e) {
+    var m = /^f-(skill|pos|who|level)$/.exec(e.target.id || '');
+    if (m) { pf[m[1]] = e.target.value; renderPool(); }
+  });
+
+  document.addEventListener('input', function (e) {
+    var t = e.target;
+    if (!edit) return;
+    if (t.id === 'b-name') { edit.name = t.value; return; }
+    if (t.id === 'b-cue') { edit.cue = t.value; return; }
+    var f = t.dataset && t.dataset.f;
+    if (!f) return;
+    var d = edit.drills[Number(t.dataset.d)];
+    if (!d) return;
+    if (f === 'name') d.name = t.value;
+    else if (f === 'min') d.min = t.value;
+    else if (f === 'how') d.how = t.value;
+    else if (f === 'clabel' && d.counters[Number(t.dataset.c)]) d.counters[Number(t.dataset.c)].label = t.value;
+    else if (f === 'cmax' && d.counters[Number(t.dataset.c)]) d.counters[Number(t.dataset.c)].max = t.value;
+  });
+
+  /* ---------- start ---------- */
+  setProgramme(POSITIONS.some(function (p) { return p.id === wanted; }) ? wanted : 'center', true);
+  if (POSITIONS.some(function (p) { return p.id === wanted; })) wanted = null;
+  fillFilters();
+  renderPlayers();
+  init();
+})();
+</script>
+
+</body></html>
